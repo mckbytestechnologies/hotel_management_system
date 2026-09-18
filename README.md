@@ -80,4 +80,4 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 ---
-*Last updated: September 18, 2026*
+*Last updated: September 18, 2026*"# hotel_management_system" 
