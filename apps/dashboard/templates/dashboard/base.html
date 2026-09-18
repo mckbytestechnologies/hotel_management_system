@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} | Hotel PMS</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50:  '#eef4ff',
+                            100: '#dbe7ff',
+                            200: '#bcd2ff',
+                            300: '#8eb4ff',
+                            400: '#598cff',
+                            500: '#3b6ef5',
+                            600: '#2a56db',
+                            700: '#2344b0',
+                            800: '#223d8c',
+                            900: '#21376f',
+                        },
+                        /* New Dark Sidebar Colors matching the image */
+                        sidebar: {
+                            bg: '#0d0f17',
+                            hover: '#1a1d2b',
+                            active: '#1e2233',
+                            text: '#8b92a5',
+                            textActive: '#ffffff',
+                        },
+                        ink: {
+                            50:  '#f8f9fb',
+                            100: '#f1f3f6',
+                            200: '#e2e5ec',
+                            400: '#9aa2b1',
+                            500: '#6b7280',
+                            700: '#3f4653',
+                            900: '#1e2330',
+                        }
+                    },
+                    boxShadow: {
+                        card: '0 1px 3px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04)',
+                        cardHover: '0 8px 24px -6px rgba(16,24,40,0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { -webkit-font-smoothing: antialiased; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f6f7f9;
+            color: #1e2330;
+        }
+
+        /* Dark Sidebar Links - Matched exactly to image */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            margin: 2px 10px;
+            border-radius: 8px;
+            color: #8b92a5;
+            font-size: 13.5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.18s ease;
+            position: relative;
+        }
+        .nav-link i {
+            width: 18px;
+            font-size: 14px;
+            text-align: center;
+            color: #6b7280;
+            transition: color 0.18s ease;
+        }
+        .nav-link:hover {
+            background: #1a1d2b;
+            color: #ffffff;
+        }
+        .nav-link:hover i { color: #ffffff; }
+        .nav-link.active {
+            background: #1e2233;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .nav-link.active i { color: #ffffff; }
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 18px;
+            background: #3b6ef5;
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #3b6ef5;
+            color: #fff;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 9px 16px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+            transition: all 0.18s ease;
+            box-shadow: 0 2px 6px rgba(59,110,245,0.25);
+        }
+        .btn-primary:hover {
+            background: #2a56db;
+            box-shadow: 0 4px 12px rgba(59,110,245,0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Card */
+        .card {
+            background: #fff;
+            border: 1px solid #eef0f4;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd0da; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9aa2b1; }
+    </style>
+</head>
+<body class="min-h-screen flex">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <!-- Only visual classes changed, logic remains identical -->
+    <aside class="w-[248px] bg-sidebar-bg min-h-screen flex flex-col shrink-0 fixed lg:sticky top-0 z-40">
+        <!-- Brand -->
+        <div class="flex items-center gap-3 px-6 h-20 border-b border-white/5">
+            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                <i class="fa-solid fa-hotel text-sidebar-bg text-[14px]"></i>
+            </div>
+            <div class="leading-tight">
+                <p class="text-[14px] font-bold text-white tracking-tight">Simplifier</p>
+                <p class="text-[10px] font-medium text-sidebar-text">Hotel PMS</p>
+            </div>
+        </div>
+
+        <!-- Nav -->
+        <nav class="flex-1 py-6 overflow-y-auto">
+            <p class="px-6 text-[10px] font-bold text-sidebar-text/70 uppercase tracking-wider mb-2">Main</p>
+            
+            <!-- All links kept exactly as they were, only styled -->
+            <a href="{% url 'dashboard:home' %}" class="nav-link {% block nav_dashboard %}{% endblock %}">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'dashboard:property_list' %}" class="nav-link {% block nav_properties %}{% endblock %}">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Property</span>
+            </a>
+            <a href="{% url 'dashboard:roomtype_list' %}" class="nav-link">
+                <i class="fa-solid fa-bed"></i>
+                <span>Room Types</span>
+            </a>
+            <a href="{% url 'dashboard:room_list' %}" class="nav-link">
+                <i class="fa-solid fa-door-open"></i>
+                <span>Rooms</span>
+            </a>
+            <a href="{% url 'dashboard:rateplan_list' %}" class="nav-link">
+                <i class="fa-solid fa-tag"></i>
+                <span>Rate Plans</span>
+            </a>
+
+            <p class="px-6 text-[10px] font-bold text-sidebar-text/70 uppercase tracking-wider mt-8 mb-2">Management</p>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Activities</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Accounts</span>
+            </a>
+        </nav>
+
+        <!-- Sidebar Footer - Changed to match image exactly (Avatar + Name) -->
+        <div class="px-6 py-4 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white text-[11px] font-bold shadow-sm">
+                    {{ request.user.username|slice:":2"|upper }}
+                </div>
+                <div class="leading-tight flex-1 min-w-0">
+                    <p class="text-[12px] font-bold text-white truncate">{{ request.user.get_full_name|default:request.user.username }}</p>
+                    <p class="text-[10px] font-medium text-sidebar-text">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <div class="flex-1 flex flex-col min-w-0 bg-[#f8f9fb]">
+
+        <!-- TOPBAR -->
+        <header class="bg-white border-b border-ink-200 h-20 px-8 flex items-center justify-between sticky top-0 z-30">
+            <!-- Left: Page title -->
+            <div>
+                <h1 class="text-[18px] font-bold text-ink-900 tracking-tight leading-tight">
+                    {% block page_title %}Dashboard{% endblock %}
+                </h1>
+                <p class="text-[12px] font-medium text-ink-400 mt-0.5">
+                    {% block page_subtitle %}Welcome back to your workspace{% endblock %}
+                </p>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-2">
+                <button class="w-9 h-9 rounded-full hover:bg-ink-50 flex items-center justify-center text-ink-500 hover:text-brand-500 transition">
+                    <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
+                </button>
+                <button class="w-9 h-9 rounded-full hover:bg-ink-50 flex items-center justify-center text-ink-500 hover:text-brand-500 transition relative">
+                    <i class="fa-regular fa-bell text-[13px]"></i>
+                    <span class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                </button>
+                <button class="w-9 h-9 rounded-full hover:bg-ink-50 flex items-center justify-center text-ink-500 hover:text-brand-500 transition">
+                    <i class="fa-regular fa-envelope text-[13px]"></i>
+                </button>
+
+                <div class="w-px h-6 bg-ink-200 mx-2"></div>
+
+                <!-- Logout -->
+                <a href="{% url 'dashboard:logout' %}"
+                   class="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-ink-200 hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 transition text-[12px] font-semibold text-ink-700">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-[11px]"></i>
+                    <span class="hidden sm:inline">Logout</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="flex-1 p-8">
+
+            <!-- Messages (Logic untouched, styling aligned) -->
+            {% if messages %}
+            <div class="space-y-2.5 mb-6">
+                {% for message in messages %}
+                <div class="flex items-center gap-3 px-4 py-3 rounded-xl text-[12.5px] font-semibold border
+                    {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border-emerald-200
+                    {% elif message.tags == 'error' %}bg-rose-50 text-rose-700 border-rose-200
+                    {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border-amber-200
+                    {% else %}bg-brand-50 text-brand-700 border-brand-200{% endif %}">
+                    {% if message.tags == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                    {% elif message.tags == 'error' %}<i class="fa-solid fa-circle-exclamation"></i>
+                    {% elif message.tags == 'warning' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                    {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+</body>
+</html>

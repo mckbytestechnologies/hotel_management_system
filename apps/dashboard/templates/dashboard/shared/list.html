@@ -1,0 +1,74 @@
+{% extends "dashboard/base.html" %}
+{% load core_extras %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{{ page_subtitle|default:"" }}{% endblock %}
+
+{% block content %}
+<div class="card overflow-hidden">
+    <div class="px-6 py-5 border-b border-ink-200 flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h2 class="text-[15px] font-bold text-ink-900 tracking-tight">{{ page_title }}</h2>
+            <p class="text-[11.5px] font-medium text-ink-400 mt-0.5">
+                Showing <span class="font-bold text-ink-700">{{ object_list|length }}</span> total entries
+            </p>
+        </div>
+        {% if can_add and add_url_name %}
+        <a href="{% url add_url_name %}" class="btn-primary">
+            <i class="fa-solid fa-plus text-[10px]"></i>
+            <span>Add {{ singular_name }}</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="bg-ink-50 border-b border-ink-200">
+                    {% for col in columns %}
+                    <th class="px-6 py-3 text-left text-[10.5px] font-bold text-ink-400 uppercase tracking-wider">{{ col.label }}</th>
+                    {% endfor %}
+                    <th class="px-6 py-3 text-right text-[10.5px] font-bold text-ink-400 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-ink-100">
+                {% for obj in object_list %}
+                <tr class="hover:bg-ink-50/60 transition-colors">
+                    {% for col in columns %}
+                    <td class="px-6 py-4 text-[13px] font-medium text-ink-700">
+                        {% if col.badge %}
+                            {% with value=obj|get_attr:col.field %}
+                            {% if value %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-[10.5px] font-bold text-emerald-600">{{ col.true_label|default:"Active" }}</span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-50 text-[10.5px] font-bold text-rose-600">{{ col.false_label|default:"Inactive" }}</span>
+                            {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            {{ obj|get_attr:col.field }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            {% if can_edit and edit_url_name %}
+                            <a href="{% url edit_url_name obj.pk %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 transition text-[11px] font-bold text-ink-500">
+                                <i class="fa-solid fa-pen text-[9px]"></i> Edit
+                            </a>
+                            {% endif %}
+                            {% if can_delete and delete_url_name %}
+                            <a href="{% url delete_url_name obj.pk %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 hover:border-rose-500 hover:text-rose-600 hover:bg-rose-50 transition text-[11px] font-bold text-ink-500">
+                                <i class="fa-solid fa-trash text-[9px]"></i> Delete
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="{{ columns|length|add:1 }}" class="px-6 py-16 text-center text-ink-400 font-medium">No records yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

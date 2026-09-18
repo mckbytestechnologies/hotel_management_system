@@ -1,0 +1,140 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Overview of your properties and operations{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+
+<!-- ===== STAT CARDS ===== -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-7">
+    <div class="card p-5">
+        <div class="flex items-start justify-between mb-3">
+            <div>
+                <p class="text-[11px] font-semibold text-ink-400 uppercase tracking-wider">Properties</p>
+                <p class="text-[26px] font-extrabold text-ink-900 tracking-tight mt-1.5">{{ total_properties }}</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center">
+                <i class="fa-solid fa-building text-brand-500 text-[15px]"></i>
+            </div>
+        </div>
+        <a href="{% url 'dashboard:property_list' %}" class="text-[11px] font-semibold text-brand-500 hover:underline">View all →</a>
+    </div>
+
+    <div class="card p-5">
+        <div class="flex items-start justify-between mb-3">
+            <div>
+                <p class="text-[11px] font-semibold text-ink-400 uppercase tracking-wider">Total Rooms</p>
+                <p class="text-[26px] font-extrabold text-ink-900 tracking-tight mt-1.5">{{ total_rooms }}</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <i class="fa-solid fa-door-open text-emerald-500 text-[15px]"></i>
+            </div>
+        </div>
+        <a href="{% url 'dashboard:room_list' %}" class="text-[11px] font-semibold text-brand-500 hover:underline">View all →</a>
+    </div>
+
+    <div class="card p-5">
+        <div class="flex items-start justify-between mb-3">
+            <div>
+                <p class="text-[11px] font-semibold text-ink-400 uppercase tracking-wider">Room Types</p>
+                <p class="text-[26px] font-extrabold text-ink-900 tracking-tight mt-1.5">{{ total_room_types }}</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                <i class="fa-solid fa-bed text-amber-500 text-[15px]"></i>
+            </div>
+        </div>
+        <a href="{% url 'dashboard:roomtype_list' %}" class="text-[11px] font-semibold text-brand-500 hover:underline">View all →</a>
+    </div>
+
+    <div class="card p-5">
+        <div class="flex items-start justify-between mb-3">
+            <div>
+                <p class="text-[11px] font-semibold text-ink-400 uppercase tracking-wider">Rate Plans</p>
+                <p class="text-[26px] font-extrabold text-ink-900 tracking-tight mt-1.5">{{ total_rate_plans }}</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
+                <i class="fa-solid fa-tag text-violet-500 text-[15px]"></i>
+            </div>
+        </div>
+        <a href="{% url 'dashboard:rateplan_list' %}" class="text-[11px] font-semibold text-brand-500 hover:underline">View all →</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- ===== ROOM STATUS BREAKDOWN ===== -->
+    <div class="card p-6 lg:col-span-1">
+        <h2 class="text-[14px] font-bold text-ink-900 mb-4">Room Status</h2>
+        <div class="space-y-4">
+            {% for row in room_status_breakdown %}
+            <div>
+                <div class="flex justify-between text-[12px] font-semibold text-ink-700 mb-1">
+                    <span>{{ row.label }}</span>
+                    <span>{{ row.count }}</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-ink-100 overflow-hidden">
+                    <div class="h-2 rounded-full bg-brand-500" style="width: {{ row.percent }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== TODAY'S OPERATIONS (placeholder until bookings app) ===== -->
+    <div class="card p-6 lg:col-span-1">
+        <h2 class="text-[14px] font-bold text-ink-900 mb-4">Today's Operations</h2>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-ink-50">
+                <span class="text-[12.5px] font-semibold text-ink-700">Check-ins</span>
+                <span class="text-[16px] font-extrabold text-ink-900">{{ todays_checkins }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-ink-50">
+                <span class="text-[12.5px] font-semibold text-ink-700">Check-outs</span>
+                <span class="text-[16px] font-extrabold text-ink-900">{{ todays_checkouts }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-ink-50">
+                <span class="text-[12.5px] font-semibold text-ink-700">Active Bookings</span>
+                <span class="text-[16px] font-extrabold text-ink-900">{{ active_bookings }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-ink-50">
+                <span class="text-[12.5px] font-semibold text-ink-700">Occupancy</span>
+                <span class="text-[16px] font-extrabold text-ink-900">{{ occupancy_percent }}%</span>
+            </div>
+        </div>
+        <p class="text-[10.5px] text-ink-400 mt-3">Live once the Bookings module is built.</p>
+    </div>
+
+    <!-- ===== CALENDAR ===== -->
+    <div class="card p-6 lg:col-span-1">
+        <h2 class="text-[14px] font-bold text-ink-900 mb-4">{{ calendar_month_name }}</h2>
+        <table class="w-full text-center">
+            <thead>
+                <tr class="text-[10px] font-bold text-ink-400 uppercase">
+                    <th class="pb-2">Su</th><th class="pb-2">Mo</th><th class="pb-2">Tu</th>
+                    <th class="pb-2">We</th><th class="pb-2">Th</th><th class="pb-2">Fr</th><th class="pb-2">Sa</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar_weeks %}
+                <tr>
+                    {% for day in week %}
+                    <td class="py-1.5">
+                        {% if day != 0 %}
+                            {% if day == today_day %}
+                            <span class="w-7 h-7 inline-flex items-center justify-center rounded-full bg-brand-500 text-white text-[12px] font-bold">{{ day }}</span>
+                            {% else %}
+                            <span class="w-7 h-7 inline-flex items-center justify-center text-[12px] font-medium text-ink-700">{{ day }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

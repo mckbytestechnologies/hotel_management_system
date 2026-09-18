@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Hotel PMS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50:'#eef4ff',100:'#dbe7ff',200:'#bcd2ff',300:'#8eb4ff',
+                            400:'#598cff',500:'#3b6ef5',600:'#2a56db',700:'#2344b0',
+                            800:'#223d8c',900:'#21376f',
+                        },
+                        ink: {
+                            50:'#f7f8fa',100:'#eef0f4',200:'#e2e5ec',400:'#9aa2b1',
+                            500:'#6b7280',700:'#3f4653',900:'#1e2330',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .input {
+            width: 100%;
+            background: #f7f8fa;
+            border: 1px solid #e2e5ec;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 12px 14px 12px 40px;
+            color: #1e2330;
+            transition: all 0.18s ease;
+        }
+        .input::placeholder { color: #9aa2b1; }
+        .input:focus {
+            background: #fff;
+            border-color: #3b6ef5;
+            box-shadow: 0 0 0 4px rgba(59,110,245,0.12);
+            outline: none;
+        }
+        .btn-primary {
+            background: #3b6ef5;
+            color: #fff;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 12px 18px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+            transition: all 0.18s ease;
+            box-shadow: 0 2px 6px rgba(59,110,245,0.25);
+        }
+        .btn-primary:hover {
+            background: #2a56db;
+            box-shadow: 0 6px 16px rgba(59,110,245,0.35);
+            transform: translateY(-1px);
+        }
+        .bg-mesh {
+            background:
+                radial-gradient(at 20% 20%, rgba(59,110,245,0.14) 0px, transparent 55%),
+                radial-gradient(at 80% 80%, rgba(42,86,219,0.14) 0px, transparent 55%),
+                radial-gradient(at 60% 10%, rgba(142,180,255,0.18) 0px, transparent 55%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#f6f7f9] bg-mesh flex items-center justify-center p-5">
+
+    <div class="w-full max-w-[420px]">
+
+        <!-- Brand -->
+        <div class="flex flex-col items-center mb-7">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/25 mb-3">
+                <i class="fa-solid fa-hotel text-white text-[22px]"></i>
+            </div>
+            <h1 class="text-[22px] font-extrabold text-ink-900 tracking-tight">Simplifier</h1>
+            <p class="text-[11.5px] font-semibold text-ink-400 uppercase tracking-widest mt-0.5">Hotel PMS</p>
+        </div>
+
+        <!-- Card -->
+        <div class="bg-white border border-ink-200 rounded-2xl shadow-[0_10px_40px_-12px_rgba(16,24,40,0.12)] p-7">
+
+            <div class="mb-6 text-center">
+                <h2 class="text-[18px] font-bold text-ink-900 tracking-tight">Welcome back</h2>
+                <p class="text-[12.5px] font-medium text-ink-400 mt-1">Sign in to continue to your workspace</p>
+            </div>
+
+            {% if form.errors %}
+            <div class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12px] font-semibold mb-5">
+                <i class="fa-solid fa-circle-exclamation text-[12px]"></i>
+                <span>Invalid username or password.</span>
+            </div>
+            {% endif %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-[11.5px] font-bold text-ink-700 mb-1.5">Username</label>
+                    <div class="relative">
+                        <i class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400 text-[12px]"></i>
+                        <input type="text" name="username" required autofocus
+                               placeholder="Enter your username"
+                               class="input">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-[11.5px] font-bold text-ink-700">Password</label>
+                        <a href="#" onclick="event.preventDefault();"
+                           class="text-[11px] font-bold text-brand-500 hover:text-brand-600 hover:underline">Forgot?</a>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400 text-[12px]"></i>
+                        <input type="password" name="password" required
+                               placeholder="••••••••"
+                               class="input">
+                    </div>
+                </div>
+
+                <label class="flex items-center gap-2 cursor-pointer pt-1">
+                    <input type="checkbox"
+                           class="w-4 h-4 rounded border-ink-200 text-brand-500 focus:ring-brand-500 accent-brand-500">
+                    <span class="text-[12px] font-medium text-ink-500">Keep me signed in</span>
+                </label>
+
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <button type="submit" class="btn-primary w-full !py-3.5 mt-2">
+                    <span>Sign In</span>
+                    <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                </button>
+            </form>
+
+            <div class="text-center pt-5 mt-5 border-t border-ink-100">
+                <p class="text-[12px] text-ink-400 font-medium">
+                    Don't have an account?
+                    <a href="#" class="font-bold text-brand-500 hover:text-brand-600 hover:underline ml-0.5">Contact admin</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-[11px] font-medium text-ink-400 mt-6">
+            &copy; 2026 Simplifier Hotel PMS · All rights reserved
+        </p>
+
+    </div>
+
+</body>
+</html>
