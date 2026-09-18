@@ -191,10 +191,15 @@
                 <span>Rate Plans</span>
             </a>
 
-            <p class="px-6 text-[10px] font-bold text-sidebar-text/70 uppercase tracking-wider mt-8 mb-2">Management</p>
-            <a href="#" class="nav-link">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Activities</span>
+            <a href="{% url 'dashboard:roomrate_list' %}" class="nav-link">
+                <i class="fa-solid fa-dollar-sign"></i>
+                <span>Room Rates</span>
+            </a>
+
+            <p class="px-6 text-[10px] font-bold text-ink-400 uppercase tracking-wider mt-5 mb-2">Management</p>
+            <a href="{% url 'dashboard:booking_list' %}" class="nav-link">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Bookings</span>
             </a>
             <a href="#" class="nav-link">
                 <i class="fa-solid fa-user-shield"></i>

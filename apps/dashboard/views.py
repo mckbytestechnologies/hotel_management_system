@@ -9,6 +9,18 @@ from django.db.models import Count
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
+from apps.bookings.models import Booking
+from apps.bookings.forms import BookingForm
+from datetime import timedelta
+from django.shortcuts import redirect
+from django.views.generic import TemplateView
+from apps.core.mixins import ModulePermissionRequiredMixin
+from apps.availability.models import RoomRate
+from apps.availability.forms import RoomRateForm, BulkRateForm
+from django.contrib import messages
+
+
+
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/home.html'
 
@@ -221,3 +233,118 @@ class RatePlanDeleteView(BaseDeleteView):
     module = Module.RATE_PLANS
     model = RatePlan
     success_url = reverse_lazy('dashboard:rateplan_list')
+
+
+class BookingListView(BaseListView):
+    module = Module.BOOKINGS
+    model = Booking
+    ordering = ['-created_at']
+    page_title = 'Bookings'
+    singular_name = 'Booking'
+    add_url_name = None  # bookings are created via the public site / dedicated flow, not this form
+    edit_url_name = 'dashboard:booking_edit'
+    delete_url_name = None  # bookings are cancelled, not deleted — see BookingCancelView below
+    columns = [
+        {'label': 'Booking #', 'field': 'booking_number'},
+        {'label': 'Guest', 'field': 'guest.full_name'},
+        {'label': 'Property', 'field': 'property.name'},
+        {'label': 'Check-in', 'field': 'check_in_date'},
+        {'label': 'Check-out', 'field': 'check_out_date'},
+        {'label': 'Status', 'field': 'status'},
+        {'label': 'Total', 'field': 'total_amount'},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('guest', 'property')
+
+
+class BookingUpdateView(BaseUpdateView):
+    module = Module.BOOKINGS
+    model = Booking
+    form_class = BookingForm
+    page_title = 'Edit Booking'
+    success_message = 'Booking updated successfully.'
+    success_url = reverse_lazy('dashboard:booking_list')
+
+
+class RoomRateListView(BaseListView):
+    module = Module.AVAILABILITY
+    model = RoomRate
+    ordering = ['-date']
+    page_title = 'Room Rates'
+    singular_name = 'Room Rate'
+    add_url_name = 'dashboard:roomrate_add'
+    edit_url_name = 'dashboard:roomrate_edit'
+    delete_url_name = 'dashboard:roomrate_delete'
+    columns = [
+        {'label': 'Date', 'field': 'date'},
+        {'label': 'Room Type', 'field': 'room_type.name'},
+        {'label': 'Rate Plan', 'field': 'rate_plan.name'},
+        {'label': 'Base Price', 'field': 'base_price'},
+        {'label': 'Active', 'field': 'is_active', 'badge': True},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('room_type', 'rate_plan', 'property')
+
+
+class RoomRateCreateView(BaseCreateView):
+    module = Module.AVAILABILITY
+    model = RoomRate
+    form_class = RoomRateForm
+    page_title = 'Add Room Rate'
+    success_message = 'Room rate created successfully.'
+    success_url = reverse_lazy('dashboard:roomrate_list')
+
+
+class RoomRateUpdateView(BaseUpdateView):
+    module = Module.AVAILABILITY
+    model = RoomRate
+    form_class = RoomRateForm
+    page_title = 'Edit Room Rate'
+    success_message = 'Room rate updated successfully.'
+    success_url = reverse_lazy('dashboard:roomrate_list')
+
+
+class RoomRateDeleteView(BaseDeleteView):
+    module = Module.AVAILABILITY
+    model = RoomRate
+    success_url = reverse_lazy('dashboard:roomrate_list')
+
+
+class BulkRateGenerateView(ModulePermissionRequiredMixin, TemplateView):
+    module = Module.AVAILABILITY
+    permission_action = 'add'
+    template_name = 'dashboard/room_rates/bulk_form.html'
+
+    def get(self, request):
+        return self.render_to_response({'form': BulkRateForm()})
+
+    def post(self, request):
+        form = BulkRateForm(request.POST)
+        if not form.is_valid():
+            return self.render_to_response({'form': form})
+
+        data = form.cleaned_data
+        date_range = [
+            data['start_date'] + timedelta(days=i)
+            for i in range((data['end_date'] - data['start_date']).days + 1)
+        ]
+
+        created, updated = 0, 0
+        for d in date_range:
+            obj, was_created = RoomRate.objects.update_or_create(
+                property=data['property'],
+                room_type=data['room_type'],
+                rate_plan=data['rate_plan'],
+                date=d,
+                defaults={'base_price': data['base_price']},
+            )
+            created += was_created
+            updated += (not was_created)
+
+        messages.success(
+            request,
+            f"Rates set for {len(date_range)} dates ({created} created, {updated} updated)."
+        )
+        return redirect('dashboard:roomrate_list')

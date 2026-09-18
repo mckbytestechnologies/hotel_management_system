@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'apps.bookings',
     'apps.integrations',
     'apps.dashboard',
+    'apps.public',
     
 ]
 
@@ -91,6 +92,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -106,3 +108,9 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:3000'])
 
 LOGIN_URL = 'dashboard:login'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

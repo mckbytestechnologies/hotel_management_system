@@ -30,10 +30,6 @@ class Property(BaseModel):
 
 
 class RoomType(BaseModel):
-    """
-    A category of room (e.g. Deluxe, Suite) belonging to a Property.
-    This is NOT a physical room — see Room model below.
-    """
     property = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name='room_types'
     )
@@ -44,6 +40,10 @@ class RoomType(BaseModel):
     max_children = models.PositiveSmallIntegerField(default=0)
     max_occupancy = models.PositiveSmallIntegerField(default=2)
     base_occupancy = models.PositiveSmallIntegerField(default=2)
+    default_price = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0,
+        help_text="Fixed nightly price used when no date-specific RoomRate exists."
+    )
 
     class Meta:
         db_table = 'room_types'

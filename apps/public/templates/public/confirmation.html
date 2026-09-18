@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: { brand: { 500: '#3b6ef5', 600: '#2a56db' } } } } }
+    </script>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-[#f6f7f9] min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div class="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-5">
+            <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
+        </div>
+        <h1 class="text-[20px] font-extrabold text-slate-900">Booking Confirmed!</h1>
+        <p class="text-[13px] text-slate-500 mt-1">A confirmation has been sent to {{ booking.guest.email }}</p>
+
+        <div class="bg-slate-50 rounded-xl p-5 mt-6 text-left space-y-3">
+            <div class="flex justify-between text-[13px]">
+                <span class="text-slate-500 font-medium">Booking Number</span>
+                <span class="font-bold text-slate-900">{{ booking.booking_number }}</span>
+            </div>
+            <div class="flex justify-between text-[13px]">
+                <span class="text-slate-500 font-medium">Property</span>
+                <span class="font-bold text-slate-900">{{ booking.property.name }}</span>
+            </div>
+            <div class="flex justify-between text-[13px]">
+                <span class="text-slate-500 font-medium">Check-in</span>
+                <span class="font-bold text-slate-900">{{ booking.check_in_date|date:"M j, Y" }}</span>
+            </div>
+            <div class="flex justify-between text-[13px]">
+                <span class="text-slate-500 font-medium">Check-out</span>
+                <span class="font-bold text-slate-900">{{ booking.check_out_date|date:"M j, Y" }}</span>
+            </div>
+            {% for br in booking.booking_rooms.all %}
+            <div class="flex justify-between text-[13px]">
+                <span class="text-slate-500 font-medium">Room</span>
+                <span class="font-bold text-slate-900">{{ br.room_type.name }} - {{ br.room.room_number }}</span>
+            </div>
+            {% endfor %}
+            <div class="border-t border-slate-200 pt-3 flex justify-between text-[16px]">
+                <span class="font-bold text-slate-900">Total Amount</span>
+                <span class="font-extrabold text-slate-900">₹{{ booking.total_amount }}</span>
+            </div>
+        </div>
+
+        <a href="{% url 'public:landing' %}" class="inline-block mt-6 text-brand-500 font-semibold text-[13px]">← Back to Home</a>
+    </div>
+</body>
+</html>

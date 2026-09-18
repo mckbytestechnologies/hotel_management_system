@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clouds Serviced Apartments | Book Your Stay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 500: '#3b6ef5', 600: '#2a56db', 700: '#2344b0' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-bg {
+            background: linear-gradient(rgba(15,23,42,0.55), rgba(15,23,42,0.75)),
+                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600') center/cover;
+        }
+        .input {
+            width: 100%;
+            border: 1px solid #e2e5ec;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
+            padding: 12px 14px;
+            color: #1e2330;
+        }
+        .input:focus { outline: none; border-color: #3b6ef5; box-shadow: 0 0 0 4px rgba(59,110,245,0.12); }
+    </style>
+</head>
+<body class="bg-[#f6f7f9]">
+
+    <!-- NAVBAR -->
+    <nav class="bg-white border-b border-ink-100 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-[10px] bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
+                <i class="fa-solid fa-hotel text-white text-[15px]"></i>
+            </div>
+            <span class="text-[16px] font-extrabold text-slate-900">Clouds Serviced Apartments</span>
+        </div>
+        <a href="{% url 'dashboard:login' %}" class="text-[13px] font-semibold text-slate-500 hover:text-brand-600">Staff Login</a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero-bg py-24 px-6 flex flex-col items-center text-center">
+        <h1 class="text-white text-[32px] sm:text-[42px] font-extrabold tracking-tight max-w-2xl">
+            Find Your Perfect Stay
+        </h1>
+        <p class="text-white/80 text-[14px] font-medium mt-3 max-w-md">
+            Comfortable rooms, transparent pricing, instant confirmation.
+        </p>
+
+        <!-- SEARCH CARD -->
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mt-10 w-full max-w-4xl">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-4 px-4 py-2.5 rounded-lg bg-rose-50 text-rose-700 text-[12.5px] font-semibold text-left">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            <form method="post" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                {% csrf_token %}
+
+                <div class="lg:col-span-2 text-left">
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Property</label>
+                    <select name="property" class="input" required>
+                        {% for property in properties %}
+                        <option value="{{ property.id }}">{{ property.name }} — {{ property.city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="text-left">
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Check-in</label>
+                    <input type="date" name="check_in" value="{{ default_checkin }}" class="input" required>
+                </div>
+
+                <div class="text-left">
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Check-out</label>
+                    <input type="date" name="check_out" value="{{ default_checkout }}" class="input" required>
+                </div>
+
+                <div class="text-left">
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Guests</label>
+                    <select name="adults" class="input">
+                        <option value="1">1 Adult</option>
+                        <option value="2" selected>2 Adults</option>
+                        <option value="3">3 Adults</option>
+                        <option value="4">4 Adults</option>
+                    </select>
+                </div>
+
+                <div class="lg:col-span-5">
+                    <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-[14px] py-3.5 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass text-[12px]"></i>
+                        Search Availability
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FEATURES STRIP -->
+    <div class="max-w-5xl mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+        <div>
+            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-500/10 flex items-center justify-center mb-3">
+                <i class="fa-solid fa-shield-halved text-brand-500"></i>
+            </div>
+            <p class="text-[13.5px] font-bold text-slate-900">Instant Confirmation</p>
+            <p class="text-[12px] text-slate-500 mt-1">Get your booking confirmed immediately, no waiting.</p>
+        </div>
+        <div>
+            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-500/10 flex items-center justify-center mb-3">
+                <i class="fa-solid fa-tag text-brand-500"></i>
+            </div>
+            <p class="text-[13.5px] font-bold text-slate-900">Best Rate Guarantee</p>
+            <p class="text-[12px] text-slate-500 mt-1">Book direct and always get our lowest available price.</p>
+        </div>
+        <div>
+            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-500/10 flex items-center justify-center mb-3">
+                <i class="fa-solid fa-headset text-brand-500"></i>
+            </div>
+            <p class="text-[13.5px] font-bold text-slate-900">24/7 Support</p>
+            <p class="text-[12px] text-slate-500 mt-1">Our team is here to help before, during, and after your stay.</p>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: { brand: { 500: '#3b6ef5', 600: '#2a56db' } } } } }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .input { width: 100%; border: 1px solid #e2e5ec; border-radius: 10px; font-size: 13.5px; font-weight: 500; padding: 12px 14px; }
+        .input:focus { outline: none; border-color: #3b6ef5; box-shadow: 0 0 0 4px rgba(59,110,245,0.12); }
+    </style>
+</head>
+<body class="bg-[#f6f7f9] min-h-screen">
+
+    <nav class="bg-white border-b border-slate-100 px-6 py-4">
+        <span class="text-[16px] font-extrabold text-slate-900">{{ property.name }}</span>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- FORM -->
+        <div class="md:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h1 class="text-[18px] font-extrabold text-slate-900 mb-5">Guest Details</h1>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="mb-4 px-4 py-2.5 rounded-lg bg-rose-50 text-rose-700 text-[12.5px] font-semibold">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="property" value="{{ property.id }}">
+                <input type="hidden" name="room_type" value="{{ room_type.id }}">
+                <input type="hidden" name="rate_plan" value="{{ rate_plan.id }}">
+                <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+                <input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
+                <input type="hidden" name="adults" value="{{ adults }}">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase">First Name</label>
+                        <input type="text" name="first_name" class="input" required>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase">Last Name</label>
+                        <input type="text" name="last_name" class="input" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase">Email</label>
+                    <input type="email" name="email" class="input" required>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase">Phone</label>
+                    <input type="tel" name="phone" class="input" required>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase">Special Requests (optional)</label>
+                    <textarea name="special_requests" rows="3" class="input"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-[14px] py-3.5 rounded-xl transition">
+                    Confirm Booking
+                </button>
+            </form>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-fit">
+            <h2 class="text-[14px] font-bold text-slate-900 mb-4">Booking Summary</h2>
+            <p class="text-[13px] font-bold text-slate-900">{{ room_type.name }}</p>
+            <p class="text-[11.5px] text-slate-500">{{ rate_plan.name }}</p>
+            <div class="border-t border-slate-100 my-4"></div>
+            <div class="space-y-2 text-[12.5px]">
+                <div class="flex justify-between"><span class="text-slate-500">Check-in</span><span class="font-semibold">{{ check_in|date:"M j, Y" }}</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Check-out</span><span class="font-semibold">{{ check_out|date:"M j, Y" }}</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Nights</span><span class="font-semibold">{{ nights }}</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Guests</span><span class="font-semibold">{{ adults }} Adults</span></div>
+            </div>
+            <div class="border-t border-slate-100 my-4"></div>
+            <div class="flex justify-between text-[16px] font-extrabold text-slate-900">
+                <span>Total</span><span>₹{{ total_price }}</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

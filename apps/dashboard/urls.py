@@ -6,6 +6,9 @@ from .views import (
     RoomTypeListView, RoomTypeCreateView, RoomTypeUpdateView, RoomTypeDeleteView,
     RoomListView, RoomCreateView, RoomUpdateView, RoomDeleteView,
     RatePlanListView, RatePlanCreateView, RatePlanUpdateView, RatePlanDeleteView,
+    BookingListView, BookingUpdateView,
+    RoomRateListView, RoomRateCreateView, RoomRateUpdateView, RoomRateDeleteView,
+    BulkRateGenerateView,
 )
 
 app_name = 'dashboard'
@@ -36,4 +39,13 @@ urlpatterns = [
     path('rate-plans/add/', RatePlanCreateView.as_view(), name='rateplan_add'),
     path('rate-plans/<int:pk>/edit/', RatePlanUpdateView.as_view(), name='rateplan_edit'),
     path('rate-plans/<int:pk>/delete/', RatePlanDeleteView.as_view(), name='rateplan_delete'),
+
+    path('bookings/', BookingListView.as_view(), name='booking_list'),
+    path('bookings/<int:pk>/edit/', BookingUpdateView.as_view(), name='booking_edit'),
+
+    path('room-rates/', RoomRateListView.as_view(), name='roomrate_list'),
+    path('room-rates/add/', RoomRateCreateView.as_view(), name='roomrate_add'),
+    path('room-rates/bulk/', BulkRateGenerateView.as_view(), name='roomrate_bulk'),
+    path('room-rates/<int:pk>/edit/', RoomRateUpdateView.as_view(), name='roomrate_edit'),
+    path('room-rates/<int:pk>/delete/', RoomRateDeleteView.as_view(), name='roomrate_delete'),
 ]

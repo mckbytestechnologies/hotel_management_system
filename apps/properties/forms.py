@@ -43,7 +43,8 @@ class RoomTypeForm(StyledModelForm):
         model = RoomType
         fields = [
             'property', 'name', 'code', 'description',
-            'max_adults', 'max_children', 'max_occupancy', 'base_occupancy', 'is_active',
+            'max_adults', 'max_children', 'max_occupancy', 'base_occupancy',
+            'default_price', 'is_active',
         ]
 
 
