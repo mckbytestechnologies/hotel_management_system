@@ -1,18 +1,2 @@
 # Virtual environment
 msquareenv/
-
-# Python
-__pycache__/
-*.py[cod]
-
-# Django
-db.sqlite3
-*.sqlite3
-media/
-
-# Environment variables
-.env
-
-# IDE
-.vscode/
-.idea/
