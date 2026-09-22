@@ -6,9 +6,12 @@ from .views import (
     RoomTypeListView, RoomTypeCreateView, RoomTypeUpdateView, RoomTypeDeleteView,
     RoomListView, RoomCreateView, RoomUpdateView, RoomDeleteView,
     RatePlanListView, RatePlanCreateView, RatePlanUpdateView, RatePlanDeleteView,
-    BookingListView, BookingUpdateView,
+    BookingListView, BookingUpdateView, BookingCheckInView, BookingCheckOutView,
     RoomRateListView, RoomRateCreateView, RoomRateUpdateView, RoomRateDeleteView,
     BulkRateGenerateView,
+    PaymentListView, InvoiceListView, InvoiceViewByPk,
+    SyncLogListView, ChannelMappingListView, ChannelMappingCreateView,
+    ChannelMappingUpdateView, ChannelMappingDeleteView,
 )
 
 app_name = 'dashboard'
@@ -48,4 +51,17 @@ urlpatterns = [
     path('room-rates/bulk/', BulkRateGenerateView.as_view(), name='roomrate_bulk'),
     path('room-rates/<int:pk>/edit/', RoomRateUpdateView.as_view(), name='roomrate_edit'),
     path('room-rates/<int:pk>/delete/', RoomRateDeleteView.as_view(), name='roomrate_delete'),
+
+    path('bookings/<int:pk>/check-in/', BookingCheckInView.as_view(), name='booking_checkin'),
+    path('bookings/<int:pk>/check-out/', BookingCheckOutView.as_view(), name='booking_checkout'),
+
+    path('payments/', PaymentListView.as_view(), name='payment_list'),
+    path('invoices/', InvoiceListView.as_view(), name='invoice_list'),
+    path('invoices/<int:pk>/view/', InvoiceViewByPk.as_view(), name='invoice_view'),
+
+    path('sync-logs/', SyncLogListView.as_view(), name='synclog_list'),
+    path('channel-mappings/', ChannelMappingListView.as_view(), name='channelmapping_list'),
+    path('channel-mappings/add/', ChannelMappingCreateView.as_view(), name='channelmapping_add'),
+    path('channel-mappings/<int:pk>/edit/', ChannelMappingUpdateView.as_view(), name='channelmapping_edit'),
+    path('channel-mappings/<int:pk>/delete/', ChannelMappingDeleteView.as_view(), name='channelmapping_delete'),
 ]

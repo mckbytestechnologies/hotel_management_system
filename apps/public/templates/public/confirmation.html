@@ -1,57 +1,1234 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Confirmed</title>
+
+    <title>Booking Confirmed | M Square Hotel</title>
+
+
+    <!-- ========================================================= -->
+    <!-- TAILWIND -->
+    <!-- ========================================================= -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <!-- ========================================================= -->
+    <!-- FONT -->
+    <!-- ========================================================= -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- ========================================================= -->
+    <!-- FONT AWESOME -->
+    <!-- ========================================================= -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+
+    <!-- ========================================================= -->
+    <!-- TAILWIND CONFIG -->
+    <!-- ========================================================= -->
+
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] },
-            colors: { brand: { 500: '#3b6ef5', 600: '#2a56db' } } } } }
+
+        tailwind.config = {
+
+            theme: {
+
+                extend: {
+
+                    fontFamily: {
+
+                        sans: ['Inter', 'sans-serif']
+
+                    },
+
+                    colors: {
+
+                        hotel: {
+
+                            cream: '#F7F4EC',
+
+                            navy: '#172033',
+
+                            dark: '#0B132B',
+
+                            gold: '#D6B878',
+
+                            goldLight: '#E3CC91',
+
+                            muted: '#6D7280',
+
+                            goldDark: '#9B8350'
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
     </script>
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+
+
+    <!-- ========================================================= -->
+    <!-- CUSTOM CSS -->
+    <!-- ========================================================= -->
+
+    <style>
+
+        html {
+
+            scroll-behavior: smooth;
+
+        }
+
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+        }
+
+
+        .glass-card {
+
+            backdrop-filter: blur(18px);
+
+            -webkit-backdrop-filter: blur(18px);
+
+        }
+
+
+        .hero-glow {
+
+            animation: glow 8s ease-in-out infinite alternate;
+
+        }
+
+
+        @keyframes glow {
+
+            from {
+
+                transform: scale(1);
+
+                opacity: 0.35;
+
+            }
+
+            to {
+
+                transform: scale(1.15);
+
+                opacity: 0.55;
+
+            }
+
+        }
+
+
+        .check-animation {
+
+            animation: checkAppear 0.6s ease-out forwards;
+
+        }
+
+
+        @keyframes checkAppear {
+
+            0% {
+
+                transform: scale(0.5);
+
+                opacity: 0;
+
+            }
+
+            70% {
+
+                transform: scale(1.08);
+
+            }
+
+            100% {
+
+                transform: scale(1);
+
+                opacity: 1;
+
+            }
+
+        }
+
+    </style>
+
 </head>
-<body class="bg-[#f6f7f9] min-h-screen flex items-center justify-center p-6">
 
-    <div class="max-w-lg w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-        <div class="w-16 h-16 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-5">
-            <i class="fa-solid fa-check text-emerald-500 text-2xl"></i>
+
+<body class="min-h-screen bg-[#F7F4EC] text-[#172033]">
+
+
+<!-- ========================================================= -->
+<!-- HEADER -->
+<!-- ========================================================= -->
+
+<header class="absolute left-0 right-0 top-0 z-50">
+
+    <div
+        class="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-10"
+    >
+
+
+        <!-- ===================================================== -->
+        <!-- LOGO -->
+        <!-- ===================================================== -->
+
+        <a
+            href="{% url 'public:landing' %}"
+            class="flex items-center gap-3"
+        >
+
+            <div
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#172033] text-[#D6B878]"
+            >
+
+                <i class="fa-solid fa-hotel text-[18px]"></i>
+
+            </div>
+
+
+            <div>
+
+                <p
+                    class="text-lg font-semibold tracking-[0.08em] text-[#172033]"
+                >
+                    M Square
+                </p>
+
+                <p
+                    class="text-[9px] uppercase tracking-[0.22em] text-[#172033]/45"
+                >
+                    Hotel
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <!-- ===================================================== -->
+        <!-- SECURE LABEL -->
+        <!-- ===================================================== -->
+
+        <div
+            class="hidden items-center gap-2 text-xs font-medium text-[#6D7280] sm:flex"
+        >
+
+            <i class="fa-solid fa-shield-halved text-[#9B8350]"></i>
+
+            Secure reservation
+
         </div>
-        <h1 class="text-[20px] font-extrabold text-slate-900">Booking Confirmed!</h1>
-        <p class="text-[13px] text-slate-500 mt-1">A confirmation has been sent to {{ booking.guest.email }}</p>
 
-        <div class="bg-slate-50 rounded-xl p-5 mt-6 text-left space-y-3">
-            <div class="flex justify-between text-[13px]">
-                <span class="text-slate-500 font-medium">Booking Number</span>
-                <span class="font-bold text-slate-900">{{ booking.booking_number }}</span>
-            </div>
-            <div class="flex justify-between text-[13px]">
-                <span class="text-slate-500 font-medium">Property</span>
-                <span class="font-bold text-slate-900">{{ booking.property.name }}</span>
-            </div>
-            <div class="flex justify-between text-[13px]">
-                <span class="text-slate-500 font-medium">Check-in</span>
-                <span class="font-bold text-slate-900">{{ booking.check_in_date|date:"M j, Y" }}</span>
-            </div>
-            <div class="flex justify-between text-[13px]">
-                <span class="text-slate-500 font-medium">Check-out</span>
-                <span class="font-bold text-slate-900">{{ booking.check_out_date|date:"M j, Y" }}</span>
-            </div>
-            {% for br in booking.booking_rooms.all %}
-            <div class="flex justify-between text-[13px]">
-                <span class="text-slate-500 font-medium">Room</span>
-                <span class="font-bold text-slate-900">{{ br.room_type.name }} - {{ br.room.room_number }}</span>
-            </div>
-            {% endfor %}
-            <div class="border-t border-slate-200 pt-3 flex justify-between text-[16px]">
-                <span class="font-bold text-slate-900">Total Amount</span>
-                <span class="font-extrabold text-slate-900">₹{{ booking.total_amount }}</span>
-            </div>
-        </div>
-
-        <a href="{% url 'public:landing' %}" class="inline-block mt-6 text-brand-500 font-semibold text-[13px]">← Back to Home</a>
     </div>
+
+</header>
+
+
+
+<!-- ========================================================= -->
+<!-- MAIN -->
+<!-- ========================================================= -->
+
+<main
+    class="relative flex min-h-screen items-center overflow-hidden px-6 py-28 lg:px-10"
+>
+
+
+    <!-- ======================================================= -->
+    <!-- BACKGROUND -->
+    <!-- ======================================================= -->
+
+    <div class="absolute inset-0 bg-[#F7F4EC]"></div>
+
+
+    <!-- ======================================================= -->
+    <!-- DECORATIVE GLOW -->
+    <!-- ======================================================= -->
+
+    <div
+        class="hero-glow absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full bg-[#D6B878]/20 blur-3xl"
+    ></div>
+
+
+    <div
+        class="absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#172033]/5 blur-3xl"
+    ></div>
+
+
+    <!-- ======================================================= -->
+    <!-- CONTENT -->
+    <!-- ======================================================= -->
+
+    <div class="relative z-10 mx-auto w-full max-w-3xl">
+
+
+        <!-- =================================================== -->
+        <!-- CONFIRMATION CARD -->
+        <!-- =================================================== -->
+
+        <div
+            class="overflow-hidden rounded-[2rem] border border-[#172033]/10 bg-white shadow-2xl"
+        >
+
+
+            <!-- ================================================= -->
+            <!-- TOP DARK SECTION -->
+            <!-- ================================================= -->
+
+            <div
+                class="relative overflow-hidden bg-[#172033] px-6 py-12 text-center sm:px-10"
+            >
+
+
+                <!-- Decorative circles -->
+
+                <div
+                    class="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#D6B878]/10 blur-2xl"
+                ></div>
+
+
+                <div
+                    class="absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-[#D6B878]/5 blur-2xl"
+                ></div>
+
+
+                <div class="relative z-10">
+
+
+                    <!-- ========================================= -->
+                    <!-- CHECK ICON -->
+                    <!-- ========================================= -->
+
+                    <div
+                        class="check-animation mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#D6B878]/30 bg-[#D6B878]/10 text-[#D6B878]"
+                    >
+
+                        <div
+                            class="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6B878]"
+                        >
+
+                            <i
+                                class="fa-solid fa-check text-xl text-[#172033]"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========================================= -->
+                    <!-- HEADING -->
+                    <!-- ========================================= -->
+
+                    <p
+                        class="mt-7 text-xs font-semibold uppercase tracking-[0.3em] text-[#D6B878]"
+                    >
+                        Reservation complete
+                    </p>
+
+
+                    <h1
+                        class="mt-3 text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl"
+                    >
+                        Booking Confirmed
+                    </h1>
+
+
+                    <p
+                        class="mx-auto mt-3 max-w-md text-sm leading-6 text-white/55"
+                    >
+                        Your stay at M Square Hotel has been successfully reserved.
+                    </p>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================= -->
+            <!-- BOOKING CONTENT -->
+            <!-- ================================================= -->
+
+            <div class="p-6 sm:p-8 lg:p-10">
+
+
+                <!-- ================================================= -->
+                <!-- GUEST CONFIRMATION -->
+                <!-- ================================================= -->
+
+                <div
+                    class="mb-8 flex items-start gap-4 rounded-2xl border border-[#172033]/10 bg-[#F7F4EC] p-5"
+                >
+
+                    <div
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#172033] text-[#D6B878]"
+                    >
+
+                        <i class="fa-regular fa-envelope"></i>
+
+                    </div>
+
+
+                    <div class="min-w-0">
+
+                        <p
+                            class="text-xs font-semibold uppercase tracking-[0.15em] text-[#9B8350]"
+                        >
+                            Confirmation sent
+                        </p>
+
+
+                        <p
+                            class="mt-1 break-all text-sm font-medium text-[#172033]"
+                        >
+                            {{ booking.guest.email }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================================================= -->
+                <!-- BOOKING DETAILS HEADING -->
+                <!-- ================================================= -->
+
+                <div class="mb-5 flex items-center justify-between">
+
+                    <div>
+
+                        <p
+                            class="text-xs font-semibold uppercase tracking-[0.25em] text-[#9B8350]"
+                        >
+                            Reservation details
+                        </p>
+
+
+                        <h2
+                            class="mt-2 text-xl font-semibold text-[#172033]"
+                        >
+                            Your stay
+                        </h2>
+
+                    </div>
+
+
+                    <div
+                        class="hidden h-10 w-10 items-center justify-center rounded-xl bg-[#172033]/5 text-[#9B8350] sm:flex"
+                    >
+
+                        <i class="fa-regular fa-calendar-check"></i>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================================================= -->
+                <!-- DETAILS CARD -->
+                <!-- ================================================= -->
+
+                <div
+                    class="overflow-hidden rounded-2xl border border-[#172033]/10 bg-white"
+                >
+
+
+                    <!-- ================================================= -->
+                    <!-- BOOKING NUMBER -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <span class="text-sm text-[#6D7280]">
+                            Booking Number
+                        </span>
+
+
+                        <span
+                            class="break-all text-sm font-semibold text-[#172033] sm:text-right"
+                        >
+                            {{ booking.booking_number }}
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- PROPERTY -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <span class="text-sm text-[#6D7280]">
+                            Property
+                        </span>
+
+
+                        <span
+                            class="text-sm font-semibold text-[#172033] sm:text-right"
+                        >
+                            {{ booking.property.name }}
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- CHECK-IN -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <div class="flex items-center gap-3">
+
+                            <i
+                                class="fa-solid fa-arrow-right-to-bracket text-xs text-[#9B8350]"
+                            ></i>
+
+
+                            <span class="text-sm text-[#6D7280]">
+                                Check-in
+                            </span>
+
+                        </div>
+
+
+                        <span
+                            class="text-sm font-semibold text-[#172033] sm:text-right"
+                        >
+                            {{ booking.check_in_date|date:"M j, Y" }}
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- CHECK-OUT -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <div class="flex items-center gap-3">
+
+                            <i
+                                class="fa-solid fa-arrow-right-from-bracket text-xs text-[#9B8350]"
+                            ></i>
+
+
+                            <span class="text-sm text-[#6D7280]">
+                                Check-out
+                            </span>
+
+                        </div>
+
+
+                        <span
+                            class="text-sm font-semibold text-[#172033] sm:text-right"
+                        >
+                            {{ booking.check_out_date|date:"M j, Y" }}
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- ROOMS -->
+                    <!-- ================================================= -->
+
+                    {% for br in booking.booking_rooms.all %}
+
+                    <div
+                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <div class="flex items-center gap-3">
+
+                            <i
+                                class="fa-solid fa-bed text-xs text-[#9B8350]"
+                            ></i>
+
+
+                            <span class="text-sm text-[#6D7280]">
+                                Room
+                            </span>
+
+                        </div>
+
+
+                        <span
+                            class="text-sm font-semibold text-[#172033] sm:text-right"
+                        >
+                            {{ br.room_type.name }} - {{ br.room.room_number }}
+                        </span>
+
+                    </div>
+
+                    {% endfor %}
+
+
+
+                    <!-- ================================================= -->
+                    <!-- TOTAL -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="flex flex-col gap-2 bg-[#172033] px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <div>
+
+                            <p
+                                class="text-xs uppercase tracking-[0.18em] text-[#D6B878]"
+                            >
+                                Total amount
+                            </p>
+
+
+                            <p class="mt-1 text-xs text-white/40">
+                                Reservation total
+                            </p>
+
+                        </div>
+
+
+                        <p class="text-2xl font-semibold text-white">
+                            ₹{{ booking.total_amount }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================================================= -->
+                <!-- SECURE INFORMATION -->
+                <!-- ================================================= -->
+
+                <div
+                    class="mt-6 flex items-center gap-3 text-xs text-[#6D7280]"
+                >
+
+                    <div
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D6B878]/15 text-[#9B8350]"
+                    >
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                    </div>
+
+
+                    <p>
+                        Your reservation details are securely stored.
+                    </p>
+
+                </div>
+
+
+
+                <!-- ================================================= -->
+                <!-- ACTIONS -->
+                <!-- ================================================= -->
+
+                <div class="mt-8 grid gap-3 sm:grid-cols-2">
+
+
+                    <!-- ================================================= -->
+                    <!-- BACK TO HOME -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{% url 'public:landing' %}"
+                        class="group flex items-center justify-center gap-3 rounded-xl bg-[#D6B878] px-6 py-3.5 text-sm font-semibold text-[#172033] transition hover:bg-[#E3CC91]"
+                    >
+
+                        <i class="fa-solid fa-house text-xs"></i>
+
+                        Back to Home
+
+                        <i
+                            class="fa-solid fa-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"
+                        ></i>
+
+                    </a>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- VIEW / PRINT INVOICE -->
+                    <!-- ================================================= -->
+
+                    <a
+                        href="{% url 'public:invoice' booking.booking_number %}"
+                        target="_blank"
+                        class="flex items-center justify-center gap-2 rounded-xl border border-[#172033]/10 bg-white px-6 py-3.5 text-sm font-semibold text-[#172033] transition hover:border-[#D6B878] hover:bg-[#F7F4EC]"
+                    >
+
+                        <i class="fa-solid fa-file-invoice text-[#9B8350]"></i>
+
+                        View / Print Invoice
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- ================================================= -->
+                <!-- PAYMENT SECTION -->
+                <!-- ================================================= -->
+
+                {% if booking.balance_due > 0 %}
+
+                <div
+                    class="mt-5 rounded-2xl border border-[#D6B878]/30 bg-[#F7F4EC] p-5"
+                >
+
+                    <div
+                        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+
+                        <div>
+
+                            <p
+                                class="text-xs font-semibold uppercase tracking-[0.18em] text-[#9B8350]"
+                            >
+                                Payment pending
+                            </p>
+
+
+                            <p class="mt-1 text-sm text-[#6D7280]">
+                                Complete your payment to finalize your reservation.
+                            </p>
+
+                        </div>
+
+
+                        <!-- ============================================= -->
+                        <!-- PAY NOW BUTTON -->
+                        <!-- ============================================= -->
+
+                        <button
+                            id="pay-now-btn"
+                            type="button"
+                            class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#172033] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#0B132B] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+
+                            <i
+                                class="fa-solid fa-credit-card text-[#D6B878]"
+                            ></i>
+
+                            Pay ₹{{ booking.balance_due }} Now
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- BOTTOM BRANDING -->
+        <!-- ================================================= -->
+
+        <div
+            class="mt-7 flex items-center justify-center gap-3 text-xs text-[#6D7280]"
+        >
+
+            <span class="h-px w-8 bg-[#D6B878]"></span>
+
+
+            <span>
+                Thank you for choosing M Square Hotel
+            </span>
+
+
+            <span class="h-px w-8 bg-[#D6B878]"></span>
+
+        </div>
+
+
+    </div>
+
+</main>
+
+
+
+<!-- ========================================================= -->
+<!-- FOOTER -->
+<!-- ========================================================= -->
+
+<footer
+    class="bg-[#0B132B] px-6 py-8 text-center"
+>
+
+    <div class="flex items-center justify-center gap-3">
+
+        <div
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D6B878] text-[#172033]"
+        >
+
+            <i class="fa-solid fa-hotel text-xs"></i>
+
+        </div>
+
+
+        <p
+            class="text-sm font-semibold tracking-[0.08em] text-white"
+        >
+            M Square Hotel
+        </p>
+
+    </div>
+
+
+    <p class="mt-3 text-xs text-white/30">
+        © 2026 M Square Hotel. All rights reserved.
+    </p>
+
+</footer>
+
+
+
+<!-- ========================================================= -->
+<!-- RAZORPAY -->
+<!-- ========================================================= -->
+
+{% if booking.balance_due > 0 %}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+<script>
+
+document
+    .getElementById('pay-now-btn')
+    ?.addEventListener('click', async function () {
+
+
+        const btn = this;
+
+
+        /* ===================================================== */
+        /* DISABLE BUTTON */
+        /* ===================================================== */
+
+        btn.disabled = true;
+
+        btn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+
+
+        try {
+
+
+            /* ================================================= */
+            /* CREATE PAYMENT ORDER */
+            /* ================================================= */
+
+            const orderRes = await fetch(
+                '/api/bookings/create-payment-order/',
+                {
+
+                    method: 'POST',
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+
+                        'X-CSRFToken': getCsrfToken()
+
+                    },
+
+                    body: JSON.stringify({
+
+                        booking_id: {{ booking.id }}
+
+                    })
+
+                }
+            );
+
+
+            const orderData = await orderRes.json();
+
+
+
+            /* ================================================= */
+            /* CHECK ORDER RESPONSE */
+            /* ================================================= */
+
+            if (!orderRes.ok) {
+
+                throw new Error(
+
+                    orderData.detail ||
+
+                    orderData.error ||
+
+                    'Unable to create payment order.'
+
+                );
+
+            }
+
+
+
+            /* ================================================= */
+            /* RAZORPAY OPTIONS */
+            /* ================================================= */
+
+            const options = {
+
+                key: orderData.razorpay_key_id,
+
+                amount: orderData.amount,
+
+                currency: orderData.currency,
+
+                name:
+                    '{{ booking.property.name|escapejs }}',
+
+                description:
+                    'Booking {{ booking.booking_number|escapejs }}',
+
+                order_id:
+                    orderData.razorpay_order_id,
+
+
+
+                /* ============================================= */
+                /* PAYMENT SUCCESS */
+                /* ============================================= */
+
+                handler: async function (response) {
+
+
+                    try {
+
+
+                        const verifyRes = await fetch(
+                            '/api/bookings/verify-payment/',
+                            {
+
+                                method: 'POST',
+
+                                headers: {
+
+                                    'Content-Type':
+                                        'application/json',
+
+                                    'X-CSRFToken':
+                                        getCsrfToken()
+
+                                },
+
+                                body: JSON.stringify({
+
+                                    razorpay_order_id:
+                                        response.razorpay_order_id,
+
+                                    razorpay_payment_id:
+                                        response.razorpay_payment_id,
+
+                                    razorpay_signature:
+                                        response.razorpay_signature
+
+                                })
+
+                            }
+                        );
+
+
+                        const verifyData =
+                            await verifyRes.json();
+
+
+
+                        /* ===================================== */
+                        /* VERIFICATION SUCCESS */
+                        /* ===================================== */
+
+                        if (verifyRes.ok) {
+
+
+                            alert(
+                                'Payment successful!'
+                            );
+
+
+                            window.location.reload();
+
+
+                        }
+
+
+                        /* ===================================== */
+                        /* VERIFICATION FAILED */
+                        /* ===================================== */
+
+                        else {
+
+
+                            alert(
+
+                                verifyData.detail ||
+
+                                'Payment verification failed. Please contact support.'
+
+                            );
+
+                        }
+
+
+                    }
+
+
+                    catch (error) {
+
+
+                        console.error(
+                            'Payment verification error:',
+                            error
+                        );
+
+
+                        alert(
+                            'Payment verification failed. Please contact support.'
+                        );
+
+                    }
+
+                },
+
+
+
+                /* ============================================= */
+                /* PREFILL GUEST DETAILS */
+                /* ============================================= */
+
+                prefill: {
+
+                    name:
+                        '{{ booking.guest.full_name|escapejs }}',
+
+                    email:
+                        '{{ booking.guest.email|escapejs }}',
+
+                    contact:
+                        '{{ booking.guest.phone|escapejs }}'
+
+                },
+
+
+
+                /* ============================================= */
+                /* RAZORPAY THEME */
+                /* ============================================= */
+
+                theme: {
+
+                    color: '#D6B878'
+
+                }
+
+            };
+
+
+
+            /* ================================================= */
+            /* CREATE RAZORPAY INSTANCE */
+            /* ================================================= */
+
+            const rzp = new Razorpay(options);
+
+
+
+            /* ================================================= */
+            /* PAYMENT FAILED EVENT */
+            /* ================================================= */
+
+            rzp.on(
+                'payment.failed',
+                function (response) {
+
+
+                    console.error(
+                        'Razorpay payment failed:',
+                        response.error
+                    );
+
+
+                    alert(
+
+                        response.error.description ||
+
+                        'Payment failed. Please try again.'
+
+                    );
+
+                }
+            );
+
+
+
+            /* ================================================= */
+            /* OPEN RAZORPAY */
+            /* ================================================= */
+
+            rzp.open();
+
+
+        }
+
+
+        catch (error) {
+
+
+            console.error(
+                'Payment error:',
+                error
+            );
+
+
+            alert(
+
+                error.message ||
+
+                'Something went wrong. Please try again.'
+
+            );
+
+        }
+
+
+        finally {
+
+
+            /* ================================================= */
+            /* RESTORE BUTTON */
+            /* ================================================= */
+
+            btn.disabled = false;
+
+
+            btn.innerHTML =
+
+                '<i class="fa-solid fa-credit-card text-[#D6B878]"></i>' +
+
+                ' Pay ₹{{ booking.balance_due }} Now';
+
+
+        }
+
+    });
+
+
+
+/* ========================================================= */
+/* CSRF TOKEN */
+/* ========================================================= */
+
+function getCsrfToken() {
+
+    const name = 'csrftoken=';
+
+    const cookies =
+        document.cookie.split(';');
+
+
+    for (
+        let i = 0;
+        i < cookies.length;
+        i++
+    ) {
+
+        let cookie =
+            cookies[i].trim();
+
+
+        if (
+            cookie.indexOf(name) === 0
+        ) {
+
+            return decodeURIComponent(
+                cookie.substring(name.length)
+            );
+
+        }
+
+    }
+
+
+    return '';
+
+}
+
+</script>
+
+{% endif %}
+
+
+
 </body>
+
 </html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            .no-print { display: none; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen py-10 px-4">
+
+    <div class="max-w-2xl mx-auto">
+
+        <div class="no-print flex justify-end mb-4">
+            <button onclick="window.print()" class="bg-brand-500 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[13px] px-5 py-2.5 rounded-lg">
+                Print / Save as PDF
+            </button>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-10">
+
+            <!-- Header -->
+            <div class="flex justify-between items-start pb-8 border-b border-slate-200">
+                <div>
+                    <h1 class="text-[22px] font-extrabold text-slate-900">{{ booking.property.name }}</h1>
+                    <p class="text-[12px] text-slate-500 mt-1">{{ booking.property.address }}</p>
+                    <p class="text-[12px] text-slate-500">{{ booking.property.city }}, {{ booking.property.state }}, {{ booking.property.country }}</p>
+                    {% if booking.property.phone %}<p class="text-[12px] text-slate-500">{{ booking.property.phone }}</p>{% endif %}
+                    {% if booking.property.tax_number %}<p class="text-[12px] text-slate-500">Tax No: {{ booking.property.tax_number }}</p>{% endif %}
+                </div>
+                <div class="text-right">
+                    <h2 class="text-[20px] font-extrabold text-slate-900">INVOICE</h2>
+                    <p class="text-[12px] text-slate-500 mt-1">{{ invoice.invoice_number }}</p>
+                    <p class="text-[12px] text-slate-500">{{ invoice.issued_at|date:"M j, Y" }}</p>
+                </div>
+            </div>
+
+            <!-- Bill To / Booking Info -->
+            <div class="grid grid-cols-2 gap-6 py-8 border-b border-slate-200">
+                <div>
+                    <p class="text-[10.5px] font-bold text-slate-400 uppercase mb-1.5">Billed To</p>
+                    <p class="text-[14px] font-bold text-slate-900">{{ booking.guest.full_name }}</p>
+                    <p class="text-[12px] text-slate-500">{{ booking.guest.email }}</p>
+                    <p class="text-[12px] text-slate-500">{{ booking.guest.phone }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10.5px] font-bold text-slate-400 uppercase mb-1.5">Booking Details</p>
+                    <p class="text-[12px] text-slate-700">Booking #: <span class="font-semibold">{{ booking.booking_number }}</span></p>
+                    <p class="text-[12px] text-slate-700">Check-in: <span class="font-semibold">{{ booking.check_in_date|date:"M j, Y" }}</span></p>
+                    <p class="text-[12px] text-slate-700">Check-out: <span class="font-semibold">{{ booking.check_out_date|date:"M j, Y" }}</span></p>
+                </div>
+            </div>
+
+            <!-- Line Items -->
+            <div class="py-6">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-200">
+                            <th class="text-left text-[10.5px] font-bold text-slate-400 uppercase pb-3">Description</th>
+                            <th class="text-right text-[10.5px] font-bold text-slate-400 uppercase pb-3">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in invoice.line_items %}
+                        <tr class="border-b border-slate-100">
+                            <td class="py-3 text-[13px] text-slate-700">{{ item.description }}</td>
+                            <td class="py-3 text-[13px] text-slate-900 font-semibold text-right">₹{{ item.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totals -->
+            <div class="flex justify-end">
+                <div class="w-64 space-y-2">
+                    <div class="flex justify-between text-[13px]">
+                        <span class="text-slate-500">Subtotal</span>
+                        <span class="font-semibold text-slate-900">₹{{ invoice.subtotal }}</span>
+                    </div>
+                    {% if invoice.discount_amount %}
+                    <div class="flex justify-between text-[13px]">
+                        <span class="text-slate-500">Discount</span>
+                        <span class="font-semibold text-emerald-600">-₹{{ invoice.discount_amount }}</span>
+                    </div>
+                    {% endif %}
+                    {% if invoice.tax_amount %}
+                    <div class="flex justify-between text-[13px]">
+                        <span class="text-slate-500">Tax</span>
+                        <span class="font-semibold text-slate-900">₹{{ invoice.tax_amount }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between text-[16px] font-extrabold text-slate-900 pt-2 border-t border-slate-200">
+                        <span>Total</span>
+                        <span>₹{{ invoice.total_amount }}</span>
+                    </div>
+                    <div class="flex justify-between text-[12px] text-slate-500 pt-1">
+                        <span>Amount Paid</span>
+                        <span class="font-semibold">₹{{ booking.paid_amount }}</span>
+                    </div>
+                    <div class="flex justify-between text-[12px] {% if booking.balance_due > 0 %}text-rose-600{% else %}text-emerald-600{% endif %} font-semibold">
+                        <span>Balance Due</span>
+                        <span>₹{{ booking.balance_due }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-8 mt-8 border-t border-slate-200 text-center">
+                <p class="text-[11px] text-slate-400">Thank you for staying with us!</p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

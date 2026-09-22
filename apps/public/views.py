@@ -10,7 +10,14 @@ from django.db.models import Count, Q
 from apps.guests.models import Guest
 from apps.bookings.services import create_booking, RoomNotAvailableError
 from django.core.exceptions import ValidationError
-
+from datetime import timedelta
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
+from django.conf import settings
+from apps.guests.models import EmailOTP
 
 
 def landing_page(request):
@@ -42,8 +49,14 @@ def landing_page(request):
 
     return render(request, 'public/landing.html', {
         'properties': properties,
+
+        # Default values
         'default_checkin': default_checkin.isoformat(),
         'default_checkout': default_checkout.isoformat(),
+
+        # Minimum selectable dates
+        'min_checkin': today.isoformat(),
+        'min_checkout': (today + timedelta(days=1)).isoformat(),
     })
 
 def search_results(request):
@@ -68,6 +81,12 @@ def search_results(request):
         check_out_date = date_cls.fromisoformat(check_out)
     except ValueError:
         messages.error(request, 'Invalid dates provided.')
+        return redirect('public:landing')
+
+    today = date_cls.today()
+
+    if check_in_date < today:
+        messages.error(request, 'Check-in date cannot be in the past.')
         return redirect('public:landing')
 
     if check_out_date <= check_in_date:
@@ -178,11 +197,20 @@ def booking_form(request):
 
     # Recalculate price for display (same logic as search) so the guest
     # sees an accurate total before submitting.
-    from datetime import timedelta
+
     stay_dates = [check_in_date + timedelta(days=i) for i in range(nights)]
-    rates = RoomRate.objects.filter(
+    rates = list(RoomRate.objects.filter(
         room_type=room_type, rate_plan=rate_plan, date__in=stay_dates
-    ).values_list('base_price', flat=True)
+    ).values_list('base_price', flat=True))
+
+    if len(rates) < len(stay_dates):
+        # Fall back to RoomType.default_price for any night without
+        # a specific RoomRate row — same fallback used in search and
+        # booking creation, so the price shown here always matches
+        # what create_booking() will actually charge.
+        missing_nights = len(stay_dates) - len(rates)
+        rates += [room_type.default_price] * missing_nights
+
     total_price = sum(rates)
 
     if request.method == 'POST':
@@ -192,8 +220,27 @@ def booking_form(request):
         phone = request.POST.get('phone', '').strip()
         special_requests = request.POST.get('special_requests', '').strip()
 
+        # if not all([first_name, last_name, email, phone]):
+        #     messages.error(request, 'Please fill in all required guest details.')
+        #     return render(request, 'public/booking_form.html', {
+        #         'property': property_obj, 'room_type': room_type, 'rate_plan': rate_plan,
+        #         'check_in': check_in_date, 'check_out': check_out_date, 'nights': nights,
+        #         'adults': adults, 'total_price': total_price,
+        #     })
+
         if not all([first_name, last_name, email, phone]):
             messages.error(request, 'Please fill in all required guest details.')
+            return render(request, 'public/booking_form.html', {
+                'property': property_obj, 'room_type': room_type, 'rate_plan': rate_plan,
+                'check_in': check_in_date, 'check_out': check_out_date, 'nights': nights,
+                'adults': adults, 'total_price': total_price,
+            })
+
+        verified_otp = EmailOTP.objects.filter(
+            email=email, is_verified=True
+        ).order_by('-created_at').first()
+        if not verified_otp:
+            messages.error(request, 'Please verify your email with the OTP before confirming.')
             return render(request, 'public/booking_form.html', {
                 'property': property_obj, 'room_type': room_type, 'rate_plan': rate_plan,
                 'check_in': check_in_date, 'check_out': check_out_date, 'nights': nights,
@@ -263,3 +310,73 @@ def confirmation(request, booking_number):
         return redirect('public:landing')
 
     return render(request, 'public/confirmation.html', {'booking': booking})
+
+def view_invoice(request, booking_number):
+    from django.shortcuts import get_object_or_404
+    from apps.bookings.models import Booking, Invoice
+    from apps.bookings.services import generate_invoice
+
+    booking = get_object_or_404(Booking, booking_number=booking_number)
+
+    invoice = Invoice.objects.filter(booking=booking).first()
+    if not invoice:
+        invoice = generate_invoice(booking.id)
+
+    return render(request, 'public/invoice.html', {
+        'booking': booking,
+        'invoice': invoice,
+    })
+
+@csrf_exempt
+@require_POST
+def send_booking_otp(request):
+    """
+    POST /book/otp/send/  Body: {"email": "guest@example.com"}
+    Generates a 6-digit OTP, emails it, and returns success. Frontend
+    calls this when the guest fills in their email on the booking form.
+    """
+    try:
+        data = json.loads(request.body)
+        email = data.get('email', '').strip()
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({'success': False, 'message': 'Invalid request.'}, status=400)
+
+    if not email or '@' not in email:
+        return JsonResponse({'success': False, 'message': 'Please enter a valid email.'}, status=400)
+
+    otp = EmailOTP.generate_for(email)
+
+    send_mail(
+        subject='Your booking verification code',
+        message=f'Your verification code is: {otp.code}\n\nThis code expires in 10 minutes.',
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+    return JsonResponse({'success': True, 'message': f'Verification code sent to {email}.'})
+
+
+@csrf_exempt
+@require_POST
+def verify_booking_otp(request):
+    """
+    POST /book/otp/verify/  Body: {"email": "...", "code": "123456"}
+    Marks the most recent valid OTP for this email as verified.
+    """
+    try:
+        data = json.loads(request.body)
+        email = data.get('email', '').strip()
+        code = data.get('code', '').strip()
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({'success': False, 'message': 'Invalid request.'}, status=400)
+
+    otp = EmailOTP.objects.filter(email=email, code=code).order_by('-created_at').first()
+
+    if not otp or not otp.is_valid():
+        return JsonResponse({'success': False, 'message': 'Invalid or expired code.'}, status=400)
+
+    otp.is_verified = True
+    otp.save(update_fields=['is_verified', 'updated_at'])
+
+    return JsonResponse({'success': True, 'message': 'Email verified successfully.'})

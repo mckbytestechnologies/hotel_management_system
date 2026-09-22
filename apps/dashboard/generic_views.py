@@ -3,19 +3,18 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from apps.core.mixins import ModulePermissionRequiredMixin
 
-
 class BaseListView(ModulePermissionRequiredMixin, ListView):
     permission_action = 'view'
     paginate_by = 20
     template_name = 'dashboard/shared/list.html'
 
-    # Override these per model:
     page_title = 'Records'
     singular_name = 'Record'
-    columns = []         
+    columns = []
     add_url_name = None
     edit_url_name = None
     delete_url_name = None
+    view_url_name = None  # NEW: optional read-only "View" link (e.g. printable invoice)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,9 +32,9 @@ class BaseListView(ModulePermissionRequiredMixin, ListView):
         context['add_url_name'] = self.add_url_name
         context['edit_url_name'] = self.edit_url_name
         context['delete_url_name'] = self.delete_url_name
+        context['view_url_name'] = self.view_url_name
         return context
-
-
+        
 class BaseCreateView(ModulePermissionRequiredMixin, CreateView):
     permission_action = 'add'
     template_name = 'dashboard/shared/form.html'

@@ -18,8 +18,13 @@ from apps.core.mixins import ModulePermissionRequiredMixin
 from apps.availability.models import RoomRate
 from apps.availability.forms import RoomRateForm, BulkRateForm
 from django.contrib import messages
+from apps.bookings.services import check_in_booking, check_out_booking, InvalidBookingStateError
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
+from django.views import View
+from apps.bookings.models import Payment, Invoice
 
-
+from apps.integrations.models import ChannelMapping, SyncLog
 
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/home.html'
@@ -348,3 +353,161 @@ class BulkRateGenerateView(ModulePermissionRequiredMixin, TemplateView):
             f"Rates set for {len(date_range)} dates ({created} created, {updated} updated)."
         )
         return redirect('dashboard:roomrate_list')
+
+@method_decorator(require_POST, name='dispatch')
+class BookingCheckInView(ModulePermissionRequiredMixin, View):
+    module = Module.BOOKINGS
+    permission_action = 'edit'
+
+    def post(self, request, pk):
+        try:
+            check_in_booking(pk)
+            messages.success(request, 'Guest checked in successfully.')
+        except InvalidBookingStateError as e:
+            messages.error(request, str(e))
+        return redirect('dashboard:booking_list')
+
+
+@method_decorator(require_POST, name='dispatch')
+class BookingCheckOutView(ModulePermissionRequiredMixin, View):
+    module = Module.BOOKINGS
+    permission_action = 'edit'
+
+    def post(self, request, pk):
+        try:
+            check_out_booking(pk)
+            messages.success(request, 'Guest checked out successfully.')
+        except InvalidBookingStateError as e:
+            messages.error(request, str(e))
+        return redirect('dashboard:booking_list')
+
+class PaymentListView(BaseListView):
+    module = Module.PAYMENTS
+    model = Payment
+    ordering = ['-created_at']
+    page_title = 'Payments'
+    singular_name = 'Payment'
+    add_url_name = None  # payments are created via booking/checkout flow, not manually here
+    edit_url_name = None  # payments are immutable records — status changes via refund flow instead
+    delete_url_name = None
+    columns = [
+        {'label': 'Booking #', 'field': 'booking.booking_number'},
+        {'label': 'Guest', 'field': 'booking.guest.full_name'},
+        {'label': 'Amount', 'field': 'amount'},
+        {'label': 'Method', 'field': 'method'},
+        {'label': 'Status', 'field': 'status'},
+        {'label': 'Reference', 'field': 'transaction_reference'},
+        {'label': 'Paid At', 'field': 'paid_at'},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('booking', 'booking__guest')
+
+
+class InvoiceListView(BaseListView):
+    module = Module.PAYMENTS
+    model = Invoice
+    ordering = ['-issued_at']
+    page_title = 'Invoices'
+    singular_name = 'Invoice'
+    view_url_name = 'dashboard:invoice_view'
+    add_url_name = None  # invoices are generated automatically, not manually created
+    edit_url_name = None
+    delete_url_name = None
+    columns = [
+        {'label': 'Invoice #', 'field': 'invoice_number'},
+        {'label': 'Booking #', 'field': 'booking.booking_number'},
+        {'label': 'Guest', 'field': 'booking.guest.full_name'},
+        {'label': 'Subtotal', 'field': 'subtotal'},
+        {'label': 'Total', 'field': 'total_amount'},
+        {'label': 'Issued', 'field': 'issued_at'},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('booking', 'booking__guest')
+
+from django.shortcuts import get_object_or_404, render
+from apps.bookings.services import generate_invoice
+
+
+class InvoiceViewByPk(ModulePermissionRequiredMixin, View):
+    """
+    Dashboard-side invoice viewer, keyed by Invoice pk (matches the
+    generic list's obj.pk convention) rather than booking_number
+    (used by the public-facing view_invoice).
+    """
+    module = Module.PAYMENTS
+    permission_action = 'view'
+
+    def get(self, request, pk):
+        invoice = get_object_or_404(Invoice, pk=pk)
+        return render(request, 'public/invoice.html', {
+            'booking': invoice.booking,
+            'invoice': invoice,
+        })
+
+class SyncLogListView(BaseListView):
+    module = Module.INTEGRATIONS
+    model = SyncLog
+    ordering = ['-created_at']
+    page_title = 'STAAH Sync Logs'
+    singular_name = 'Sync Log'
+    add_url_name = None
+    edit_url_name = None
+    delete_url_name = None
+    columns = [
+        {'label': 'Property', 'field': 'property.name'},
+        {'label': 'Type', 'field': 'sync_type'},
+        {'label': 'Direction', 'field': 'direction'},
+        {'label': 'Status', 'field': 'status'},
+        {'label': 'Time', 'field': 'created_at'},
+        {'label': 'Error', 'field': 'error_message'},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('property')
+
+
+class ChannelMappingListView(BaseListView):
+    module = Module.INTEGRATIONS
+    model = ChannelMapping
+    ordering = ['property']
+    page_title = 'STAAH Channel Mappings'
+    singular_name = 'Channel Mapping'
+    add_url_name = 'dashboard:channelmapping_add'
+    edit_url_name = 'dashboard:channelmapping_edit'
+    delete_url_name = 'dashboard:channelmapping_delete'
+    columns = [
+        {'label': 'Property', 'field': 'property.name'},
+        {'label': 'Room Type', 'field': 'room_type.name'},
+        {'label': 'Rate Plan', 'field': 'rate_plan.name'},
+        {'label': 'STAAH Property ID', 'field': 'staah_property_id'},
+        {'label': 'STAAH Room ID', 'field': 'staah_room_id'},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('property', 'room_type', 'rate_plan')
+
+
+class ChannelMappingCreateView(BaseCreateView):
+    module = Module.INTEGRATIONS
+    model = ChannelMapping
+    fields = ['property', 'room_type', 'rate_plan', 'staah_property_id', 'staah_room_id', 'staah_rate_plan_id']
+    page_title = 'Add Channel Mapping'
+    success_message = 'Channel mapping created successfully.'
+    success_url = reverse_lazy('dashboard:channelmapping_list')
+
+
+class ChannelMappingUpdateView(BaseUpdateView):
+    module = Module.INTEGRATIONS
+    model = ChannelMapping
+    fields = ['property', 'room_type', 'rate_plan', 'staah_property_id', 'staah_room_id', 'staah_rate_plan_id']
+    page_title = 'Edit Channel Mapping'
+    success_message = 'Channel mapping updated successfully.'
+    success_url = reverse_lazy('dashboard:channelmapping_list')
+
+
+class ChannelMappingDeleteView(BaseDeleteView):
+    module = Module.INTEGRATIONS
+    model = ChannelMapping
+    success_url = reverse_lazy('dashboard:channelmapping_list')

@@ -96,3 +96,106 @@ class BookingRoom(BaseModel):
 
     def __str__(self):
         return f"{self.booking.booking_number} - {self.room}"
+
+class Payment(BaseModel):
+    """
+    A single payment transaction against a Booking. A booking can have
+    multiple Payment rows (deposit, balance, split payments, failed
+    attempts kept for audit trail).
+    """
+    class Method(models.TextChoices):
+        CASH = 'CASH', 'Cash'
+        CARD = 'CARD', 'Card'
+        UPI = 'UPI', 'UPI'
+        BANK_TRANSFER = 'BANK_TRANSFER', 'Bank Transfer'
+        ONLINE_GATEWAY = 'ONLINE_GATEWAY', 'Online Gateway'
+        OTHER = 'OTHER', 'Other'
+
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        SUCCESS = 'SUCCESS', 'Success'
+        FAILED = 'FAILED', 'Failed'
+        REFUNDED = 'REFUNDED', 'Refunded'          # fully refunded
+        PARTIALLY_REFUNDED = 'PARTIALLY_REFUNDED', 'Partially Refunded'
+
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    method = models.CharField(max_length=20, choices=Method.choices, default=Method.CASH)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.SUCCESS)
+    gateway_order_id = models.CharField(max_length=150, blank=True, db_index=True)
+    transaction_reference = models.CharField(max_length=150, blank=True, db_index=True)
+    gateway_response = models.JSONField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    notes = models.CharField(max_length=255, blank=True)
+    received_by = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='payments_received'
+    )
+
+    class Meta:
+        db_table = 'payments'
+        verbose_name = 'Payment'
+        verbose_name_plural = 'Payments'
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['booking', 'status'])]
+
+    def __str__(self):
+        return f"{self.booking.booking_number} - {self.amount} ({self.status})"
+
+
+class Invoice(BaseModel):
+    """
+    A generated bill for a Booking. Line items are stored as JSON
+    (room charges, taxes, discounts) rather than a separate line-item
+    model — invoices are a point-in-time snapshot of charges, not
+    something that needs relational querying line-by-line.
+    """
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='invoice')
+    invoice_number = models.CharField(max_length=30, unique=True, db_index=True)
+    line_items = models.JSONField(default=list)  # [{"description": "...", "amount": "..."}]
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'invoices'
+        verbose_name = 'Invoice'
+        verbose_name_plural = 'Invoices'
+        ordering = ['-issued_at']
+
+    def __str__(self):
+        return self.invoice_number
+
+
+class Refund(BaseModel):
+    """
+    A refund against a specific Payment. Kept separate from Payment
+    (rather than a negative-amount Payment row) since refunds have
+    their own reason/status lifecycle and need clear audit separation
+    from the original charge.
+    """
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        PROCESSED = 'PROCESSED', 'Processed'
+        FAILED = 'FAILED', 'Failed'
+
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='refunds')
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='refunds')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    reason = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    transaction_reference = models.CharField(max_length=150, blank=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    processed_by = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='refunds_processed'
+    )
+
+    class Meta:
+        db_table = 'refunds'
+        verbose_name = 'Refund'
+        verbose_name_plural = 'Refunds'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Refund {self.amount} - {self.booking.booking_number}"

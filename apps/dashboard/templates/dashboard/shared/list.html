@@ -51,7 +51,27 @@
                     {% endfor %}
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
+                                {% if view_url_name %}
+                                <a href="{% url view_url_name obj.pk %}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 transition text-[11px] font-bold text-ink-500">
+                                    <i class="fa-solid fa-eye text-[9px]"></i> View
+                                </a>
+                                {% endif %}
                             {% if can_edit and edit_url_name %}
+                                {% if obj.status == 'CONFIRMED' %}
+                                <form method="post" action="{% url 'dashboard:booking_checkin' obj.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition text-[11px] font-bold">
+                                        <i class="fa-solid fa-right-to-bracket text-[9px]"></i> Check In
+                                    </button>
+                                </form>
+                                {% elif obj.status == 'CHECKED_IN' %}
+                                <form method="post" action="{% url 'dashboard:booking_checkout' obj.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition text-[11px] font-bold">
+                                        <i class="fa-solid fa-right-from-bracket text-[9px]"></i> Check Out
+                                    </button>
+                                </form>
+                                {% endif %}
                             <a href="{% url edit_url_name obj.pk %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-ink-200 hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 transition text-[11px] font-bold text-ink-500">
                                 <i class="fa-solid fa-pen text-[9px]"></i> Edit
                             </a>

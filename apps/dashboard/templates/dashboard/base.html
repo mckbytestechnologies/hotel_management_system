@@ -201,6 +201,25 @@
                 <i class="fa-solid fa-calendar-check"></i>
                 <span>Bookings</span>
             </a>
+
+            <a href="{% url 'dashboard:payment_list' %}" class="nav-link">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <span>Payments</span>
+            </a>
+            <a href="{% url 'dashboard:invoice_list' %}" class="nav-link">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="{% url 'dashboard:channelmapping_list' %}" class="nav-link">
+                <i class="fa-solid fa-link"></i>
+                <span>Channel Mappings</span>
+            </a>
+            <a href="{% url 'dashboard:synclog_list' %}" class="nav-link">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Sync Logs</span>
+            </a>
+
             <a href="#" class="nav-link">
                 <i class="fa-solid fa-user-shield"></i>
                 <span>Accounts</span>

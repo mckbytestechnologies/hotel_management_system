@@ -114,3 +114,25 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')
+RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='')
+
+
+STAAH_API_BASE_URL = env('STAAH_API_BASE_URL', default='https://api.staah.com')
+STAAH_API_KEY = env('STAAH_API_KEY', default='')
+STAAH_API_SECRET = env('STAAH_API_SECRET', default='')
+
+CHANNEX_API_BASE_URL = env('CHANNEX_API_BASE_URL', default='https://staging.channex.io/api/v1')
+CHANNEX_API_KEY = env('CHANNEX_API_KEY', default='')
+CHANNEX_WEBHOOK_SECRET = env('CHANNEX_WEBHOOK_SECRET', default='')
+
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@yourhotel.com')
+
+ADMIN_NOTIFICATION_EMAIL = env('ADMIN_NOTIFICATION_EMAIL', default='')

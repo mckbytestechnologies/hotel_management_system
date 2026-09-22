@@ -1,140 +1,581 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clouds Serviced Apartments | Book Your Stay</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: { 500: '#3b6ef5', 600: '#2a56db', 700: '#2344b0' },
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .hero-bg {
-            background: linear-gradient(rgba(15,23,42,0.55), rgba(15,23,42,0.75)),
-                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600') center/cover;
-        }
-        .input {
-            width: 100%;
-            border: 1px solid #e2e5ec;
-            border-radius: 10px;
-            font-size: 13.5px;
-            font-weight: 500;
-            padding: 12px 14px;
-            color: #1e2330;
-        }
-        .input:focus { outline: none; border-color: #3b6ef5; box-shadow: 0 0 0 4px rgba(59,110,245,0.12); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M Square — Serviced Apartments</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  :root{
+    --ink:#15181B;
+    --paper:#F6F3EC;
+    --paper-2:#EFEAE0;
+    --bottle:#1F3D33;
+    --bottle-light:#2B5245;
+    --stone:#8B8375;
+    --stone-light:#B8B0A0;
+    --white:#FFFFFF;
+    --line: rgba(21,24,27,0.10);
+    --line-dark: rgba(246,243,236,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{ font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ color:inherit; text-decoration:none; }
+  img{ display:block; max-width:100%; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  @media (min-width:1024px){ .wrap{ padding:0 40px; } }
+
+  /* ---------- header ---------- */
+  header.site{
+    position:absolute; inset:0 0 auto 0; z-index:40;
+    padding:28px 0;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{
+    width:38px; height:38px; border-radius:8px;
+    background:var(--white); color:var(--bottle);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+  }
+  .brand-name{ color:var(--white); font-size:17px; letter-spacing:0.01em; }
+  .brand-sub{ color:rgba(255,255,255,0.5); font-size:11px; letter-spacing:0.08em; margin-top:1px; }
+
+  .nav{ display:none; align-items:center; gap:32px; font-size:14px; color:rgba(255,255,255,0.82); }
+  @media (min-width:860px){ .nav{ display:flex; } }
+  .nav a:hover{ color:var(--white); }
+
+  .staff-link{
+    display:none;
+    font-size:13.5px; color:rgba(255,255,255,0.85);
+    border:1px solid rgba(255,255,255,0.28);
+    padding:9px 18px; border-radius:100px;
+    transition:border-color .18s ease, color .18s ease;
+  }
+  @media (min-width:640px){ .staff-link{ display:inline-block; } }
+  .staff-link:hover{ color:var(--white); border-color:rgba(255,255,255,0.6); }
+
+  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+
+  /* ---------- hero ---------- */
+  section.hero{
+    position:relative; min-height:100vh;
+    display:flex; align-items:flex-end;
+    background:var(--ink); overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute; inset:0;
+    background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2200&q=80') center/cover;
+  }
+  .hero-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(21,24,27,0.35) 0%, rgba(21,24,27,0.55) 55%, rgba(21,24,27,0.92) 100%);
+  }
+  .hero-inner{ position:relative; z-index:5; width:100%; padding-bottom:88px; padding-top:170px; }
+  .hero-grid{ display:grid; gap:40px; }
+  @media (min-width:960px){ .hero-grid{ grid-template-columns:1.3fr 0.7fr; align-items:end; } }
+
+  .hero-label{ color:var(--stone-light); font-size:13.5px; font-style:italic; font-family:'Fraunces',serif; margin-bottom:18px; }
+  h1.hero-title{
+    color:var(--white); font-size:44px; line-height:1.08; letter-spacing:-0.015em;
+    max-width:15ch;
+  }
+  @media (min-width:640px){ h1.hero-title{ font-size:58px; } }
+  @media (min-width:1180px){ h1.hero-title{ font-size:68px; } }
+
+  .hero-copy{ color:rgba(246,243,236,0.72); font-size:16px; line-height:1.6; max-width:46ch; margin-top:22px; }
+
+  .hero-stats{
+    display:grid; grid-template-columns:1fr 1fr; gap:1px;
+    background:rgba(246,243,236,0.14);
+    border:1px solid rgba(246,243,236,0.14);
+  }
+  .hero-stat{ background:rgba(21,24,27,0.35); padding:22px; }
+  .hero-stat .n{ color:var(--white); font-family:'Fraunces',serif; font-size:26px; }
+  .hero-stat .l{ color:rgba(246,243,236,0.55); font-size:12.5px; margin-top:4px; }
+
+  /* ---------- band ---------- */
+  section.band{ background:var(--white); border-bottom:1px solid var(--line); }
+  .band-grid{ display:grid; grid-template-columns:1fr; }
+  @media (min-width:760px){ .band-grid{ grid-template-columns:repeat(4,1fr); } }
+  .band-item{
+    display:flex; align-items:center; gap:14px; padding:24px 6px;
+    border-bottom:1px solid var(--line);
+  }
+  @media (min-width:760px){
+    .band-item{ border-bottom:none; border-right:1px solid var(--line); padding:26px; }
+    .band-item:last-child{ border-right:none; }
+  }
+  .band-item i{ color:var(--bottle); font-size:16px; width:20px; text-align:center; }
+  .band-item .t{ font-size:14px; font-weight:600; }
+  .band-item .s{ font-size:12.5px; color:var(--stone); margin-top:2px; }
+
+  /* ---------- section heading ---------- */
+  .section{ padding:100px 0; }
+  .section-head{ max-width:640px; margin-bottom:56px; }
+  .section-head h2{ font-size:36px; line-height:1.15; letter-spacing:-0.01em; }
+  @media (min-width:760px){ .section-head h2{ font-size:44px; } }
+  .section-head .accent{ color:var(--bottle); }
+  .section-head p{ font-size:15.5px; color:var(--stone); line-height:1.6; margin-top:16px; max-width:52ch; }
+
+  /* ---------- three quiet cards (no numbers — not a sequence) ---------- */
+  .service-grid{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
+  @media (min-width:760px){ .service-grid{ grid-template-columns:repeat(3,1fr); } }
+  .service{ background:var(--white); padding:36px 32px; }
+  .service i{ color:var(--bottle); font-size:19px; }
+  .service h3{ font-size:19px; margin-top:22px; }
+  .service p{ font-size:14px; color:var(--stone); line-height:1.65; margin-top:10px; }
+
+  /* ---------- how it works (a real sequence: numbers earned) ---------- */
+  section.flow{ background:var(--ink); color:var(--white); }
+  .flow-grid{ display:grid; gap:56px; }
+  @media (min-width:900px){ .flow-grid{ grid-template-columns:0.85fr 1.15fr; } }
+  .flow-head h2{ color:var(--white); font-size:36px; line-height:1.18; }
+  @media (min-width:760px){ .flow-head h2{ font-size:42px; } }
+  .flow-head p{ color:rgba(246,243,236,0.55); font-size:15px; line-height:1.6; margin-top:18px; max-width:38ch; }
+
+  .flow-steps{ display:flex; flex-direction:column; }
+  .flow-step{
+    display:flex; gap:22px; padding:26px 0;
+    border-top:1px solid var(--line-dark);
+  }
+  .flow-step:last-child{ border-bottom:1px solid var(--line-dark); }
+  .flow-step .num{ font-family:'Fraunces',serif; font-size:14px; color:var(--stone-light); padding-top:3px; width:26px; flex-shrink:0; }
+  .flow-step h4{ font-size:17px; color:var(--white); font-weight:500; margin:0; }
+  .flow-step p{ color:rgba(246,243,236,0.55); font-size:14px; line-height:1.6; margin-top:6px; max-width:44ch; }
+
+  /* ---------- rooms ---------- */
+  .room-feature{ display:grid; border:1px solid var(--line); overflow:hidden; }
+  @media (min-width:900px){ .room-feature{ grid-template-columns:1.2fr 0.8fr; } }
+  .room-feature .img{ position:relative; min-height:320px; background-size:cover; background-position:center; }
+  @media (min-width:900px){ .room-feature .img{ min-height:100%; } }
+  .room-feature .body{ padding:40px; display:flex; flex-direction:column; justify-content:space-between; background:var(--white); }
+  .room-tag{ font-size:12.5px; color:var(--bottle); font-style:italic; font-family:'Fraunces',serif; }
+  .room-feature h3{ font-size:27px; margin-top:14px; }
+  .room-feature .desc{ font-size:14.5px; color:var(--stone); line-height:1.65; margin-top:14px; }
+  .spec-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:26px; }
+  .spec{ background:var(--paper-2); padding:14px 16px; }
+  .spec .l{ font-size:11px; color:var(--stone); }
+  .spec .v{ font-size:13.5px; font-weight:600; margin-top:3px; }
+  .price-row{ margin-top:28px; padding-top:22px; border-top:1px solid var(--line); }
+  .price-row .l{ font-size:12px; color:var(--stone); }
+  .price-row .v{ font-family:'Fraunces',serif; font-size:26px; margin-top:2px; }
+  .price-row .v span{ font-family:'Inter',sans-serif; font-size:13px; color:var(--stone); font-weight:400; }
+
+  .room-small-grid{ display:grid; gap:20px; margin-top:20px; }
+  @media (min-width:700px){ .room-small-grid{ grid-template-columns:1fr 1fr; } }
+  .room-small{ border:1px solid var(--line); overflow:hidden; background:var(--white); }
+  .room-small .img{ height:220px; background-size:cover; background-position:center; }
+  .room-small .body{ padding:22px 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .room-small h4{ font-size:16.5px; font-weight:500; }
+  .room-small .s{ font-size:13px; color:var(--stone); margin-top:3px; }
+  .room-small .go{
+    width:38px; height:38px; border-radius:100px; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .room-small:hover .go{ background:var(--bottle); color:var(--white); border-color:var(--bottle); }
+
+  /* ---------- booking panel ---------- */
+  section.book{ background:var(--paper); }
+  .book-panel{ background:var(--ink); border-radius:6px; padding:44px 28px; position:relative; }
+  @media (min-width:760px){ .book-panel{ padding:56px; } }
+  .book-head p.eyebrow{ color:var(--stone-light); font-family:'Fraunces',serif; font-style:italic; font-size:14px; }
+  .book-head h2{ color:var(--white); font-size:32px; margin-top:12px; }
+  @media (min-width:760px){ .book-head h2{ font-size:38px; } }
+
+  .msg{ background:rgba(207,88,60,0.14); border:1px solid rgba(207,88,60,0.35); color:#E9B9AA; font-size:13.5px; padding:12px 16px; border-radius:4px; margin-top:22px; }
+
+  form.search{ margin-top:34px; display:grid; gap:12px; }
+  @media (min-width:1024px){ form.search{ grid-template-columns:1.3fr 1fr 1fr 0.8fr auto; align-items:stretch; } }
+
+  .field{ border:1px solid var(--line-dark); background:rgba(246,243,236,0.04); padding:14px 16px; border-radius:4px; }
+  .field label{ display:block; font-size:11px; color:var(--stone-light); margin-bottom:5px; }
+  .field select, .field input{
+    width:100%; background:transparent; border:none; color:var(--white);
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:500; outline:none;
+  }
+  .field select option{ background:var(--ink); color:var(--white); }
+  input[type="date"]::-webkit-calendar-picker-indicator{ filter:invert(1); opacity:0.55; cursor:pointer; }
+
+  .btn-search{
+    background:var(--paper); color:var(--ink);
+    border:none; border-radius:4px; padding:14px 26px;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+    cursor:pointer; transition:background .18s ease;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .btn-search:hover{ background:var(--white); }
+
+  .book-foot{ display:flex; flex-wrap:wrap; gap:20px; margin-top:22px; font-size:12.5px; color:rgba(246,243,236,0.4); }
+
+  /* ---------- philosophy ---------- */
+  section.about{ background:var(--white); }
+  .about-grid{ display:grid; gap:52px; align-items:center; }
+  @media (min-width:960px){ .about-grid{ grid-template-columns:1fr 0.85fr; } }
+  .about-text h2{ font-size:34px; line-height:1.16; max-width:14ch; }
+  @media (min-width:760px){ .about-text h2{ font-size:42px; } }
+  .about-text p{ font-size:15px; color:var(--stone); line-height:1.7; margin-top:20px; max-width:48ch; }
+  .about-img{ position:relative; }
+  .about-img .frame{ border-radius:4px; overflow:hidden; }
+  .about-img img{ width:100%; height:440px; object-fit:cover; }
+  .quote{
+    position:absolute; left:-16px; bottom:-24px; max-width:260px;
+    background:var(--ink); color:var(--paper);
+    padding:22px; border-radius:4px; font-family:'Fraunces',serif; font-size:14.5px; line-height:1.55;
+  }
+  @media (max-width:640px){ .quote{ position:static; margin-top:16px; max-width:none; } }
+
+  /* ---------- footer ---------- */
+  footer{ background:var(--ink); color:rgba(246,243,236,0.55); padding:72px 0 32px; }
+  .foot-grid{ display:grid; gap:44px; }
+  @media (min-width:760px){ .foot-grid{ grid-template-columns:1.4fr 1fr 1fr 1fr; } }
+  footer .brand-name, footer .brand-sub{ color:var(--white); }
+  footer .brand-sub{ color:rgba(246,243,236,0.4); }
+  .foot-desc{ font-size:13.5px; line-height:1.6; margin-top:18px; max-width:34ch; }
+  .foot-col h5{ font-size:12px; color:var(--white); letter-spacing:0.03em; }
+  .foot-col a, .foot-col p{ display:block; font-size:13.5px; margin-top:12px; }
+  .foot-col a:hover{ color:var(--white); }
+  .foot-bottom{ margin-top:56px; padding-top:24px; border-top:1px solid var(--line-dark); display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; font-size:12.5px; color:rgba(246,243,236,0.35); }
+</style>
 </head>
-<body class="bg-[#f6f7f9]">
 
-    <!-- NAVBAR -->
-    <nav class="bg-white border-b border-ink-100 px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-[10px] bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-                <i class="fa-solid fa-hotel text-white text-[15px]"></i>
-            </div>
-            <span class="text-[16px] font-extrabold text-slate-900">Clouds Serviced Apartments</span>
-        </div>
-        <a href="{% url 'dashboard:login' %}" class="text-[13px] font-semibold text-slate-500 hover:text-brand-600">Staff Login</a>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
+      <div>
+        <p class="brand-name">M Square</p>
+        <p class="brand-sub">Serviced Apartments</p>
+      </div>
+    </a>
+    <nav class="nav">
+      <a href="#top">Home</a>
+      <a href="#rooms">Rooms</a>
+      <a href="#experience">Experience</a>
+      <a href="#about">About</a>
     </nav>
+    <a class="staff-link" href="{% url 'dashboard:login' %}">Staff login</a>
+  </div>
+</header>
 
-    <!-- HERO -->
-    <div class="hero-bg py-24 px-6 flex flex-col items-center text-center">
-        <h1 class="text-white text-[32px] sm:text-[42px] font-extrabold tracking-tight max-w-2xl">
-            Find Your Perfect Stay
-        </h1>
-        <p class="text-white/80 text-[14px] font-medium mt-3 max-w-md">
-            Comfortable rooms, transparent pricing, instant confirmation.
-        </p>
+<section class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-scrim"></div>
+  <div class="hero-inner wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="hero-label">A quieter kind of hospitality</p>
+        <h1 class="hero-title">Rooms built for staying, not just sleeping.</h1>
+        <p class="hero-copy">Serviced apartments designed for longer visits — real kitchens, real light, and a booking process that takes under two minutes.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><p class="n">4.9</p><p class="l">Guest rating</p></div>
+        <div class="hero-stat"><p class="n">12min</p><p class="l">Avg. check-in</p></div>
+        <div class="hero-stat"><p class="n">24/7</p><p class="l">Front desk</p></div>
+        <div class="hero-stat"><p class="n">0</p><p class="l">Hidden fees</p></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- SEARCH CARD -->
-        <div class="bg-white rounded-2xl shadow-2xl p-6 mt-10 w-full max-w-4xl">
-            {% if messages %}
-                {% for message in messages %}
-                <div class="mb-4 px-4 py-2.5 rounded-lg bg-rose-50 text-rose-700 text-[12.5px] font-semibold text-left">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            {% endif %}
-            <form method="post" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                {% csrf_token %}
+<section class="band">
+  <div class="wrap band-grid">
+    <div class="band-item"><i class="fa-solid fa-bed"></i><div><p class="t">Rooms</p><p class="s">Live availability</p></div></div>
+    <div class="band-item"><i class="fa-regular fa-calendar"></i><div><p class="t">Reservations</p><p class="s">Instant confirmation</p></div></div>
+    <div class="band-item"><i class="fa-solid fa-shield-halved"></i><div><p class="t">Guest data</p><p class="s">Kept private</p></div></div>
+    <div class="band-item"><i class="fa-solid fa-credit-card"></i><div><p class="t">Payments</p><p class="s">Clear, itemized</p></div></div>
+  </div>
+</section>
 
-                <div class="lg:col-span-2 text-left">
-                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Property</label>
-                    <select name="property" class="input" required>
-                        {% for property in properties %}
-                        <option value="{{ property.id }}">{{ property.name }} — {{ property.city }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+<section class="section book" id="find-stay">
+  <div class="wrap">
+    <div class="book-panel">
+      <div class="book-head">
+        <p class="eyebrow">Check availability</p>
+        <h2>Find your dates.</h2>
+      </div>
 
-                <div class="text-left">
-                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Check-in</label>
-                    <input type="date" name="check_in" value="{{ default_checkin }}" class="input" required>
-                </div>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="msg">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
 
-                <div class="text-left">
-                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Check-out</label>
-                    <input type="date" name="check_out" value="{{ default_checkout }}" class="input" required>
-                </div>
+      <form method="post" class="search">
+        {% csrf_token %}
 
-                <div class="text-left">
-                    <label class="block text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Guests</label>
-                    <select name="adults" class="input">
-                        <option value="1">1 Adult</option>
-                        <option value="2" selected>2 Adults</option>
-                        <option value="3">3 Adults</option>
-                        <option value="4">4 Adults</option>
-                    </select>
-                </div>
-
-                <div class="lg:col-span-5">
-                    <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-[14px] py-3.5 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-magnifying-glass text-[12px]"></i>
-                        Search Availability
-                    </button>
-                </div>
-            </form>
+        <div class="field">
+          <label for="f-property">Property</label>
+          <select id="f-property" name="property" required>
+            {% for property in properties %}
+              <option value="{{ property.id }}">{{ property.name }} — {{ property.city }}</option>
+            {% empty %}
+              <option value="">M Square Hotel</option>
+            {% endfor %}
+          </select>
         </div>
+
+        <div class="field">
+          <label for="f-checkin">Check-in</label>
+          <input type="date" id="f-checkin" name="check_in" value="{{ default_checkin }}" min="{{ min_checkin }}" required>
+        </div>
+
+        <div class="field">
+          <label for="f-checkout">Check-out</label>
+          <input type="date" id="f-checkout" name="check_out" value="{{ default_checkout }}" required>
+        </div>
+
+        <div class="field">
+          <label for="f-adults">Guests</label>
+          <select id="f-adults" name="adults">
+            <option value="1">1 guest</option>
+            <option value="2" selected>2 guests</option>
+            <option value="3">3 guests</option>
+            <option value="4">4 guests</option>
+            <option value="5">5 guests</option>
+            <option value="6">6 guests</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-search">Search</button>
+      </form>
+
+      <div class="book-foot">
+        <span>Real-time availability</span>
+        <span>No hidden fees</span>
+        <span>Free cancellation on most rooms</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Fewer steps between <span class="accent">arriving</span> and settling in.</h2>
+      <p>Everything from finding a room to checking out runs through one system, so nothing gets lost between the booking and the front desk.</p>
+    </div>
+    <div class="service-grid">
+      <div class="service">
+        <i class="fa-solid fa-bed"></i>
+        <h3>Room operations</h3>
+        <p>Availability, pricing and status stay in sync across every channel a room is listed on.</p>
+      </div>
+      <div class="service">
+        <i class="fa-regular fa-address-card"></i>
+        <h3>Guest history</h3>
+        <p>Preferences and past stays are on hand the moment a returning guest checks in.</p>
+      </div>
+      <div class="service">
+        <i class="fa-solid fa-receipt"></i>
+        <h3>Billing, itemized</h3>
+        <p>Every charge is traceable — no surprise line items at checkout, for guests or for staff.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="flow">
+  <div class="wrap section">
+    <div class="flow-grid">
+      <div class="flow-head">
+        <h2>From search to checkout, in order.</h2>
+        <p>A stay has a natural sequence — this is ours, kept short on purpose.</p>
+      </div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <span class="num">01</span>
+          <div><h4>Search</h4><p>Pick dates and see what's actually free, priced for those exact nights.</p></div>
+        </div>
+        <div class="flow-step">
+          <span class="num">02</span>
+          <div><h4>Reserve</h4><p>Confirm guest details and hold the room — no waiting on a callback.</p></div>
+        </div>
+        <div class="flow-step">
+          <span class="num">03</span>
+          <div><h4>Arrive</h4><p>Front desk already has the reservation; check-in takes minutes.</p></div>
+        </div>
+        <div class="flow-step">
+          <span class="num">04</span>
+          <div><h4>Settle up</h4><p>One itemized bill, sent to your inbox the moment you check out.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="rooms">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>A room for every <span class="accent">length of stay</span>.</h2>
+      <p>Three layouts, each built around comfort for more than a night or two.</p>
     </div>
 
-    <!-- FEATURES STRIP -->
-    <div class="max-w-5xl mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+    <div class="room-feature">
+      <div class="img" style="background-image:url('https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=80')"></div>
+      <div class="body">
         <div>
-            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-500/10 flex items-center justify-center mb-3">
-                <i class="fa-solid fa-shield-halved text-brand-500"></i>
-            </div>
-            <p class="text-[13.5px] font-bold text-slate-900">Instant Confirmation</p>
-            <p class="text-[12px] text-slate-500 mt-1">Get your booking confirmed immediately, no waiting.</p>
+          <p class="room-tag">Most booked</p>
+          <h3>The Double</h3>
+          <p class="desc">A comfortable double room with a proper desk and a kitchenette — built for the stay that runs longer than expected.</p>
+          <div class="spec-grid">
+            <div class="spec"><p class="l">Guests</p><p class="v">Up to 2</p></div>
+            <div class="spec"><p class="l">Floor</p><p class="v">1st floor</p></div>
+            <div class="spec"><p class="l">Size</p><p class="v">28 m²</p></div>
+            <div class="spec"><p class="l">Status</p><p class="v">Available</p></div>
+          </div>
         </div>
-        <div>
-            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-500/10 flex items-center justify-center mb-3">
-                <i class="fa-solid fa-tag text-brand-500"></i>
-            </div>
-            <p class="text-[13.5px] font-bold text-slate-900">Best Rate Guarantee</p>
-            <p class="text-[12px] text-slate-500 mt-1">Book direct and always get our lowest available price.</p>
+        <div class="price-row">
+          <p class="l">Starting from</p>
+          <p class="v">₹3,000 <span>/ night</span></p>
         </div>
-        <div>
-            <div class="w-12 h-12 mx-auto rounded-xl bg-brand-500/10 flex items-center justify-center mb-3">
-                <i class="fa-solid fa-headset text-brand-500"></i>
-            </div>
-            <p class="text-[13.5px] font-bold text-slate-900">24/7 Support</p>
-            <p class="text-[12px] text-slate-500 mt-1">Our team is here to help before, during, and after your stay.</p>
-        </div>
+      </div>
     </div>
+
+    <div class="room-small-grid">
+      <a class="room-small" href="#find-stay">
+        <div class="img" style="background-image:url('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80')"></div>
+        <div class="body">
+          <div><h4>The Deluxe</h4><p class="s">More space to spread out.</p></div>
+          <div class="go"><i class="fa-solid fa-arrow-right" style="font-size:13px;"></i></div>
+        </div>
+      </a>
+      <a class="room-small" href="#find-stay">
+        <div class="img" style="background-image:url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80')"></div>
+        <div class="body">
+          <div><h4>The Suite</h4><p class="s">A separate room to work from.</p></div>
+          <div class="go"><i class="fa-solid fa-arrow-right" style="font-size:13px;"></i></div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section" id="experience">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Details that make a stay <span class="accent">easier</span>, not louder.</h2>
+      <p>The quiet parts of a good stay — the ones you only notice when they're missing.</p>
+    </div>
+    <div class="room-small-grid" style="grid-template-columns:1.4fr 1fr;">
+      <div class="room-small" style="cursor:default;">
+        <div class="img" style="height:320px;background-image:url('https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1600&q=80')"></div>
+        <div class="body" style="display:block;">
+          <h4 style="font-size:19px;">Common spaces, actually usable</h4>
+          <p class="s" style="margin-top:8px;line-height:1.6;">Quiet corners for calls, a proper table for meals, and light that doesn't disappear by 4pm.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="room-small" style="cursor:default;">
+          <div class="img" style="height:140px;background-image:url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80')"></div>
+          <div class="body" style="display:block;padding:18px 20px;">
+            <h4 style="font-size:15.5px;">Dining, nearby</h4>
+            <p class="s" style="margin-top:4px;">Curated picks within walking distance.</p>
+          </div>
+        </div>
+        <div class="room-small" style="cursor:default;">
+          <div class="img" style="height:140px;background-image:url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1000&q=80')"></div>
+          <div class="body" style="display:block;padding:18px 20px;">
+            <h4 style="font-size:15.5px;">Wellness on request</h4>
+            <p class="s" style="margin-top:4px;">In-room or at a partner studio close by.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section about" id="about">
+  <div class="wrap about-grid">
+    <div class="about-text">
+      <h2>Hospitality should be easy to forget you're managing.</h2>
+      <p>A good stay isn't measured by the room alone — it's the absence of friction everywhere around it: the booking, the check-in, the bill.</p>
+      <p>M Square keeps rooms, reservations and billing in one place, so guests get a smoother stay and the team behind it keeps a clear view of everything running.</p>
+    </div>
+    <div class="about-img">
+      <div class="frame">
+        <img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1400&q=80" alt="Interior">
+      </div>
+      <div class="quote">"The best system is the one you stop noticing."</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#top">
+          <div class="brand-mark" style="background:var(--bottle-light);color:var(--white);"><i class="fa-solid fa-hotel"></i></div>
+          <div><p class="brand-name">M Square</p><p class="brand-sub">Serviced Apartments</p></div>
+        </a>
+        <p class="foot-desc">A modern serviced-apartment stay, built around comfort and a booking process that gets out of the way.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Explore</h5>
+        <a href="#rooms">Rooms</a>
+        <a href="#experience">Experience</a>
+        <a href="#about">About</a>
+      </div>
+      <div class="foot-col">
+        <h5>Guest</h5>
+        <a href="#find-stay">Find a room</a>
+        <a href="#about">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h5>Management</h5>
+        <p style="max-width:24ch;">Staff access the booking system separately from the guest site.</p>
+        <a href="{% url 'dashboard:login' %}" style="color:var(--white);">Staff login →</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 M Square Hotel. All rights reserved.</p>
+      <div style="display:flex;gap:20px;">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const checkIn = document.getElementById('f-checkin');
+    const checkOut = document.getElementById('f-checkout');
+    if (!checkIn || !checkOut) return;
+
+    function updateCheckoutMin() {
+      if (!checkIn.value) return;
+      const d = new Date(checkIn.value);
+      d.setDate(d.getDate() + 1);
+      const min = d.toISOString().split('T')[0];
+      checkOut.min = min;
+      if (!checkOut.value || checkOut.value < min) checkOut.value = min;
+    }
+    checkIn.addEventListener('change', updateCheckoutMin);
+    updateCheckoutMin();
+  });
+</script>
 
 </body>
 </html>
