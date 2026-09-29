@@ -155,6 +155,15 @@
       </div>
     </div>
 
+        {% if property_images %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:36px;">
+      {% for img in property_images %}
+      <img src="{{ img.image.url }}" alt="{{ img.caption|default:property.name }}"
+           style="width:100%; height:150px; object-fit:cover; border-radius:4px;">
+      {% endfor %}
+    </div>
+    {% endif %}
+
     {% if messages %}
       {% for message in messages %}
         <div class="msg"><i class="fa-solid fa-circle-exclamation" style="margin-top:2px;"></i><span>{{ message }}</span></div>
@@ -174,7 +183,9 @@
             <span class="avail-pill"><span class="dot"></span>{{ r.available_rooms }} room{{ r.available_rooms|pluralize }} left</span>
           </div>
 
-          <p class="room-desc">{{ r.room_type.description|default:"Comfortable, well-appointed room." }}</p>
+          <div class="room-desc">
+              {{ r.room_type.description|default:"Comfortable, well-appointed room."|safe }}
+          </div>
 
           <div class="tag-row">
             <div class="tag"><i class="fa-solid fa-user-group"></i> Up to {{ r.room_type.max_occupancy }} guests</div>

@@ -1,1234 +1,147 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Booking Confirmed | M Square Hotel</title>
-
-
-    <!-- ========================================================= -->
-    <!-- TAILWIND -->
-    <!-- ========================================================= -->
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-
-    <!-- ========================================================= -->
-    <!-- FONT -->
-    <!-- ========================================================= -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-
-    <!-- ========================================================= -->
-    <!-- FONT AWESOME -->
-    <!-- ========================================================= -->
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
-
-
-    <!-- ========================================================= -->
-    <!-- TAILWIND CONFIG -->
-    <!-- ========================================================= -->
-
-    <script>
-
-        tailwind.config = {
-
-            theme: {
-
-                extend: {
-
-                    fontFamily: {
-
-                        sans: ['Inter', 'sans-serif']
-
-                    },
-
-                    colors: {
-
-                        hotel: {
-
-                            cream: '#F7F4EC',
-
-                            navy: '#172033',
-
-                            dark: '#0B132B',
-
-                            gold: '#D6B878',
-
-                            goldLight: '#E3CC91',
-
-                            muted: '#6D7280',
-
-                            goldDark: '#9B8350'
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    </script>
-
-
-    <!-- ========================================================= -->
-    <!-- CUSTOM CSS -->
-    <!-- ========================================================= -->
-
-    <style>
-
-        html {
-
-            scroll-behavior: smooth;
-
-        }
-
-
-        body {
-
-            font-family: 'Inter', sans-serif;
-
-        }
-
-
-        .glass-card {
-
-            backdrop-filter: blur(18px);
-
-            -webkit-backdrop-filter: blur(18px);
-
-        }
-
-
-        .hero-glow {
-
-            animation: glow 8s ease-in-out infinite alternate;
-
-        }
-
-
-        @keyframes glow {
-
-            from {
-
-                transform: scale(1);
-
-                opacity: 0.35;
-
-            }
-
-            to {
-
-                transform: scale(1.15);
-
-                opacity: 0.55;
-
-            }
-
-        }
-
-
-        .check-animation {
-
-            animation: checkAppear 0.6s ease-out forwards;
-
-        }
-
-
-        @keyframes checkAppear {
-
-            0% {
-
-                transform: scale(0.5);
-
-                opacity: 0;
-
-            }
-
-            70% {
-
-                transform: scale(1.08);
-
-            }
-
-            100% {
-
-                transform: scale(1);
-
-                opacity: 1;
-
-            }
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmed | M Square</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  :root{
+    --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
+    --bottle:#1F3D33; --bottle-light:#2B5245;
+    --stone:#8B8375; --line: rgba(21,24,27,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased;
+  }
+  h1,.serif{ font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em; }
+  p{ margin:0; } a{ color:inherit; text-decoration:none; }
+
+  .card{ width:100%; max-width:480px; background:var(--white); background:#fff; border:1px solid var(--line); border-radius:4px; padding:40px 34px; text-align:center; }
+  .check{ width:52px; height:52px; border-radius:100px; background:rgba(31,61,51,0.10); color:var(--bottle); display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:19px; }
+  h1{ font-size:24px; margin-top:22px; }
+  .sub{ font-size:13.5px; color:var(--stone); margin-top:8px; }
+
+  .details{ background:var(--paper-2); border-radius:4px; margin-top:26px; padding:22px 24px; text-align:left; display:flex; flex-direction:column; gap:12px; }
+  .drow{ display:flex; justify-content:space-between; font-size:13.5px; }
+  .drow .l{ color:var(--stone); }
+  .drow .v{ font-weight:600; }
+  .dtotal{ border-top:1px solid var(--line); margin-top:4px; padding-top:14px; display:flex; justify-content:space-between; align-items:baseline; }
+  .dtotal .l{ font-size:14.5px; font-weight:600; }
+  .dtotal .v{ font-family:'Fraunces',serif; font-size:22px; }
+
+  .btn-pay{
+    width:100%; margin-top:24px; padding:15px; border:none; border-radius:4px;
+    background:var(--bottle); color:var(--white); font-family:'Inter',sans-serif;
+    font-weight:600; font-size:14.5px; cursor:pointer; transition:background .18s ease;
+  }
+  .btn-pay:hover{ background:var(--bottle-light); }
+  .btn-pay:disabled{ opacity:0.6; cursor:not-allowed; }
+
+  .links{ margin-top:22px; display:flex; flex-direction:column; gap:10px; }
+  .link-home{ font-size:13.5px; font-weight:600; color:var(--bottle); }
+  .link-invoice{ font-size:12.5px; color:var(--stone); display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+  .link-invoice:hover{ color:var(--ink); }
+</style>
 </head>
 
-
-<body class="min-h-screen bg-[#F7F4EC] text-[#172033]">
-
-
-<!-- ========================================================= -->
-<!-- HEADER -->
-<!-- ========================================================= -->
-
-<header class="absolute left-0 right-0 top-0 z-50">
-
-    <div
-        class="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-10"
-    >
-
-
-        <!-- ===================================================== -->
-        <!-- LOGO -->
-        <!-- ===================================================== -->
-
-        <a
-            href="{% url 'public:landing' %}"
-            class="flex items-center gap-3"
-        >
-
-            <div
-                class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#172033] text-[#D6B878]"
-            >
-
-                <i class="fa-solid fa-hotel text-[18px]"></i>
-
-            </div>
-
-
-            <div>
-
-                <p
-                    class="text-lg font-semibold tracking-[0.08em] text-[#172033]"
-                >
-                    M Square
-                </p>
-
-                <p
-                    class="text-[9px] uppercase tracking-[0.22em] text-[#172033]/45"
-                >
-                    Hotel
-                </p>
-
-            </div>
-
-        </a>
-
-
-        <!-- ===================================================== -->
-        <!-- SECURE LABEL -->
-        <!-- ===================================================== -->
-
-        <div
-            class="hidden items-center gap-2 text-xs font-medium text-[#6D7280] sm:flex"
-        >
-
-            <i class="fa-solid fa-shield-halved text-[#9B8350]"></i>
-
-            Secure reservation
-
-        </div>
-
-    </div>
-
-</header>
-
-
-
-<!-- ========================================================= -->
-<!-- MAIN -->
-<!-- ========================================================= -->
-
-<main
-    class="relative flex min-h-screen items-center overflow-hidden px-6 py-28 lg:px-10"
->
-
-
-    <!-- ======================================================= -->
-    <!-- BACKGROUND -->
-    <!-- ======================================================= -->
-
-    <div class="absolute inset-0 bg-[#F7F4EC]"></div>
-
-
-    <!-- ======================================================= -->
-    <!-- DECORATIVE GLOW -->
-    <!-- ======================================================= -->
-
-    <div
-        class="hero-glow absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full bg-[#D6B878]/20 blur-3xl"
-    ></div>
-
-
-    <div
-        class="absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-[#172033]/5 blur-3xl"
-    ></div>
-
-
-    <!-- ======================================================= -->
-    <!-- CONTENT -->
-    <!-- ======================================================= -->
-
-    <div class="relative z-10 mx-auto w-full max-w-3xl">
-
-
-        <!-- =================================================== -->
-        <!-- CONFIRMATION CARD -->
-        <!-- =================================================== -->
-
-        <div
-            class="overflow-hidden rounded-[2rem] border border-[#172033]/10 bg-white shadow-2xl"
-        >
-
-
-            <!-- ================================================= -->
-            <!-- TOP DARK SECTION -->
-            <!-- ================================================= -->
-
-            <div
-                class="relative overflow-hidden bg-[#172033] px-6 py-12 text-center sm:px-10"
-            >
-
-
-                <!-- Decorative circles -->
-
-                <div
-                    class="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#D6B878]/10 blur-2xl"
-                ></div>
-
-
-                <div
-                    class="absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-[#D6B878]/5 blur-2xl"
-                ></div>
-
-
-                <div class="relative z-10">
-
-
-                    <!-- ========================================= -->
-                    <!-- CHECK ICON -->
-                    <!-- ========================================= -->
-
-                    <div
-                        class="check-animation mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#D6B878]/30 bg-[#D6B878]/10 text-[#D6B878]"
-                    >
-
-                        <div
-                            class="flex h-14 w-14 items-center justify-center rounded-full bg-[#D6B878]"
-                        >
-
-                            <i
-                                class="fa-solid fa-check text-xl text-[#172033]"
-                            ></i>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- ========================================= -->
-                    <!-- HEADING -->
-                    <!-- ========================================= -->
-
-                    <p
-                        class="mt-7 text-xs font-semibold uppercase tracking-[0.3em] text-[#D6B878]"
-                    >
-                        Reservation complete
-                    </p>
-
-
-                    <h1
-                        class="mt-3 text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl"
-                    >
-                        Booking Confirmed
-                    </h1>
-
-
-                    <p
-                        class="mx-auto mt-3 max-w-md text-sm leading-6 text-white/55"
-                    >
-                        Your stay at M Square Hotel has been successfully reserved.
-                    </p>
-
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ================================================= -->
-            <!-- BOOKING CONTENT -->
-            <!-- ================================================= -->
-
-            <div class="p-6 sm:p-8 lg:p-10">
-
-
-                <!-- ================================================= -->
-                <!-- GUEST CONFIRMATION -->
-                <!-- ================================================= -->
-
-                <div
-                    class="mb-8 flex items-start gap-4 rounded-2xl border border-[#172033]/10 bg-[#F7F4EC] p-5"
-                >
-
-                    <div
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#172033] text-[#D6B878]"
-                    >
-
-                        <i class="fa-regular fa-envelope"></i>
-
-                    </div>
-
-
-                    <div class="min-w-0">
-
-                        <p
-                            class="text-xs font-semibold uppercase tracking-[0.15em] text-[#9B8350]"
-                        >
-                            Confirmation sent
-                        </p>
-
-
-                        <p
-                            class="mt-1 break-all text-sm font-medium text-[#172033]"
-                        >
-                            {{ booking.guest.email }}
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- BOOKING DETAILS HEADING -->
-                <!-- ================================================= -->
-
-                <div class="mb-5 flex items-center justify-between">
-
-                    <div>
-
-                        <p
-                            class="text-xs font-semibold uppercase tracking-[0.25em] text-[#9B8350]"
-                        >
-                            Reservation details
-                        </p>
-
-
-                        <h2
-                            class="mt-2 text-xl font-semibold text-[#172033]"
-                        >
-                            Your stay
-                        </h2>
-
-                    </div>
-
-
-                    <div
-                        class="hidden h-10 w-10 items-center justify-center rounded-xl bg-[#172033]/5 text-[#9B8350] sm:flex"
-                    >
-
-                        <i class="fa-regular fa-calendar-check"></i>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- DETAILS CARD -->
-                <!-- ================================================= -->
-
-                <div
-                    class="overflow-hidden rounded-2xl border border-[#172033]/10 bg-white"
-                >
-
-
-                    <!-- ================================================= -->
-                    <!-- BOOKING NUMBER -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <span class="text-sm text-[#6D7280]">
-                            Booking Number
-                        </span>
-
-
-                        <span
-                            class="break-all text-sm font-semibold text-[#172033] sm:text-right"
-                        >
-                            {{ booking.booking_number }}
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- PROPERTY -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <span class="text-sm text-[#6D7280]">
-                            Property
-                        </span>
-
-
-                        <span
-                            class="text-sm font-semibold text-[#172033] sm:text-right"
-                        >
-                            {{ booking.property.name }}
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- CHECK-IN -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <div class="flex items-center gap-3">
-
-                            <i
-                                class="fa-solid fa-arrow-right-to-bracket text-xs text-[#9B8350]"
-                            ></i>
-
-
-                            <span class="text-sm text-[#6D7280]">
-                                Check-in
-                            </span>
-
-                        </div>
-
-
-                        <span
-                            class="text-sm font-semibold text-[#172033] sm:text-right"
-                        >
-                            {{ booking.check_in_date|date:"M j, Y" }}
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- CHECK-OUT -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <div class="flex items-center gap-3">
-
-                            <i
-                                class="fa-solid fa-arrow-right-from-bracket text-xs text-[#9B8350]"
-                            ></i>
-
-
-                            <span class="text-sm text-[#6D7280]">
-                                Check-out
-                            </span>
-
-                        </div>
-
-
-                        <span
-                            class="text-sm font-semibold text-[#172033] sm:text-right"
-                        >
-                            {{ booking.check_out_date|date:"M j, Y" }}
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- ROOMS -->
-                    <!-- ================================================= -->
-
-                    {% for br in booking.booking_rooms.all %}
-
-                    <div
-                        class="flex flex-col gap-1 border-b border-[#172033]/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <div class="flex items-center gap-3">
-
-                            <i
-                                class="fa-solid fa-bed text-xs text-[#9B8350]"
-                            ></i>
-
-
-                            <span class="text-sm text-[#6D7280]">
-                                Room
-                            </span>
-
-                        </div>
-
-
-                        <span
-                            class="text-sm font-semibold text-[#172033] sm:text-right"
-                        >
-                            {{ br.room_type.name }} - {{ br.room.room_number }}
-                        </span>
-
-                    </div>
-
-                    {% endfor %}
-
-
-
-                    <!-- ================================================= -->
-                    <!-- TOTAL -->
-                    <!-- ================================================= -->
-
-                    <div
-                        class="flex flex-col gap-2 bg-[#172033] px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <div>
-
-                            <p
-                                class="text-xs uppercase tracking-[0.18em] text-[#D6B878]"
-                            >
-                                Total amount
-                            </p>
-
-
-                            <p class="mt-1 text-xs text-white/40">
-                                Reservation total
-                            </p>
-
-                        </div>
-
-
-                        <p class="text-2xl font-semibold text-white">
-                            ₹{{ booking.total_amount }}
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- SECURE INFORMATION -->
-                <!-- ================================================= -->
-
-                <div
-                    class="mt-6 flex items-center gap-3 text-xs text-[#6D7280]"
-                >
-
-                    <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D6B878]/15 text-[#9B8350]"
-                    >
-
-                        <i class="fa-solid fa-shield-halved"></i>
-
-                    </div>
-
-
-                    <p>
-                        Your reservation details are securely stored.
-                    </p>
-
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- ACTIONS -->
-                <!-- ================================================= -->
-
-                <div class="mt-8 grid gap-3 sm:grid-cols-2">
-
-
-                    <!-- ================================================= -->
-                    <!-- BACK TO HOME -->
-                    <!-- ================================================= -->
-
-                    <a
-                        href="{% url 'public:landing' %}"
-                        class="group flex items-center justify-center gap-3 rounded-xl bg-[#D6B878] px-6 py-3.5 text-sm font-semibold text-[#172033] transition hover:bg-[#E3CC91]"
-                    >
-
-                        <i class="fa-solid fa-house text-xs"></i>
-
-                        Back to Home
-
-                        <i
-                            class="fa-solid fa-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"
-                        ></i>
-
-                    </a>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- VIEW / PRINT INVOICE -->
-                    <!-- ================================================= -->
-
-                    <a
-                        href="{% url 'public:invoice' booking.booking_number %}"
-                        target="_blank"
-                        class="flex items-center justify-center gap-2 rounded-xl border border-[#172033]/10 bg-white px-6 py-3.5 text-sm font-semibold text-[#172033] transition hover:border-[#D6B878] hover:bg-[#F7F4EC]"
-                    >
-
-                        <i class="fa-solid fa-file-invoice text-[#9B8350]"></i>
-
-                        View / Print Invoice
-
-                    </a>
-
-                </div>
-
-
-
-                <!-- ================================================= -->
-                <!-- PAYMENT SECTION -->
-                <!-- ================================================= -->
-
-                {% if booking.balance_due > 0 %}
-
-                <div
-                    class="mt-5 rounded-2xl border border-[#D6B878]/30 bg-[#F7F4EC] p-5"
-                >
-
-                    <div
-                        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-
-                        <div>
-
-                            <p
-                                class="text-xs font-semibold uppercase tracking-[0.18em] text-[#9B8350]"
-                            >
-                                Payment pending
-                            </p>
-
-
-                            <p class="mt-1 text-sm text-[#6D7280]">
-                                Complete your payment to finalize your reservation.
-                            </p>
-
-                        </div>
-
-
-                        <!-- ============================================= -->
-                        <!-- PAY NOW BUTTON -->
-                        <!-- ============================================= -->
-
-                        <button
-                            id="pay-now-btn"
-                            type="button"
-                            class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#172033] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#0B132B] disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-
-                            <i
-                                class="fa-solid fa-credit-card text-[#D6B878]"
-                            ></i>
-
-                            Pay ₹{{ booking.balance_due }} Now
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                {% endif %}
-
-
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ================================================= -->
-        <!-- BOTTOM BRANDING -->
-        <!-- ================================================= -->
-
-        <div
-            class="mt-7 flex items-center justify-center gap-3 text-xs text-[#6D7280]"
-        >
-
-            <span class="h-px w-8 bg-[#D6B878]"></span>
-
-
-            <span>
-                Thank you for choosing M Square Hotel
-            </span>
-
-
-            <span class="h-px w-8 bg-[#D6B878]"></span>
-
-        </div>
-
-
-    </div>
-
-</main>
-
-
-
-<!-- ========================================================= -->
-<!-- FOOTER -->
-<!-- ========================================================= -->
-
-<footer
-    class="bg-[#0B132B] px-6 py-8 text-center"
->
-
-    <div class="flex items-center justify-center gap-3">
-
-        <div
-            class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#D6B878] text-[#172033]"
-        >
-
-            <i class="fa-solid fa-hotel text-xs"></i>
-
-        </div>
-
-
-        <p
-            class="text-sm font-semibold tracking-[0.08em] text-white"
-        >
-            M Square Hotel
-        </p>
-
-    </div>
-
-
-    <p class="mt-3 text-xs text-white/30">
-        © 2026 M Square Hotel. All rights reserved.
-    </p>
-
-</footer>
-
-
-
-<!-- ========================================================= -->
-<!-- RAZORPAY -->
-<!-- ========================================================= -->
+<body>
+
+<div class="card">
+  <div class="check"><i class="fa-solid fa-check"></i></div>
+  <h1>Booking confirmed</h1>
+  <p class="sub">A confirmation has been sent to {{ booking.guest.email }}</p>
+
+  <div class="details">
+    <div class="drow"><span class="l">Booking number</span><span class="v">{{ booking.booking_number }}</span></div>
+    <div class="drow"><span class="l">Property</span><span class="v">{{ booking.property.name }}</span></div>
+    <div class="drow"><span class="l">Check-in</span><span class="v">{{ booking.check_in_date|date:"M j, Y" }}</span></div>
+    <div class="drow"><span class="l">Check-out</span><span class="v">{{ booking.check_out_date|date:"M j, Y" }}</span></div>
+    {% for br in booking.booking_rooms.all %}
+    <div class="drow"><span class="l">Room</span><span class="v">{{ br.room_type.name }} — {{ br.room.room_number }}</span></div>
+    {% endfor %}
+    <div class="dtotal"><span class="l">Total amount</span><span class="v">₹{{ booking.total_amount }}</span></div>
+  </div>
+
+  {% if booking.balance_due > 0 %}
+  <button id="pay-now-btn" class="btn-pay">Pay ₹{{ booking.balance_due }} now</button>
+  {% endif %}
+
+  <div class="links">
+    <a href="{% url 'public:landing' %}" class="link-home">← Back to home</a>
+    <a href="{% url 'public:invoice' booking.booking_number %}" target="_blank" class="link-invoice">
+      <i class="fa-solid fa-file-invoice"></i> View / print invoice
+    </a>
+  </div>
+</div>
 
 {% if booking.balance_due > 0 %}
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-
 <script>
+document.getElementById('pay-now-btn')?.addEventListener('click', async function() {
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
 
-document
-    .getElementById('pay-now-btn')
-    ?.addEventListener('click', async function () {
+    try {
+        const orderRes = await fetch('/api/bookings/create-payment-order/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ booking_id: {{ booking.id }} })
+        });
+        const orderData = await orderRes.json();
 
-
-        const btn = this;
-
-
-        /* ===================================================== */
-        /* DISABLE BUTTON */
-        /* ===================================================== */
-
-        btn.disabled = true;
-
-        btn.innerHTML =
-            '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-
-
-
-        try {
-
-
-            /* ================================================= */
-            /* CREATE PAYMENT ORDER */
-            /* ================================================= */
-
-            const orderRes = await fetch(
-                '/api/bookings/create-payment-order/',
-                {
-
+        const options = {
+            key: orderData.razorpay_key_id,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: '{{ booking.property.name }}',
+            description: 'Booking {{ booking.booking_number }}',
+            order_id: orderData.razorpay_order_id,
+            handler: async function(response) {
+                const verifyRes = await fetch('/api/bookings/verify-payment/', {
                     method: 'POST',
-
-                    headers: {
-
-                        'Content-Type': 'application/json',
-
-                        'X-CSRFToken': getCsrfToken()
-
-                    },
-
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-
-                        booking_id: {{ booking.id }}
-
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature,
                     })
-
+                });
+                if (verifyRes.ok) {
+                    alert('Payment successful!');
+                    window.location.reload();
+                } else {
+                    alert('Payment verification failed. Please contact support.');
                 }
-            );
-
-
-            const orderData = await orderRes.json();
-
-
-
-            /* ================================================= */
-            /* CHECK ORDER RESPONSE */
-            /* ================================================= */
-
-            if (!orderRes.ok) {
-
-                throw new Error(
-
-                    orderData.detail ||
-
-                    orderData.error ||
-
-                    'Unable to create payment order.'
-
-                );
-
-            }
-
-
-
-            /* ================================================= */
-            /* RAZORPAY OPTIONS */
-            /* ================================================= */
-
-            const options = {
-
-                key: orderData.razorpay_key_id,
-
-                amount: orderData.amount,
-
-                currency: orderData.currency,
-
-                name:
-                    '{{ booking.property.name|escapejs }}',
-
-                description:
-                    'Booking {{ booking.booking_number|escapejs }}',
-
-                order_id:
-                    orderData.razorpay_order_id,
-
-
-
-                /* ============================================= */
-                /* PAYMENT SUCCESS */
-                /* ============================================= */
-
-                handler: async function (response) {
-
-
-                    try {
-
-
-                        const verifyRes = await fetch(
-                            '/api/bookings/verify-payment/',
-                            {
-
-                                method: 'POST',
-
-                                headers: {
-
-                                    'Content-Type':
-                                        'application/json',
-
-                                    'X-CSRFToken':
-                                        getCsrfToken()
-
-                                },
-
-                                body: JSON.stringify({
-
-                                    razorpay_order_id:
-                                        response.razorpay_order_id,
-
-                                    razorpay_payment_id:
-                                        response.razorpay_payment_id,
-
-                                    razorpay_signature:
-                                        response.razorpay_signature
-
-                                })
-
-                            }
-                        );
-
-
-                        const verifyData =
-                            await verifyRes.json();
-
-
-
-                        /* ===================================== */
-                        /* VERIFICATION SUCCESS */
-                        /* ===================================== */
-
-                        if (verifyRes.ok) {
-
-
-                            alert(
-                                'Payment successful!'
-                            );
-
-
-                            window.location.reload();
-
-
-                        }
-
-
-                        /* ===================================== */
-                        /* VERIFICATION FAILED */
-                        /* ===================================== */
-
-                        else {
-
-
-                            alert(
-
-                                verifyData.detail ||
-
-                                'Payment verification failed. Please contact support.'
-
-                            );
-
-                        }
-
-
-                    }
-
-
-                    catch (error) {
-
-
-                        console.error(
-                            'Payment verification error:',
-                            error
-                        );
-
-
-                        alert(
-                            'Payment verification failed. Please contact support.'
-                        );
-
-                    }
-
-                },
-
-
-
-                /* ============================================= */
-                /* PREFILL GUEST DETAILS */
-                /* ============================================= */
-
-                prefill: {
-
-                    name:
-                        '{{ booking.guest.full_name|escapejs }}',
-
-                    email:
-                        '{{ booking.guest.email|escapejs }}',
-
-                    contact:
-                        '{{ booking.guest.phone|escapejs }}'
-
-                },
-
-
-
-                /* ============================================= */
-                /* RAZORPAY THEME */
-                /* ============================================= */
-
-                theme: {
-
-                    color: '#D6B878'
-
-                }
-
-            };
-
-
-
-            /* ================================================= */
-            /* CREATE RAZORPAY INSTANCE */
-            /* ================================================= */
-
-            const rzp = new Razorpay(options);
-
-
-
-            /* ================================================= */
-            /* PAYMENT FAILED EVENT */
-            /* ================================================= */
-
-            rzp.on(
-                'payment.failed',
-                function (response) {
-
-
-                    console.error(
-                        'Razorpay payment failed:',
-                        response.error
-                    );
-
-
-                    alert(
-
-                        response.error.description ||
-
-                        'Payment failed. Please try again.'
-
-                    );
-
-                }
-            );
-
-
-
-            /* ================================================= */
-            /* OPEN RAZORPAY */
-            /* ================================================= */
-
-            rzp.open();
-
-
-        }
-
-
-        catch (error) {
-
-
-            console.error(
-                'Payment error:',
-                error
-            );
-
-
-            alert(
-
-                error.message ||
-
-                'Something went wrong. Please try again.'
-
-            );
-
-        }
-
-
-        finally {
-
-
-            /* ================================================= */
-            /* RESTORE BUTTON */
-            /* ================================================= */
-
-            btn.disabled = false;
-
-
-            btn.innerHTML =
-
-                '<i class="fa-solid fa-credit-card text-[#D6B878]"></i>' +
-
-                ' Pay ₹{{ booking.balance_due }} Now';
-
-
-        }
-
-    });
-
-
-
-/* ========================================================= */
-/* CSRF TOKEN */
-/* ========================================================= */
-
-function getCsrfToken() {
-
-    const name = 'csrftoken=';
-
-    const cookies =
-        document.cookie.split(';');
-
-
-    for (
-        let i = 0;
-        i < cookies.length;
-        i++
-    ) {
-
-        let cookie =
-            cookies[i].trim();
-
-
-        if (
-            cookie.indexOf(name) === 0
-        ) {
-
-            return decodeURIComponent(
-                cookie.substring(name.length)
-            );
-
-        }
-
+            },
+            prefill: {
+                name: '{{ booking.guest.full_name }}',
+                email: '{{ booking.guest.email }}',
+                contact: '{{ booking.guest.phone }}'
+            },
+            theme: { color: '#1F3D33' }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+    } catch (err) {
+        alert('Something went wrong. Please try again.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Pay ₹{{ booking.balance_due }} now';
     }
-
-
-    return '';
-
-}
-
+});
 </script>
-
 {% endif %}
 
-
-
 </body>
-
 </html>

@@ -23,8 +23,31 @@ class StyledModelForm(forms.ModelForm):
             else:
                 field.widget.attrs.setdefault('class', TAILWIND_INPUT)
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    """A file field that accepts several files in one upload."""
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('widget', MultipleFileInput(attrs={'accept': 'image/*'}))
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_clean(d, initial) for d in data]
+        return [single_clean(data, initial)] if data else []
+
+MAX_IMAGE_MB = 5
+
 
 class PropertyForm(StyledModelForm):
+    new_images = MultipleFileField(
+        required=False, label='Add images',
+        help_text=f'You can select several. JPG/PNG/WebP, up to {MAX_IMAGE_MB} MB each.',
+    )
+
     class Meta:
         model = Property
         fields = [
@@ -36,6 +59,15 @@ class PropertyForm(StyledModelForm):
             'check_in_time': forms.TimeInput(attrs={'type': 'time'}),
             'check_out_time': forms.TimeInput(attrs={'type': 'time'}),
         }
+
+    def clean_new_images(self):
+        files = [f for f in self.cleaned_data.get('new_images', []) if f]
+        for f in files:
+            if not (f.content_type or '').startswith('image/'):
+                raise forms.ValidationError(f'"{f.name}" is not an image.')
+            if f.size > MAX_IMAGE_MB * 1024 * 1024:
+                raise forms.ValidationError(f'"{f.name}" is larger than {MAX_IMAGE_MB} MB.')
+        return files
 
 
 class RoomTypeForm(StyledModelForm):

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property, RoomType, Room, RatePlan
+from .models import Property, RoomType, Room, RatePlan, PropertyImage
 
 
 @admin.register(Property)
@@ -36,3 +36,7 @@ class RatePlanAdmin(admin.ModelAdmin):
     search_fields = ('name', 'code')
     ordering = ('property', 'name')
     readonly_fields = ('created_at', 'updated_at')
+
+class PropertyImageInline(admin.TabularInline):
+    model = PropertyImage
+    extra = 1

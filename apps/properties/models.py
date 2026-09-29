@@ -28,7 +28,42 @@ class Property(BaseModel):
     def __str__(self):
         return f"{self.name} ({self.code})"
 
+    @property
+    def cover_image(self):
+        """First active image, with the designated cover sorted first."""
+        return self.images.filter(is_active=True).first()
 
+class PropertyImage(BaseModel):
+    """
+    One photo of a property. A property can have many; at most one is
+    the cover (used as the main image on the public site).
+    """
+    property = models.ForeignKey(
+        Property, on_delete=models.CASCADE, related_name='images'
+    )
+    image = models.ImageField(upload_to='properties/%Y/%m/')
+    caption = models.CharField(max_length=200, blank=True)
+    is_cover = models.BooleanField(default=False)
+    sort_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        db_table = 'property_images'
+        verbose_name = 'Property Image'
+        verbose_name_plural = 'Property Images'
+        ordering = ['-is_cover', 'sort_order', 'id']
+
+    def __str__(self):
+        return f"{self.property.code} - image {self.pk}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Only one cover per property.
+        if self.is_cover:
+            PropertyImage.objects.filter(
+                property=self.property, is_cover=True
+            ).exclude(pk=self.pk).update(is_cover=False)
+
+            
 class RoomType(BaseModel):
     property = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name='room_types'

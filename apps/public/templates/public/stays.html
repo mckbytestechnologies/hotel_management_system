@@ -1,0 +1,353 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stays | M Square</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  :root{
+    --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
+    --bottle:#1F3D33; --bottle-light:#2B5245;
+    --stone:#8B8375; --stone-light:#B8B0A0;
+    --white:#FFFFFF; --line:rgba(21,24,27,0.10); --line-dark:rgba(246,243,236,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,.serif{ font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em; }
+  p{ margin:0; } a{ color:inherit; text-decoration:none; } ul{ list-style:none; margin:0; padding:0; }
+  :focus-visible{ outline:2px solid var(--bottle); outline-offset:2px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  @media (min-width:1024px){ .wrap{ padding:0 40px; } }
+
+  /* header + search bar */
+  header.site{ background:var(--ink); }
+  header .row{ display:flex; align-items:center; justify-content:space-between; padding:20px 0; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{ width:36px; height:36px; border-radius:8px; background:var(--bottle-light); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .brand-name{ color:#fff; font-size:16px; } .brand-sub{ color:rgba(255,255,255,.45); font-size:10.5px; margin-top:1px; }
+  .top-links{ display:flex; gap:22px; font-size:13.5px; color:rgba(255,255,255,.7); }
+  .top-links a:hover{ color:#fff; }
+
+  .bar{ background:var(--ink); padding:0 0 26px; }
+  .bar-grid{ display:grid; gap:10px; }
+  @media (min-width:900px){ .bar-grid{ grid-template-columns:1.5fr 1fr 1fr 0.8fr auto; } }
+  .field{ border:1px solid var(--line-dark); background:rgba(246,243,236,.05); padding:12px 16px; border-radius:4px; }
+  .field label{ display:block; font-size:11px; color:var(--stone-light); margin-bottom:4px; }
+  .field input, .field select{ width:100%; background:transparent; border:none; color:#fff; font-family:'Inter',sans-serif; font-size:14px; font-weight:500; outline:none; }
+  .field input::placeholder{ color:rgba(255,255,255,.35); }
+  .field select option{ background:var(--ink); color:#fff; }
+  .field:focus-within{ border-color:rgba(246,243,236,.45); }
+  input[type="date"]::-webkit-calendar-picker-indicator{ filter:invert(1); opacity:.55; cursor:pointer; }
+  .btn-search{ background:var(--paper); color:var(--ink); border:none; border-radius:4px; padding:0 30px; min-height:56px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer; }
+  .btn-search:hover{ background:#fff; }
+
+  /* layout */
+  .layout{ display:grid; gap:24px; padding-top:34px; padding-bottom:80px; }
+  @media (min-width:960px){ .layout{ grid-template-columns:260px 1fr; align-items:start; } }
+
+  .filters-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; background:var(--white); border:1px solid var(--line); border-radius:4px; padding:13px 16px; font-family:'Inter',sans-serif; font-size:14px; font-weight:600; cursor:pointer; }
+  @media (min-width:960px){ .filters-toggle{ display:none; } }
+  .filters{ display:none; background:var(--white); border:1px solid var(--line); border-radius:4px; }
+  .filters.open{ display:block; }
+  @media (min-width:960px){ .filters{ display:block; position:sticky; top:20px; } }
+  .filters-head{ display:flex; align-items:baseline; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line); }
+  .filters-head h2{ font-size:18px; }
+  .filters-head a{ font-size:12.5px; font-weight:600; color:var(--bottle); }
+  .fgroup{ padding:18px 20px; border-bottom:1px solid var(--line); }
+  .fgroup:last-child{ border-bottom:none; }
+  .fgroup h3{ font-family:'Inter',sans-serif; font-size:13px; font-weight:600; margin-bottom:12px; letter-spacing:0; }
+  .opt{ display:flex; align-items:center; gap:10px; font-size:13.5px; padding:6px 0; cursor:pointer; }
+  .opt input{ accent-color:var(--bottle); width:15px; height:15px; margin:0; }
+  .opt .count{ margin-left:auto; font-size:12px; color:var(--stone); }
+
+  /* results header */
+  .results-head h1{ font-size:26px; }
+  .results-head .sub{ font-size:13.5px; color:var(--stone); margin-top:6px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .chip{ display:inline-flex; align-items:center; gap:8px; background:var(--paper-2); border:1px solid var(--line); border-radius:4px; padding:6px 10px; font-size:12.5px; }
+  .chip i{ font-size:10px; color:var(--stone); }
+  .chip:hover{ border-color:rgba(21,24,27,.3); }
+
+  .sortbar{ display:flex; gap:26px; margin:22px 0 18px; border-bottom:1px solid var(--line); overflow-x:auto; white-space:nowrap; scrollbar-width:none; }
+  .sortbar::-webkit-scrollbar{ display:none; }
+  .sortbar a{ padding:0 0 12px; font-size:13.5px; color:var(--stone); border-bottom:2px solid transparent; margin-bottom:-1px; }
+  .sortbar a:hover{ color:var(--ink); }
+  .sortbar a[aria-current="true"]{ color:var(--ink); font-weight:600; border-color:var(--bottle); }
+
+  /* stay cards */
+  .stay{ display:grid; background:var(--white); border:1px solid var(--line); border-radius:4px; margin-bottom:16px; overflow:hidden; cursor:pointer; transition:border-color .18s ease; }
+  .stay:hover{ border-color:rgba(21,24,27,.28); }
+  .stay.sold{ opacity:.72; }
+  @media (min-width:760px){ .stay{ grid-template-columns:270px 1fr 190px; } }
+
+  .slider{ position:relative; background:var(--paper-2); min-height:200px; }
+  .slides{ display:flex; height:100%; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }
+  .slides::-webkit-scrollbar{ display:none; }
+  .slides img{ flex:0 0 100%; width:100%; height:100%; min-height:200px; object-fit:cover; scroll-snap-align:start; display:block; }
+  .slider-btn{ position:absolute; top:50%; transform:translateY(-50%); width:32px; height:32px; border-radius:100px; border:none; background:rgba(255,255,255,.92); color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; opacity:0; transition:opacity .18s ease; }
+  .slider-btn.prev{ left:8px; } .slider-btn.next{ right:8px; }
+  .stay:hover .slider-btn, .slider-btn:focus-visible{ opacity:1; }
+  @media (hover:none){ .slider-btn{ opacity:1; } }
+  .slider-count{ position:absolute; right:8px; bottom:8px; background:rgba(21,24,27,.72); color:#fff; font-size:11px; padding:3px 8px; border-radius:100px; }
+
+  .stay-main{ padding:20px 22px; }
+  .prop-open{ background:none; border:none; padding:0; font:inherit; color:inherit; cursor:pointer; text-align:left; }
+  .stay-main h3{ font-size:19px; }
+  .loc{ font-size:13px; color:var(--stone); margin-top:6px; line-height:1.5; }
+  .loc i{ font-size:11px; margin-right:5px; color:var(--bottle); }
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .tags li{ font-size:12px; color:var(--ink); background:var(--paper-2); border:1px solid var(--line); border-radius:4px; padding:5px 10px; }
+  .tags li i{ color:var(--bottle); margin-right:6px; font-size:11px; }
+  .times{ font-size:12.5px; color:var(--stone); margin-top:14px; }
+
+  .stay-price{ padding:20px 22px; border-top:1px solid var(--line); background:var(--paper-2); display:flex; flex-direction:column; justify-content:center; gap:4px; }
+  @media (min-width:760px){ .stay-price{ border-top:none; border-left:1px solid var(--line); text-align:right; align-items:flex-end; } }
+  .stay-price .from{ font-size:12px; color:var(--stone); }
+  .stay-price .amt{ font-family:'Fraunces',serif; font-size:26px; }
+  .stay-price .per{ font-size:12px; color:var(--stone); }
+  .stay-price .left{ font-size:12.5px; font-weight:600; color:var(--bottle); margin-top:10px; }
+  .stay-price .out{ font-size:12.5px; font-weight:600; color:#8A3A28; margin-top:10px; }
+  .btn-select{ margin-top:10px; background:var(--bottle); color:#fff; border-radius:4px; padding:11px 18px; font-size:13.5px; font-weight:600; text-align:center; transition:background .18s ease; }
+  .btn-select:hover{ background:var(--bottle-light); }
+
+  .pager{ display:flex; align-items:center; justify-content:space-between; margin-top:28px; font-size:13.5px; }
+  .pager a{ border:1px solid var(--line); background:var(--white); border-radius:4px; padding:9px 16px; font-weight:600; }
+  .pager a:hover{ border-color:rgba(21,24,27,.3); }
+  .pager .info{ color:var(--stone); }
+
+  .empty{ background:var(--white); border:1px solid var(--line); border-radius:4px; padding:60px 24px; text-align:center; }
+  .empty h3{ font-size:19px; } .empty p{ font-size:13.5px; color:var(--stone); margin-top:8px; }
+  .empty a{ display:inline-block; margin-top:18px; font-weight:600; font-size:13.5px; color:var(--bottle); }
+
+  @media (prefers-reduced-motion: reduce){ .slider-btn, .stay{ transition:none; } }
+</style>
+</head>
+
+<body>
+
+<header class="site">
+  <div class="wrap row">
+    <a class="brand" href="{% url 'public:landing' %}">
+      <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
+      <div><p class="brand-name">M Square</p><p class="brand-sub">Serviced Apartments</p></div>
+    </a>
+    <nav class="top-links">
+      <a href="{% url 'public:landing' %}">Home</a>
+    </nav>
+  </div>
+</header>
+
+<form method="get" id="filter-form">
+  <input type="hidden" name="sort" value="{{ sort }}">
+
+  <section class="bar">
+    <div class="wrap bar-grid">
+      <div class="field">
+        <label for="s-q">Area or property</label>
+        <input type="text" id="s-q" name="q" value="{{ q }}" placeholder="Search by name or area">
+      </div>
+      <div class="field">
+        <label for="s-in">Check-in</label>
+        <input type="date" id="s-in" name="check_in" value="{{ check_in|date:'Y-m-d' }}" min="{{ min_checkin }}" required>
+      </div>
+      <div class="field">
+        <label for="s-out">Check-out</label>
+        <input type="date" id="s-out" name="check_out" value="{{ check_out|date:'Y-m-d' }}" required>
+      </div>
+      <div class="field">
+        <label for="s-adults">Guests</label>
+        <select id="s-adults" name="adults">
+          {% for n in "123456" %}
+          <option value="{{ n }}" {% if adults|stringformat:"s" == n %}selected{% endif %}>{{ n }} guest{% if n != "1" %}s{% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-search">Search</button>
+    </div>
+  </section>
+
+  <div class="wrap layout">
+
+    <div>
+      <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="filters">
+        <span><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Filters</span>
+        {% if chips %}<span style="font-size:12px;color:var(--bottle);">{{ chips|length }} applied</span>{% endif %}
+      </button>
+
+      <aside class="filters" id="filters" aria-label="Filters">
+        <div class="filters-head">
+          <h2>Filters</h2>
+          {% if chips %}<a href="?{{ clear_qs }}">Clear all</a>{% endif %}
+        </div>
+
+        <div class="fgroup">
+          <h3>Price per night</h3>
+          {% for key, label in price_bands %}
+          <label class="opt"><input type="checkbox" class="auto" name="price" value="{{ key }}" {% if key in bands_selected %}checked{% endif %}> {{ label }}</label>
+          {% endfor %}
+        </div>
+
+        <div class="fgroup">
+          <h3>Location</h3>
+          <label class="opt"><input type="radio" class="auto" name="city" value="" {% if not city %}checked{% endif %}> All locations</label>
+          {% for c in cities %}
+          <label class="opt"><input type="radio" class="auto" name="city" value="{{ c.city }}" {% if c.city == city %}checked{% endif %}> {{ c.city }} <span class="count">{{ c.n }}</span></label>
+          {% endfor %}
+        </div>
+
+        <div class="fgroup">
+          <h3>Booking options</h3>
+          <label class="opt"><input type="checkbox" class="auto" name="free_cancel" value="1" {% if free_cancel %}checked{% endif %}> Free cancellation</label>
+          <label class="opt"><input type="checkbox" class="auto" name="breakfast" value="1" {% if breakfast %}checked{% endif %}> Breakfast included</label>
+        </div>
+      </aside>
+    </div>
+
+    <section class="results">
+      <div class="results-head">
+        <h1>{% if city %}Stays in {{ city }}{% else %}All stays{% endif %}</h1>
+        <p class="sub">{{ total }} propert{{ total|pluralize:"y,ies" }} · {{ check_in|date:"M j" }} – {{ check_out|date:"M j, Y" }} · {{ nights }} night{{ nights|pluralize }}</p>
+        {% if chips %}
+        <div class="chips">
+          {% for label, qs in chips %}
+          <a class="chip" href="?{{ qs }}" aria-label="Remove filter {{ label }}">{{ label }} <i class="fa-solid fa-xmark"></i></a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <nav class="sortbar" aria-label="Sort results">
+        {% for key, label in sort_options %}
+        <a href="?{{ base_qs }}{% if base_qs %}&{% endif %}sort={{ key }}" {% if sort == key %}aria-current="true"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
+
+      {% for card in cards %}
+      <article class="stay {% if card.sold_out %}sold{% endif %}" data-index="{{ forloop.counter0 }}">
+        <div class="slider">
+          <div class="slides">
+            {% for img in card.images %}
+            <img src="{{ img.url }}" alt="{{ img.caption|default:card.name }}" loading="lazy">
+            {% endfor %}
+          </div>
+          {% if card.images|length > 1 %}
+          <button type="button" class="slider-btn prev" data-dir="prev" aria-label="Previous photo"><i class="fa-solid fa-chevron-left"></i></button>
+          <button type="button" class="slider-btn next" data-dir="next" aria-label="Next photo"><i class="fa-solid fa-chevron-right"></i></button>
+          <span class="slider-count">1 / {{ card.images|length }}</span>
+          {% endif %}
+        </div>
+
+        <div class="stay-main">
+          <h3><button type="button" class="prop-open">{{ card.name }}</button></h3>
+          <p class="loc"><i class="fa-solid fa-location-dot"></i>{{ card.address }}</p>
+          <ul class="tags">
+            {% if card.free_cancellation %}<li><i class="fa-solid fa-circle-check"></i>Free cancellation</li>{% endif %}
+            {% if card.breakfast %}<li><i class="fa-solid fa-utensils"></i>Breakfast included</li>{% endif %}
+            {% if card.max_guests %}<li><i class="fa-solid fa-user-group"></i>Up to {{ card.max_guests }} guests</li>{% endif %}
+            <li><i class="fa-solid fa-bed"></i>{{ card.room_types|length }} room type{{ card.room_types|length|pluralize }}</li>
+          </ul>
+          <p class="times">Check-in {{ card.check_in_time }} · Check-out {{ card.check_out_time }}</p>
+        </div>
+
+        <div class="stay-price">
+          {% if card.starting_price %}
+          <p class="from">From</p>
+          <p class="amt">₹{{ card.starting_price|floatformat:0 }}</p>
+          <p class="per">per night</p>
+          {% endif %}
+          {% if card.sold_out %}
+          <p class="out">Sold out for these dates</p>
+          {% else %}
+          <p class="left">{{ card.rooms_left }} room{{ card.rooms_left|pluralize }} left</p>
+          <a class="btn-select" href="{{ card.book_url }}">Select rooms</a>
+          {% endif %}
+        </div>
+      </article>
+      {% empty %}
+      <div class="empty">
+        <h3>No stays match your filters</h3>
+        <p>Try removing a filter or changing your dates.</p>
+        <a href="?{{ clear_qs }}">Clear all filters</a>
+      </div>
+      {% endfor %}
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="pager" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{{ page_qs }}{% if page_qs %}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+        {% else %}<span></span>{% endif %}
+        <span class="info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{{ page_qs }}{% if page_qs %}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+        {% else %}<span></span>{% endif %}
+      </nav>
+      {% endif %}
+    </section>
+
+  </div>
+</form>
+
+{{ cards|json_script:"property-data" }}
+
+
+<script>
+(function () {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const form = document.getElementById('filter-form');
+
+  // Checkbox / radio changes apply immediately.
+  form.querySelectorAll('.auto').forEach(function (el) {
+    el.addEventListener('change', function () { form.submit(); });
+  });
+
+  // Keep check-out after check-in.
+  const cin = document.getElementById('s-in'), cout = document.getElementById('s-out');
+  function syncCheckout() {
+    if (!cin.value) return;
+    const d = new Date(cin.value); d.setDate(d.getDate() + 1);
+    const min = d.toISOString().split('T')[0];
+    cout.min = min;
+    if (!cout.value || cout.value < min) cout.value = min;
+  }
+  cin.addEventListener('change', syncCheckout); syncCheckout();
+
+  // Mobile filters toggle.
+  const toggle = document.getElementById('filters-toggle'), panel = document.getElementById('filters');
+  toggle.addEventListener('click', function () {
+    const open = panel.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  // Card sliders + open popup.
+  document.querySelectorAll('.stay').forEach(function (card) {
+    const slides = card.querySelector('.slides');
+    const count = card.querySelector('.slider-count');
+    slides.addEventListener('scroll', function () {
+      if (!count) return;
+      count.textContent = (Math.round(slides.scrollLeft / slides.clientWidth) + 1) + ' / ' + slides.children.length;
+    }, { passive: true });
+
+    card.querySelectorAll('.slider-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        slides.scrollBy({ left: (btn.dataset.dir === 'next' ? 1 : -1) * slides.clientWidth, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    });
+
+    card.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function (e) { e.stopPropagation(); });   // "Select rooms" just navigates
+    });
+    card.addEventListener('click', function () { window.PropertyModal.open(Number(card.dataset.index)); });
+  });
+})();
+</script>
+
+</body>
+</html>

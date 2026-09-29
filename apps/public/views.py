@@ -18,7 +18,60 @@ from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.conf import settings
 from apps.guests.models import EmailOTP
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from urllib.parse import quote_plus
+from urllib.parse import urlencode
+from django.core.paginator import Paginator
+from django.db.models import Count, Exists, Min, OuterRef, Q
+from django.urls import reverse
 
+
+PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80'
+
+def build_property_cards(properties):
+    """
+    Turns each active property into a plain dict for the landing page
+    cards and popup. Everything is serialised here so the template can
+    hand it to the browser as JSON (json_script) with no extra queries.
+    """
+    cards = []
+    for p in properties:
+        images = [
+            {'url': img.image.url, 'caption': img.caption}
+            for img in p.images.all() if img.is_active
+        ] or [{'url': PLACEHOLDER_IMAGE, 'caption': ''}]
+
+        room_types = [rt for rt in p.room_types.all() if rt.is_active]
+        prices = [float(rt.default_price) for rt in room_types
+                  if rt.default_price and rt.default_price > 0]
+
+        full_address = ', '.join(x for x in [p.address, p.city, p.state, p.country] if x)
+        query = quote_plus(full_address)
+
+        cards.append({
+            'id': p.id,
+            'name': p.name,
+            'city': p.city,
+            'address': full_address,
+            'phone': p.phone,
+            'check_in_time': p.check_in_time.strftime('%I:%M %p').lstrip('0'),
+            'check_out_time': p.check_out_time.strftime('%I:%M %p').lstrip('0'),
+            'images': images,
+            'room_types': [
+                {
+                    'name': rt.name,
+                    'max_occupancy': rt.max_occupancy,
+                    'price': float(rt.default_price) if rt.default_price and rt.default_price > 0 else None,
+                }
+                for rt in room_types
+            ],
+            'starting_price': min(prices) if prices else None,
+            'map_embed_url': f'https://www.google.com/maps?q={query}&output=embed',
+            'map_link': f'https://www.google.com/maps/search/?api=1&query={query}',
+        })
+    return cards
 
 def landing_page(request):
     """
@@ -26,7 +79,7 @@ def landing_page(request):
     guests). Submitting redirects to the search results page with these
     as query params — keeps the results page bookmarkable/shareable.
     """
-    properties = Property.objects.filter(is_active=True)
+    properties = Property.objects.filter(is_active=True).prefetch_related('images', 'room_types')
 
     if request.method == 'POST':
         property_id = request.POST.get('property')
@@ -49,6 +102,7 @@ def landing_page(request):
 
     return render(request, 'public/landing.html', {
         'properties': properties,
+        'property_cards': build_property_cards(properties),
 
         # Default values
         'default_checkin': default_checkin.isoformat(),
@@ -58,7 +112,7 @@ def landing_page(request):
         'min_checkin': today.isoformat(),
         'min_checkout': (today + timedelta(days=1)).isoformat(),
     })
-
+    
 def search_results(request):
     """
     Public search results page. Reuses the exact same availability
@@ -111,6 +165,7 @@ def search_results(request):
     )
 
     rate_plans = RatePlan.objects.filter(property=property_obj, is_active=True)
+    
 
     rates_qs = RoomRate.objects.filter(
         property=property_obj, date__in=stay_dates
@@ -155,6 +210,7 @@ def search_results(request):
     return render(request, 'public/search_results.html', {
         'property': property_obj,
         'check_in': check_in_date,
+        'property_images': property_obj.images.filter(is_active=True)[:5],
         'check_out': check_out_date,
         'nights': nights,
         'adults': adults,
@@ -332,8 +388,9 @@ def view_invoice(request, booking_number):
 def send_booking_otp(request):
     """
     POST /book/otp/send/  Body: {"email": "guest@example.com"}
-    Generates a 6-digit OTP, emails it, and returns success. Frontend
-    calls this when the guest fills in their email on the booking form.
+    Generates a 6-digit OTP, emails it as a styled HTML message (with
+    plain-text fallback), and returns success. Frontend calls this when
+    the guest fills in their email on the booking form.
     """
     try:
         data = json.loads(request.body)
@@ -344,19 +401,33 @@ def send_booking_otp(request):
     if not email or '@' not in email:
         return JsonResponse({'success': False, 'message': 'Please enter a valid email.'}, status=400)
 
+    if not EmailOTP.can_request_new(email):
+        wait_seconds = EmailOTP.seconds_until_next_request(email)
+        return JsonResponse({
+            'success': False,
+            'message': f'Please wait {wait_seconds} seconds before requesting another code.'
+        }, status=429)
+
     otp = EmailOTP.generate_for(email)
 
-    send_mail(
+    html_content = render_to_string('public/Bookingsemails/otp_code.html', {
+        'code': otp.code,
+        'property_name': 'M Square',
+    })
+    text_content = strip_tags(html_content)
+
+    email_msg = EmailMultiAlternatives(
         subject='Your booking verification code',
-        message=f'Your verification code is: {otp.code}\n\nThis code expires in 10 minutes.',
+        body=text_content,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
+        to=[email],
     )
+    email_msg.attach_alternative(html_content, "text/html")
+    email_msg.send(fail_silently=False)
 
     return JsonResponse({'success': True, 'message': f'Verification code sent to {email}.'})
 
-
+    
 @csrf_exempt
 @require_POST
 def verify_booking_otp(request):
@@ -380,3 +451,180 @@ def verify_booking_otp(request):
     otp.save(update_fields=['is_verified', 'updated_at'])
 
     return JsonResponse({'success': True, 'message': 'Email verified successfully.'})
+
+PRICE_BANDS = {
+    'lt1000':    ('Under ₹1,000', 0, 1000),
+    '1000-2500': ('₹1,000 – ₹2,500', 1000, 2500),
+    '2500-5000': ('₹2,500 – ₹5,000', 2500, 5000),
+    'gt5000':    ('₹5,000 and above', 5000, None),
+}
+SORT_OPTIONS = [
+    ('recommended', 'Recommended'),
+    ('price_asc', 'Price (low to high)'),
+    ('price_desc', 'Price (high to low)'),
+    ('rooms', 'Most rooms left'),
+]
+STAYS_PAGE_SIZE = 8
+
+
+def _parse_date(value, fallback):
+    try:
+        return date_cls.fromisoformat(value)
+    except (TypeError, ValueError):
+        return fallback
+
+
+def _querystring(request, drop=(), remove_value=None):
+    """Current query string with some params removed, so sort links and
+    filter chips keep everything else the guest has selected."""
+    params = request.GET.copy()
+    if remove_value:
+        key, val = remove_value
+        params.setlist(key, [v for v in params.getlist(key) if v != val])
+    for k in drop:
+        params.pop(k, None)
+    return params.urlencode()
+
+
+def stays(request):
+    """
+    Public listing of all active properties with filters, sorting and
+    per-date availability. Filtering happens in the database; the
+    availability-dependent sort and the pagination happen on the (small)
+    filtered list, which is fine for tens to a few hundred properties.
+    """
+    today = date_cls.today()
+    check_in = max(_parse_date(request.GET.get('check_in'), today + timedelta(days=1)), today)
+    check_out = _parse_date(request.GET.get('check_out'), check_in + timedelta(days=1))
+    if check_out <= check_in:
+        check_out = check_in + timedelta(days=1)
+    if check_out > check_in + timedelta(days=90):
+        check_out = check_in + timedelta(days=90)   # keeps the date list bounded
+    nights = (check_out - check_in).days
+    stay_dates = [check_in + timedelta(days=i) for i in range(nights)]
+
+    try:
+        adults = max(1, min(int(request.GET.get('adults', 2)), 12))
+    except ValueError:
+        adults = 2
+
+    q = request.GET.get('q', '').strip()
+    city = request.GET.get('city', '').strip()
+    bands = [b for b in request.GET.getlist('price') if b in PRICE_BANDS]
+    free_cancel = request.GET.get('free_cancel') == '1'
+    breakfast = request.GET.get('breakfast') == '1'
+    sort = request.GET.get('sort', 'recommended')
+    if sort not in dict(SORT_OPTIONS):
+        sort = 'recommended'
+
+    qs = (
+        Property.objects.filter(is_active=True)
+        .annotate(min_price=Min(
+            'room_types__default_price',
+            filter=Q(room_types__is_active=True, room_types__default_price__gt=0),
+        ))
+        .prefetch_related('images', 'room_types', 'rate_plans')
+    )
+    if q:
+        qs = qs.filter(
+            Q(name__icontains=q) | Q(city__icontains=q) |
+            Q(address__icontains=q) | Q(state__icontains=q)
+        )
+    if city:
+        qs = qs.filter(city__iexact=city)
+    if bands:
+        cond = Q()
+        for key in bands:
+            _, low, high = PRICE_BANDS[key]
+            part = Q(min_price__gte=low)
+            if high is not None:
+                part &= Q(min_price__lt=high)
+            cond |= part
+        qs = qs.filter(cond)
+    if free_cancel:
+        qs = qs.filter(Exists(RatePlan.objects.filter(
+            property=OuterRef('pk'), is_active=True, is_refundable=True)))
+    if breakfast:
+        qs = qs.filter(Exists(RatePlan.objects.filter(
+            property=OuterRef('pk'), is_active=True).exclude(meal_plan='')))
+    if adults > 1:
+        qs = qs.filter(Exists(RoomType.objects.filter(
+            property=OuterRef('pk'), is_active=True, max_occupancy__gte=adults)))
+
+    props = list(qs)
+
+    # Rooms left per property for the chosen dates: two queries in total.
+    blocked_room_ids = set(
+        Availability.objects.filter(date__in=stay_dates)
+        .filter(Q(is_available=False) | Q(is_blocked=True))
+        .values_list('room_id', flat=True).distinct()
+    )
+    rooms_left = {}
+    room_rows = Room.objects.filter(
+        is_active=True, property_id__in=[p.id for p in props],
+        room_type__is_active=True, room_type__max_occupancy__gte=adults,
+    ).values_list('property_id', 'id')
+    for pid, rid in room_rows:
+        if rid not in blocked_room_ids:
+            rooms_left[pid] = rooms_left.get(pid, 0) + 1
+
+    def sort_key(p):
+        no_price = p.min_price is None
+        if sort == 'price_asc':
+            key = (no_price, p.min_price or 0)
+        elif sort == 'price_desc':
+            key = (no_price, -(p.min_price or 0))
+        elif sort == 'rooms':
+            key = (-rooms_left.get(p.id, 0), p.name.lower())
+        else:
+            key = (0, p.name.lower())
+        return (rooms_left.get(p.id, 0) == 0, key)   # sold-out always last
+
+    props.sort(key=sort_key)
+
+    paginator = Paginator(props, STAYS_PAGE_SIZE)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    cards = build_property_cards(page_obj.object_list)
+    date_params = {'check_in': check_in.isoformat(), 'check_out': check_out.isoformat(), 'adults': adults}
+    for card, p in zip(cards, page_obj.object_list):
+        plans = [rp for rp in p.rate_plans.all() if rp.is_active]
+        types = [rt for rt in p.room_types.all() if rt.is_active]
+        left = rooms_left.get(p.id, 0)
+        card.update({
+            'rooms_left': left,
+            'sold_out': left == 0,
+            'free_cancellation': any(rp.is_refundable for rp in plans),
+            'breakfast': any(rp.meal_plan for rp in plans),
+            'max_guests': max((rt.max_occupancy for rt in types), default=None),
+            'book_url': f"{reverse('public:search')}?{urlencode({'property': p.id, **date_params})}",
+        })
+
+    chips = []
+    if q:
+        chips.append((f'"{q}"', _querystring(request, drop=('q', 'page'))))
+    if city:
+        chips.append((city, _querystring(request, drop=('city', 'page'))))
+    for b in bands:
+        chips.append((PRICE_BANDS[b][0], _querystring(request, drop=('page',), remove_value=('price', b))))
+    if free_cancel:
+        chips.append(('Free cancellation', _querystring(request, drop=('free_cancel', 'page'))))
+    if breakfast:
+        chips.append(('Breakfast included', _querystring(request, drop=('breakfast', 'page'))))
+
+    return render(request, 'public/stays.html', {
+        'cards': cards,
+        'page_obj': page_obj,
+        'total': paginator.count,
+        'check_in': check_in, 'check_out': check_out, 'nights': nights, 'adults': adults,
+        'q': q, 'city': city, 'bands_selected': bands,
+        'free_cancel': free_cancel, 'breakfast': breakfast,
+        'sort': sort, 'sort_options': SORT_OPTIONS,
+        'price_bands': [(k, v[0]) for k, v in PRICE_BANDS.items()],
+        'cities': Property.objects.filter(is_active=True).values('city').annotate(n=Count('id')).order_by('city'),
+        'chips': chips,
+        'clear_qs': urlencode(date_params),
+        'base_qs': _querystring(request, drop=('sort', 'page')),
+        'page_qs': _querystring(request, drop=('page',)),
+        'min_checkin': today.isoformat(),
+    })

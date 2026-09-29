@@ -1,0 +1,96 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Search{% endblock %}
+{% block page_title %}Search results{% endblock %}
+{% block page_subtitle %}Showing results for "{{ query }}"{% endblock %}
+
+{% block content %}
+{% if not query %}
+<div class="card p-10 text-center">
+    <p class="text-ink-400 text-[13px] font-medium">Type something in the search box above and press Enter.</p>
+</div>
+{% else %}
+
+<div class="space-y-6">
+
+    <!-- Bookings -->
+    <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-200">
+            <h2 class="text-[13px] font-bold text-ink-900">Bookings ({{ bookings|length }})</h2>
+        </div>
+        {% if bookings %}
+        <div class="divide-y divide-ink-100">
+            {% for b in bookings %}
+            <a href="{% url 'dashboard:booking_edit' b.pk %}" class="flex items-center justify-between px-6 py-3.5 hover:bg-ink-50 transition">
+                <div>
+                    <p class="text-[13px] font-semibold text-ink-900">{{ b.booking_number }}</p>
+                    <p class="text-[11.5px] text-ink-400">{{ b.guest.full_name }} · {{ b.property.name }}</p>
+                </div>
+                <span class="text-[11px] font-bold text-ink-400">{{ b.check_in_date }} → {{ b.check_out_date }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="px-6 py-6 text-[12.5px] text-ink-400">No matching bookings.</p>
+        {% endif %}
+    </div>
+
+    <!-- Guests -->
+    <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-200">
+            <h2 class="text-[13px] font-bold text-ink-900">Guests ({{ guests|length }})</h2>
+        </div>
+        {% if guests %}
+        <div class="divide-y divide-ink-100">
+            {% for g in guests %}
+            <div class="px-6 py-3.5">
+                <p class="text-[13px] font-semibold text-ink-900">{{ g.full_name }}</p>
+                <p class="text-[11.5px] text-ink-400">{{ g.email }} · {{ g.phone }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="px-6 py-6 text-[12.5px] text-ink-400">No matching guests.</p>
+        {% endif %}
+    </div>
+
+    <!-- Properties -->
+    <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-200">
+            <h2 class="text-[13px] font-bold text-ink-900">Properties ({{ properties|length }})</h2>
+        </div>
+        {% if properties %}
+        <div class="divide-y divide-ink-100">
+            {% for p in properties %}
+            <a href="{% url 'dashboard:property_edit' p.pk %}" class="block px-6 py-3.5 hover:bg-ink-50 transition">
+                <p class="text-[13px] font-semibold text-ink-900">{{ p.name }}</p>
+                <p class="text-[11.5px] text-ink-400">{{ p.code }} · {{ p.city }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="px-6 py-6 text-[12.5px] text-ink-400">No matching properties.</p>
+        {% endif %}
+    </div>
+
+    <!-- Rooms -->
+    <div class="card overflow-hidden">
+        <div class="px-6 py-4 border-b border-ink-200">
+            <h2 class="text-[13px] font-bold text-ink-900">Rooms ({{ rooms|length }})</h2>
+        </div>
+        {% if rooms %}
+        <div class="divide-y divide-ink-100">
+            {% for r in rooms %}
+            <a href="{% url 'dashboard:room_edit' r.pk %}" class="flex items-center justify-between px-6 py-3.5 hover:bg-ink-50 transition">
+                <p class="text-[13px] font-semibold text-ink-900">Room {{ r.room_number }}</p>
+                <p class="text-[11.5px] text-ink-400">{{ r.room_type.name }} · {{ r.property.name }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="px-6 py-6 text-[12.5px] text-ink-400">No matching rooms.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endif %}
+{% endblock %}

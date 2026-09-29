@@ -1,0 +1,8 @@
+Django
+django-environ
+djangorestframework
+django-filter
+django-cors-headers
+drf-spectacular
+razorpay
+gunicorn

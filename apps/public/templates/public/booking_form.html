@@ -1,1680 +1,278 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Complete Your Booking | {{ property.name }}</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    },
-                    colors: {
-                        brand: {
-                            500: '#d9b765',
-                            600: '#c9a653'
-                        },
-                        navy: {
-                            900: '#0b132b',
-                            800: '#111a34',
-                            700: '#17213d',
-                            600: '#202c49'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0b132b;
-            color: #f8fafc;
-        }
-
-
-        /* ==============================
-           INPUTS
-        ============================== */
-
-        .input {
-            width: 100%;
-            background: #202c49;
-            border: 1px solid #34415f;
-            color: #f8fafc;
-
-            border-radius: 12px;
-
-            font-size: 13.5px;
-            font-weight: 500;
-
-            padding: 13px 14px;
-
-            transition:
-                border-color 0.2s ease,
-                box-shadow 0.2s ease,
-                background-color 0.2s ease;
-        }
-
-        .input::placeholder {
-            color: #8793aa;
-            opacity: 1;
-        }
-
-        .input:hover {
-            border-color: #465575;
-        }
-
-        .input:focus {
-            outline: none;
-            background: #202c49;
-            border-color: #d9b765;
-
-            box-shadow:
-                0 0 0 3px rgba(217, 183, 101, 0.12);
-        }
-
-
-        /* Chrome / Edge / Safari autofill */
-
-        .input:-webkit-autofill,
-        .input:-webkit-autofill:hover,
-        .input:-webkit-autofill:focus,
-        .input:-webkit-autofill:active {
-
-            -webkit-text-fill-color: #f8fafc !important;
-
-            -webkit-box-shadow:
-                0 0 0 1000px #202c49 inset !important;
-
-            box-shadow:
-                0 0 0 1000px #202c49 inset !important;
-
-            background-color: #202c49 !important;
-
-            border: 1px solid #34415f !important;
-
-            caret-color: #f8fafc;
-
-            transition:
-                background-color 5000s ease-in-out 0s;
-        }
-
-        textarea.input {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        textarea.input:focus {
-            border-color: #d9b765;
-
-            box-shadow:
-                0 0 0 3px rgba(217, 183, 101, 0.12);
-        }
-
-
-        /* ==============================
-           PAGE CONTAINER
-        ============================== */
-
-        .page-container {
-            width: min(1120px, calc(100% - 40px));
-            margin: 0 auto;
-        }
-
-
-        /* ==============================
-           HEADER
-        ============================== */
-
-        .top-nav {
-            background: rgba(11, 19, 43, 0.96);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-
-        /* ==============================
-           CARDS
-        ============================== */
-
-        .main-card {
-            background: #151f3b;
-
-            border: 1px solid rgba(255, 255, 255, 0.10);
-
-            border-radius: 18px;
-
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, 0.18);
-        }
-
-        .summary-card {
-            background: #151f3b;
-
-            border: 1px solid rgba(255, 255, 255, 0.10);
-
-            border-radius: 18px;
-
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, 0.18);
-        }
-
-
-        /* ==============================
-           ICON BOXES
-        ============================== */
-
-        .icon-box {
-            width: 46px;
-            height: 46px;
-
-            border-radius: 12px;
-
-            background: rgba(217, 183, 101, 0.10);
-
-            border: 1px solid rgba(217, 183, 101, 0.22);
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: #d9b765;
-        }
-
-
-        /* ==============================
-           GOLD BUTTON
-        ============================== */
-
-        .confirm-button {
-            width: 100%;
-
-            background: #d9b765;
-            color: #0b132b;
-
-            font-size: 14px;
-            font-weight: 800;
-
-            padding: 14px 20px;
-
-            border-radius: 12px;
-
-            transition:
-                background-color 0.2s ease,
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-        .confirm-button:hover {
-            background: #e4c77f;
-
-            transform: translateY(-1px);
-
-            box-shadow:
-                0 8px 20px rgba(217, 183, 101, 0.18);
-        }
-
-        .confirm-button:active {
-            transform: translateY(0);
-        }
-
-
-        /* ==============================
-           DISABLED CONFIRM BUTTON
-        ============================== */
-
-        .confirm-button:disabled {
-            background: #3b4661;
-            color: #8793aa;
-            cursor: not-allowed;
-
-            transform: none;
-
-            box-shadow: none;
-        }
-
-        .confirm-button:disabled:hover {
-            background: #3b4661;
-            color: #8793aa;
-
-            transform: none;
-
-            box-shadow: none;
-        }
-
-
-        /* ==============================
-           OTP BUTTONS
-        ============================== */
-
-        .otp-send-button {
-            flex-shrink: 0;
-
-            background: #202c49;
-            border: 1px solid #465575;
-
-            color: #f8fafc;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            padding: 0 18px;
-
-            border-radius: 10px;
-
-            transition:
-                background-color 0.2s ease,
-                border-color 0.2s ease,
-                color 0.2s ease;
-        }
-
-        .otp-send-button:hover {
-            background: #283553;
-            border-color: #d9b765;
-            color: #d9b765;
-        }
-
-        .otp-send-button:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
-        .otp-verify-button {
-            flex-shrink: 0;
-
-            background: #34d399;
-            color: #071b15;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            padding: 0 18px;
-
-            border-radius: 10px;
-
-            transition:
-                background-color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .otp-verify-button:hover {
-            background: #5ee7b7;
-            transform: translateY(-1px);
-        }
-
-        .otp-verify-button:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-
-        /* ==============================
-           OTP AREA
-        ============================== */
-
-        .otp-box {
-            background: rgba(217, 183, 101, 0.05);
-
-            border: 1px solid rgba(217, 183, 101, 0.15);
-
-            border-radius: 12px;
-
-            padding: 14px;
-        }
-
-
-        /* ==============================
-           SUMMARY
-        ============================== */
-
-        .summary-room {
-            background: #1d2947;
-
-            border: 1px solid rgba(255, 255, 255, 0.08);
-
-            border-radius: 14px;
-        }
-
-        .summary-divider {
-            border-color: rgba(255, 255, 255, 0.09);
-        }
-
-
-        /* ==============================
-           BADGES
-        ============================== */
-
-        .gold-badge {
-            background: rgba(217, 183, 101, 0.10);
-
-            border: 1px solid rgba(217, 183, 101, 0.22);
-
-            color: #e4c77f;
-        }
-
-        .green-badge {
-            background: rgba(52, 211, 153, 0.10);
-
-            border: 1px solid rgba(52, 211, 153, 0.20);
-
-            color: #5ee7b7;
-        }
-
-
-        /* ==============================
-           SUCCESS MESSAGE
-        ============================== */
-
-        .success-box {
-            background: rgba(52, 211, 153, 0.08);
-
-            border: 1px solid rgba(52, 211, 153, 0.20);
-
-            color: #63e6be;
-        }
-
-
-        /* ==============================
-           EMAIL VERIFIED
-        ============================== */
-
-        .verified-box {
-            background: rgba(52, 211, 153, 0.08);
-
-            border: 1px solid rgba(52, 211, 153, 0.20);
-
-            border-radius: 10px;
-
-            color: #5ee7b7;
-        }
-
-
-        /* ==============================
-           RESPONSIVE
-        ============================== */
-
-        @media (max-width: 768px) {
-
-            .page-container {
-                width: min(100% - 28px, 600px);
-            }
-
-            .main-card,
-            .summary-card {
-                border-radius: 14px;
-            }
-
-            .desktop-grid {
-                grid-template-columns: 1fr !important;
-            }
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete Your Booking | M Square</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  :root{
+    --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
+    --bottle:#1F3D33; --bottle-light:#2B5245;
+    --stone:#8B8375; --stone-light:#B8B0A0;
+    --white:#FFFFFF; --line: rgba(21,24,27,0.10); --line-dark: rgba(246,243,236,0.12);
+    --err:#8A3A28;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,.serif{ font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em; }
+  p{ margin:0; } a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px; }
+  @media (min-width:1024px){ .wrap{ padding:0 40px; } }
+
+  header.site{ background:var(--ink); }
+  header .row{ display:flex; align-items:center; padding:22px 0; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{ width:34px; height:34px; border-radius:8px; background:var(--bottle-light); color:var(--white); display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .brand-name{ color:var(--white); font-size:15.5px; }
+
+  main{ padding:52px 0 80px; }
+  .layout{ display:grid; gap:24px; }
+  @media (min-width:840px){ .layout{ grid-template-columns:1fr 340px; align-items:start; } }
+
+  .panel{ background:var(--white); border:1px solid var(--line); border-radius:4px; }
+  .panel-pad{ padding:32px; }
+  .eyebrow{ font-family:'Fraunces',serif; font-style:italic; font-size:13px; color:var(--bottle); }
+  h1.page-title{ font-size:25px; margin-top:10px; }
+
+  .msg{ background:rgba(207,88,60,0.08); border:1px solid rgba(207,88,60,0.25); color:var(--err); font-size:13.5px; padding:12px 16px; border-radius:4px; margin-top:20px; }
+
+  form{ margin-top:26px; display:flex; flex-direction:column; gap:18px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  label{ display:block; font-size:11px; color:var(--stone); margin-bottom:6px; letter-spacing:0.02em; }
+  .input, textarea{
+    width:100%; border:1px solid var(--line); background:var(--paper-2);
+    border-radius:4px; padding:12px 14px; font-family:'Inter',sans-serif;
+    font-size:14px; color:var(--ink); outline:none; transition:border-color .18s ease, background .18s ease;
+  }
+  .input:focus, textarea:focus{ border-color:var(--bottle); background:var(--white); }
+  textarea{ resize:vertical; min-height:80px; }
+
+  .email-row{ display:flex; gap:10px; }
+  .email-row .input{ flex:1; }
+
+  .btn-secondary{
+    white-space:nowrap; padding:0 18px; border-radius:4px; border:1px solid var(--ink);
+    background:var(--ink); color:var(--white); font-family:'Inter',sans-serif;
+    font-weight:600; font-size:12.5px; cursor:pointer; transition:background .18s ease;
+  }
+  .btn-secondary:hover{ background:var(--bottle); border-color:var(--bottle); }
+  .btn-secondary:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .otp-status{ font-size:12.5px; font-weight:600; margin-top:8px; min-height:16px; }
+  .otp-status.ok{ color:var(--bottle); }
+  .otp-status.bad{ color:var(--err); }
+
+  .otp-verify-row{ display:none; gap:10px; margin-top:12px; }
+  .otp-verify-row.show{ display:flex; }
+  .otp-verify-row .input{ letter-spacing:0.15em; }
+
+  .btn-confirm{
+    margin-top:6px; width:100%; padding:15px; border:none; border-radius:4px;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px; cursor:not-allowed;
+    background:var(--stone-light); color:var(--white); transition:background .18s ease;
+  }
+  .btn-confirm.enabled{ cursor:pointer; background:var(--bottle); }
+  .btn-confirm.enabled:hover{ background:var(--bottle-light); }
+
+  /* summary panel */
+  .summary{ position:sticky; top:24px; }
+  .summary-head{ padding:26px 26px 20px; border-bottom:1px solid var(--line); }
+  .summary-head .room-type{ font-size:17px; }
+  .summary-head .rate-plan{ font-size:13px; color:var(--stone); margin-top:4px; }
+  .summary-rows{ padding:20px 26px; display:flex; flex-direction:column; gap:11px; }
+  .summary-row{ display:flex; justify-content:space-between; font-size:13px; }
+  .summary-row .l{ color:var(--stone); }
+  .summary-row .v{ font-weight:600; }
+  .summary-total{ padding:20px 26px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:baseline; }
+  .summary-total .l{ font-size:14.5px; font-weight:600; }
+  .summary-total .v{ font-family:'Fraunces',serif; font-size:24px; }
+</style>
 </head>
 
+<body>
 
-<body class="min-h-screen">
+<header class="site">
+  <div class="wrap row">
+    <a class="brand" href="{% url 'public:landing' %}">
+      <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
+      <span class="brand-name">{{ property.name }}</span>
+    </a>
+  </div>
+</header>
 
+<main>
+  <div class="wrap">
+    <div class="layout">
 
-<!-- =========================================================
-     HEADER
-========================================================== -->
+      <div class="panel panel-pad">
+        <p class="eyebrow">Almost there</p>
+        <h1 class="page-title">Guest details</h1>
 
-<nav class="top-nav">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="msg">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
 
-    <div class="page-container h-[86px] flex items-center justify-between">
+        <form method="post" id="booking-form">
+          {% csrf_token %}
+          <input type="hidden" name="property" value="{{ property.id }}">
+          <input type="hidden" name="room_type" value="{{ room_type.id }}">
+          <input type="hidden" name="rate_plan" value="{{ rate_plan.id }}">
+          <input type="hidden" name="check_in" value="{{ check_in|date:'Y-m-d' }}">
+          <input type="hidden" name="check_out" value="{{ check_out|date:'Y-m-d' }}">
+          <input type="hidden" name="adults" value="{{ adults }}">
 
-        <!-- BRAND -->
-
-        <a
-            href="{% url 'public:landing' %}"
-            class="flex items-center gap-3 no-underline"
-        >
-
-            <div
-                class="w-11 h-11 rounded-xl flex items-center justify-center"
-                style="
-                    background:#d9b765;
-                    color:#0b132b;
-                "
-            >
-                <i class="fa-solid fa-hotel text-[16px]"></i>
-            </div>
-
+          <div class="row2">
             <div>
-
-                <div
-                    class="text-[17px] font-extrabold tracking-[-0.3px]"
-                    style="color:#f8fafc;"
-                >
-                    {{ property.name }}
-                </div>
-
-                <div
-                    class="text-[9px] font-semibold tracking-[2px] mt-[2px]"
-                    style="color:#d9b765;"
-                >
-                    SECURE BOOKING
-                </div>
-
+              <label for="f-first">First name</label>
+              <input type="text" name="first_name" id="f-first" class="input" required>
             </div>
-
-        </a>
-
-
-        <!-- NEW SEARCH -->
-
-        <a
-            href="{% url 'public:landing' %}"
-            class="text-[13px] font-semibold transition"
-            style="color:#b7c0d1;"
-            onmouseover="this.style.color='#d9b765'"
-            onmouseout="this.style.color='#b7c0d1'"
-        >
-            <i class="fa-solid fa-arrow-left mr-1"></i>
-            New Search
-        </a>
-
-    </div>
-
-</nav>
-
-
-<!-- =========================================================
-     MAIN CONTENT
-========================================================== -->
-
-<main class="page-container py-14">
-
-
-    <!-- PAGE INTRO -->
-
-    <div class="mb-10">
-
-        <div class="flex items-center gap-3 mb-5">
-
-            <span
-                class="block w-10 h-[2px]"
-                style="background:#d9b765;"
-            ></span>
-
-            <span
-                class="text-[11px] font-bold tracking-[3px] uppercase"
-                style="color:#d9b765;"
-            >
-                Complete Your Reservation
-            </span>
-
-        </div>
-
-
-        <h1
-            class="text-[42px] md:text-[48px] font-extrabold tracking-[-1.5px] leading-[1.05]"
-            style="color:#f8fafc;"
-        >
-            Guest Details
-        </h1>
-
-
-        <p
-            class="text-[14px] mt-3"
-            style="color:#9ba7bd;"
-        >
-            Enter your details below to confirm your stay at
-            {{ property.name }}.
-        </p>
-
-    </div>
-
-
-    <!-- =====================================================
-         CONTENT GRID
-    ====================================================== -->
-
-    <div
-        class="desktop-grid grid grid-cols-[minmax(0,1fr)_355px] gap-7 items-start"
-    >
-
-
-        <!-- =================================================
-             GUEST FORM
-        ================================================== -->
-
-        <div class="main-card p-7 md:p-8">
-
-
-            <!-- FORM HEADER -->
-
-            <div class="flex items-center gap-4 mb-8">
-
-                <div class="icon-box flex-shrink-0">
-
-                    <i class="fa-solid fa-user text-[16px]"></i>
-
-                </div>
-
-
-                <div>
-
-                    <h2
-                        class="text-[17px] font-extrabold"
-                        style="color:#f8fafc;"
-                    >
-                        Guest Information
-                    </h2>
-
-                    <p
-                        class="text-[12px] mt-1"
-                        style="color:#8e9ab0;"
-                    >
-                        Please provide the details of the primary guest.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- DJANGO MESSAGES -->
-
-            {% if messages %}
-
-                {% for message in messages %}
-
-                    <div
-                        class="mb-5 px-4 py-3 rounded-xl text-[12.5px] font-semibold"
-                        style="
-                            background:rgba(244,63,94,0.10);
-                            border:1px solid rgba(244,63,94,0.18);
-                            color:#fb7185;
-                        "
-                    >
-                        {{ message }}
-                    </div>
-
-                {% endfor %}
-
-            {% endif %}
-
-
-            <!-- FORM -->
-
-            <form method="post" class="space-y-5" id="booking-form">
-
-                {% csrf_token %}
-
-
-                <!-- HIDDEN VALUES -->
-
-                <input
-                    type="hidden"
-                    name="property"
-                    value="{{ property.id }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="room_type"
-                    value="{{ room_type.id }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="rate_plan"
-                    value="{{ rate_plan.id }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="check_in"
-                    value="{{ check_in|date:'Y-m-d' }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="check_out"
-                    value="{{ check_out|date:'Y-m-d' }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="adults"
-                    value="{{ adults }}"
-                >
-
-
-                <!-- FIRST + LAST NAME -->
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                    <div>
-
-                        <label
-                            class="block text-[11px] font-bold uppercase tracking-[0.3px] mb-2"
-                            style="color:#c3cada;"
-                        >
-                            First Name
-                        </label>
-
-                        <input
-                            type="text"
-                            name="first_name"
-                            class="input"
-                            placeholder="Enter first name"
-                            autocomplete="given-name"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div>
-
-                        <label
-                            class="block text-[11px] font-bold uppercase tracking-[0.3px] mb-2"
-                            style="color:#c3cada;"
-                        >
-                            Last Name
-                        </label>
-
-                        <input
-                            type="text"
-                            name="last_name"
-                            class="input"
-                            placeholder="Enter last name"
-                            autocomplete="family-name"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
-                     EMAIL + OTP VERIFICATION
-                ================================================== -->
-
-                <div>
-
-                    <label
-                        class="block text-[11px] font-bold uppercase tracking-[0.3px] mb-2"
-                        style="color:#c3cada;"
-                    >
-                        Email Address
-                    </label>
-
-
-                    <!-- EMAIL INPUT + SEND CODE -->
-
-                    <div class="flex flex-col sm:flex-row gap-2">
-
-                        <div class="relative flex-1">
-
-                            <i
-                                class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-[14px]"
-                                style="color:#d9b765;"
-                            ></i>
-
-                            <input
-                                type="email"
-                                name="email"
-                                id="email-input"
-                                class="input pl-11"
-                                placeholder="Enter your email address"
-                                autocomplete="email"
-                                required
-                            >
-
-                        </div>
-
-
-                        <button
-                            type="button"
-                            id="send-otp-btn"
-                            class="otp-send-button min-h-[48px]"
-                        >
-                            <i class="fa-regular fa-paper-plane mr-1"></i>
-                            Send Code
-                        </button>
-
-                    </div>
-
-
-                    <!-- OTP STATUS -->
-
-                    <p
-                        id="otp-status"
-                        class="text-[11.5px] font-semibold mt-2 min-h-[17px]"
-                    ></p>
-
-
-                    <!-- OTP VERIFICATION -->
-
-                    <div
-                        id="otp-verify-row"
-                        class="otp-box hidden mt-3"
-                    >
-
-                        <div class="flex flex-col sm:flex-row gap-2">
-
-                            <div class="relative flex-1">
-
-                                <i
-                                    class="fa-solid fa-shield-halved absolute left-4 top-1/2 -translate-y-1/2 text-[13px]"
-                                    style="color:#d9b765;"
-                                ></i>
-
-                                <input
-                                    type="text"
-                                    id="otp-code-input"
-                                    class="input pl-11"
-                                    placeholder="Enter 6-digit verification code"
-                                    maxlength="6"
-                                    inputmode="numeric"
-                                    autocomplete="one-time-code"
-                                >
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                id="verify-otp-btn"
-                                class="otp-verify-button min-h-[48px]"
-                            >
-                                <i class="fa-solid fa-check mr-1"></i>
-                                Verify
-                            </button>
-
-                        </div>
-
-
-                        <p
-                            class="text-[10.5px] mt-2"
-                            style="color:#7d899f;"
-                        >
-                            Enter the 6-digit code sent to your email address.
-                        </p>
-
-                    </div>
-
-
-                    <!-- VERIFIED MESSAGE -->
-
-                    <div
-                        id="email-verified-box"
-                        class="verified-box hidden mt-3 px-3 py-2.5 text-[11.5px] font-semibold items-center gap-2"
-                    >
-
-                        <i class="fa-solid fa-circle-check"></i>
-
-                        <span>
-                            Email address verified successfully.
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PHONE -->
-
-                <div>
-
-                    <label
-                        class="block text-[11px] font-bold uppercase tracking-[0.3px] mb-2"
-                        style="color:#c3cada;"
-                    >
-                        Phone Number
-                    </label>
-
-
-                    <div class="relative">
-
-                        <i
-                            class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-[13px]"
-                            style="color:#d9b765;"
-                        ></i>
-
-                        <input
-                            type="tel"
-                            name="phone"
-                            class="input pl-11"
-                            placeholder="Enter your phone number"
-                            autocomplete="tel"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- SPECIAL REQUESTS -->
-
-                <div>
-
-                    <label
-                        class="block text-[11px] font-bold uppercase tracking-[0.3px] mb-2"
-                        style="color:#c3cada;"
-                    >
-                        Special Requests
-
-                        <span
-                            class="font-medium normal-case"
-                            style="color:#707c93;"
-                        >
-                            (optional)
-                        </span>
-
-                    </label>
-
-
-                    <textarea
-                        name="special_requests"
-                        rows="4"
-                        class="input"
-                        placeholder="Let us know if you have any special requests..."
-                    ></textarea>
-
-                </div>
-
-
-                <!-- DIVIDER -->
-
-                <div
-                    class="border-t pt-5"
-                    style="border-color:rgba(255,255,255,0.08);"
-                ></div>
-
-
-                <!-- CONFIRM BUTTON -->
-
-                <button
-                    type="submit"
-                    id="confirm-booking-btn"
-                    class="confirm-button"
-                    disabled
-                >
-
-                    <i class="fa-solid fa-envelope-circle-check text-[12px] mr-2"></i>
-
-                    Verify Email to Continue
-
-                </button>
-
-
-                <!-- SECURITY MESSAGE -->
-
-                <div
-                    class="flex items-center justify-center gap-2 text-[11px] pt-1"
-                    style="color:#7d899f;"
-                >
-
-                    <i
-                        class="fa-solid fa-shield-halved"
-                        style="color:#d9b765;"
-                    ></i>
-
-                    Your information is securely handled.
-
-                </div>
-
-            </form>
-
-        </div>
-
-
-        <!-- =================================================
-             BOOKING SUMMARY
-        ================================================== -->
-
-        <div class="summary-card p-7 h-fit">
-
-
-            <!-- SUMMARY HEADER -->
-
-            <div class="flex items-center gap-4 mb-6">
-
-                <div class="icon-box flex-shrink-0">
-
-                    <i class="fa-regular fa-calendar text-[16px]"></i>
-
-                </div>
-
-
-                <div>
-
-                    <h2
-                        class="text-[17px] font-extrabold"
-                        style="color:#f8fafc;"
-                    >
-                        Booking Summary
-                    </h2>
-
-                    <p
-                        class="text-[11px] mt-1"
-                        style="color:#7f8ba2;"
-                    >
-                        Your reservation details
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- ROOM -->
-
-            <div class="summary-room p-5 mb-6">
-
-                <div class="flex items-start justify-between gap-3">
-
-                    <div>
-
-                        <p
-                            class="text-[15px] font-extrabold"
-                            style="color:#f8fafc;"
-                        >
-                            {{ room_type.name }}
-                        </p>
-
-                        <p
-                            class="text-[11.5px] mt-1"
-                            style="color:#8995aa;"
-                        >
-                            {{ rate_plan.name }}
-                        </p>
-
-                    </div>
-
-
-                    <i
-                        class="fa-solid fa-bed mt-1"
-                        style="color:#d9b765;"
-                    ></i>
-
-                </div>
-
-
-                <!-- MEAL PLAN -->
-
-                {% if rate_plan.meal_plan %}
-
-                    <div
-                        class="gold-badge inline-flex items-center gap-1.5 mt-4 px-2.5 py-1 rounded-md text-[10.5px] font-bold"
-                    >
-
-                        <i class="fa-solid fa-utensils text-[9px]"></i>
-
-                        {{ rate_plan.meal_plan }}
-
-                    </div>
-
-                {% endif %}
-
-
-                <!-- REFUNDABILITY -->
-
-                {% if rate_plan.is_refundable %}
-
-                    <div
-                        class="green-badge inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-md text-[10.5px] font-bold"
-                    >
-
-                        <i class="fa-solid fa-circle-check text-[9px]"></i>
-
-                        Free Cancellation
-
-                    </div>
-
-                {% else %}
-
-                    <div
-                        class="gold-badge inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-md text-[10.5px] font-bold"
-                    >
-
-                        <i class="fa-solid fa-circle-info text-[9px]"></i>
-
-                        Non-Refundable
-
-                    </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <!-- DATE / GUEST DETAILS -->
-
-            <div class="space-y-4">
-
-
-                <!-- CHECK IN -->
-
-                <div class="flex items-center justify-between gap-4">
-
-                    <span
-                        class="text-[12.5px]"
-                        style="color:#8d99ae;"
-                    >
-                        Check-in
-                    </span>
-
-                    <span
-                        class="text-[12.5px] font-bold text-right"
-                        style="color:#f1f4f8;"
-                    >
-                        {{ check_in|date:"M j, Y" }}
-                    </span>
-
-                </div>
-
-
-                <!-- CHECK OUT -->
-
-                <div class="flex items-center justify-between gap-4">
-
-                    <span
-                        class="text-[12.5px]"
-                        style="color:#8d99ae;"
-                    >
-                        Check-out
-                    </span>
-
-                    <span
-                        class="text-[12.5px] font-bold text-right"
-                        style="color:#f1f4f8;"
-                    >
-                        {{ check_out|date:"M j, Y" }}
-                    </span>
-
-                </div>
-
-
-                <!-- NIGHTS -->
-
-                <div class="flex items-center justify-between gap-4">
-
-                    <span
-                        class="text-[12.5px]"
-                        style="color:#8d99ae;"
-                    >
-                        Nights
-                    </span>
-
-                    <span
-                        class="text-[12.5px] font-bold"
-                        style="color:#f1f4f8;"
-                    >
-                        {{ nights }}
-                    </span>
-
-                </div>
-
-
-                <!-- GUESTS -->
-
-                <div class="flex items-center justify-between gap-4">
-
-                    <span
-                        class="text-[12.5px]"
-                        style="color:#8d99ae;"
-                    >
-                        Guests
-                    </span>
-
-                    <span
-                        class="text-[12.5px] font-bold"
-                        style="color:#f1f4f8;"
-                    >
-                        {{ adults }} Adult{{ adults|pluralize }}
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- DIVIDER -->
-
-            <div
-                class="border-t my-6"
-                style="border-color:rgba(255,255,255,0.09);"
-            ></div>
-
-
-            <!-- TOTAL -->
-
             <div>
-
-                <div class="flex items-end justify-between gap-4">
-
-                    <div>
-
-                        <p
-                            class="text-[10px] font-bold tracking-[1px] uppercase"
-                            style="color:#d9b765;"
-                        >
-                            Total Amount
-                        </p>
-
-                        <p
-                            class="text-[10.5px] mt-1"
-                            style="color:#77839a;"
-                        >
-                            For {{ nights }} night{{ nights|pluralize }}
-                        </p>
-
-                    </div>
-
-
-                    <div
-                        class="text-[24px] font-extrabold"
-                        style="color:#f8fafc;"
-                    >
-                        ₹{{ total_price }}
-                    </div>
-
-                </div>
-
+              <label for="f-last">Last name</label>
+              <input type="text" name="last_name" id="f-last" class="input" required>
             </div>
+          </div>
 
-
-            <!-- SUCCESS INFORMATION -->
-
-            <div
-                class="success-box rounded-xl p-4 mt-6 flex gap-3"
-            >
-
-                <i
-                    class="fa-solid fa-circle-check text-[14px] mt-[2px]"
-                ></i>
-
-                <p
-                    class="text-[11px] font-semibold leading-[1.5]"
-                >
-                    Your room will be reserved after the booking is
-                    successfully confirmed.
-                </p>
-
+          <div>
+            <label for="email-input">Email</label>
+            <div class="email-row">
+              <input type="email" name="email" id="email-input" class="input" required>
+              <button type="button" id="send-otp-btn" class="btn-secondary">Send code</button>
             </div>
+            <p id="otp-status" class="otp-status"></p>
+            <div id="otp-verify-row" class="otp-verify-row">
+              <input type="text" id="otp-code-input" class="input" placeholder="6-digit code" maxlength="6">
+              <button type="button" id="verify-otp-btn" class="btn-secondary">Verify</button>
+            </div>
+          </div>
 
+          <div>
+            <label for="f-phone">Phone</label>
+            <input type="tel" name="phone" id="f-phone" class="input" required>
+          </div>
+
+          <div>
+            <label for="f-notes">Special requests (optional)</label>
+            <textarea name="special_requests" id="f-notes"></textarea>
+          </div>
+
+          <button type="submit" id="confirm-booking-btn" class="btn-confirm" disabled>Verify email to continue</button>
+        </form>
+      </div>
+
+      <div class="panel summary">
+        <div class="summary-head">
+          <p class="room-type serif">{{ room_type.name }}</p>
+          <p class="rate-plan">{{ rate_plan.name }}</p>
         </div>
+        <div class="summary-rows">
+          <div class="summary-row"><span class="l">Check-in</span><span class="v">{{ check_in|date:"M j, Y" }}</span></div>
+          <div class="summary-row"><span class="l">Check-out</span><span class="v">{{ check_out|date:"M j, Y" }}</span></div>
+          <div class="summary-row"><span class="l">Nights</span><span class="v">{{ nights }}</span></div>
+          <div class="summary-row"><span class="l">Guests</span><span class="v">{{ adults }} adults</span></div>
+        </div>
+        <div class="summary-total">
+          <span class="l">Total</span>
+          <span class="v">₹{{ total_price }}</span>
+        </div>
+      </div>
 
     </div>
-
+  </div>
 </main>
 
-
-<!-- =========================================================
-     FOOTER
-========================================================== -->
-
-<footer
-    class="mt-10 border-t"
-    style="
-        background:#080f25;
-        border-color:rgba(255,255,255,0.08);
-    "
->
-
-    <div
-        class="page-container py-7 flex flex-col md:flex-row items-center justify-between gap-4"
-    >
-
-        <p
-            class="text-[11px]"
-            style="color:#69758d;"
-        >
-            © 2026 {{ property.name }}. All rights reserved.
-        </p>
-
-
-        <div
-            class="flex items-center gap-4 text-[11px]"
-            style="color:#69758d;"
-        >
-
-            <span>Secure Booking</span>
-
-            <span
-                class="w-1 h-1 rounded-full"
-                style="background:#d9b765;"
-            ></span>
-
-            <span>Privacy</span>
-
-            <span
-                class="w-1 h-1 rounded-full"
-                style="background:#d9b765;"
-            ></span>
-
-            <span>Terms</span>
-
-        </div>
-
-    </div>
-
-</footer>
-
-
-<!-- =========================================================
-     OTP JAVASCRIPT
-========================================================== -->
-
 <script>
+  const emailInput = document.getElementById('email-input');
+  const sendOtpBtn = document.getElementById('send-otp-btn');
+  const otpStatus = document.getElementById('otp-status');
+  const otpVerifyRow = document.getElementById('otp-verify-row');
+  const otpCodeInput = document.getElementById('otp-code-input');
+  const verifyOtpBtn = document.getElementById('verify-otp-btn');
+  const confirmBtn = document.getElementById('confirm-booking-btn');
 
-    const emailInput = document.getElementById('email-input');
-
-    const sendOtpBtn = document.getElementById('send-otp-btn');
-
-    const otpStatus = document.getElementById('otp-status');
-
-    const otpVerifyRow = document.getElementById('otp-verify-row');
-
-    const otpCodeInput = document.getElementById('otp-code-input');
-
-    const verifyOtpBtn = document.getElementById('verify-otp-btn');
-
-    const confirmBtn = document.getElementById('confirm-booking-btn');
-
-    const emailVerifiedBox = document.getElementById('email-verified-box');
-
-
-    /*
-     * Get Django CSRF token
-     */
-
-    function getCsrfToken() {
-
-        const csrfInput =
-            document.querySelector(
-                'input[name="csrfmiddlewaretoken"]'
-            );
-
-        return csrfInput ? csrfInput.value : '';
-
+  sendOtpBtn.addEventListener('click', async function() {
+    const email = emailInput.value.trim();
+    if (!email || !email.includes('@')) {
+      otpStatus.textContent = 'Please enter a valid email first.';
+      otpStatus.className = 'otp-status bad';
+      return;
     }
-
-
-    /*
-     * Display OTP status message
-     */
-
-    function setOtpStatus(message, type) {
-
-        otpStatus.textContent = message;
-
-        if (type === 'success') {
-
-            otpStatus.className =
-                'text-[11.5px] font-semibold mt-2 min-h-[17px] text-emerald-400';
-
-        } else if (type === 'error') {
-
-            otpStatus.className =
-                'text-[11.5px] font-semibold mt-2 min-h-[17px] text-rose-400';
-
-        } else {
-
-            otpStatus.className =
-                'text-[11.5px] font-semibold mt-2 min-h-[17px] text-slate-400';
-
-        }
-
+    sendOtpBtn.disabled = true;
+    sendOtpBtn.textContent = 'Sending...';
+    try {
+      const res = await fetch('{% url "public:send_otp" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+      });
+      const data = await res.json();
+      if (data.success) {
+        otpStatus.textContent = data.message;
+        otpStatus.className = 'otp-status ok';
+        otpVerifyRow.classList.add('show');
+      } else {
+        otpStatus.textContent = data.message;
+        otpStatus.className = 'otp-status bad';
+      }
+    } catch (err) {
+      otpStatus.textContent = 'Something went wrong. Please try again.';
+      otpStatus.className = 'otp-status bad';
+    } finally {
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.textContent = 'Send code';
     }
+  });
 
-
-    /*
-     * SEND OTP
-     */
-
-    sendOtpBtn.addEventListener('click', async function () {
-
-        const email = emailInput.value.trim();
-
-
-        /*
-         * Validate email
-         */
-
-        if (!email || !email.includes('@')) {
-
-            setOtpStatus(
-                'Please enter a valid email address first.',
-                'error'
-            );
-
-            emailInput.focus();
-
-            return;
-
-        }
-
-
-        /*
-         * Disable button while sending
-         */
-
+  verifyOtpBtn.addEventListener('click', async function() {
+    const email = emailInput.value.trim();
+    const code = otpCodeInput.value.trim();
+    if (!code) {
+      otpStatus.textContent = 'Please enter the code sent to your email.';
+      otpStatus.className = 'otp-status bad';
+      return;
+    }
+    verifyOtpBtn.disabled = true;
+    verifyOtpBtn.textContent = 'Verifying...';
+    try {
+      const res = await fetch('{% url "public:verify_otp" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, code: code })
+      });
+      const data = await res.json();
+      if (data.success) {
+        otpStatus.textContent = 'Email verified — you can confirm your booking.';
+        otpStatus.className = 'otp-status ok';
+        otpVerifyRow.classList.remove('show');
         sendOtpBtn.disabled = true;
-
-        sendOtpBtn.innerHTML =
-            '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Sending...';
-
-
-        try {
-
-            const res = await fetch(
-                '{% url "public:send_otp" %}',
-                {
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type': 'application/json',
-
-                        'X-CSRFToken': getCsrfToken()
-                    },
-
-                    body: JSON.stringify({
-                        email: email
-                    })
-                }
-            );
-
-
-            const data = await res.json();
-
-
-            if (data.success) {
-
-                setOtpStatus(
-                    data.message ||
-                    'Verification code sent to your email.',
-                    'success'
-                );
-
-
-                /*
-                 * Show OTP verification area
-                 */
-
-                otpVerifyRow.classList.remove('hidden');
-
-
-                /*
-                 * Focus OTP field
-                 */
-
-                otpCodeInput.focus();
-
-
-            } else {
-
-                setOtpStatus(
-                    data.message ||
-                    'Unable to send verification code.',
-                    'error'
-                );
-
-            }
-
-
-        } catch (err) {
-
-            console.error('Send OTP error:', err);
-
-            setOtpStatus(
-                'Something went wrong. Please try again.',
-                'error'
-            );
-
-        } finally {
-
-            sendOtpBtn.disabled = false;
-
-            sendOtpBtn.innerHTML =
-                '<i class="fa-regular fa-paper-plane mr-1"></i> Send Code';
-
-        }
-
-    });
-
-
-    /*
-     * VERIFY OTP
-     */
-
-    verifyOtpBtn.addEventListener('click', async function () {
-
-        const email = emailInput.value.trim();
-
-        const code = otpCodeInput.value.trim();
-
-
-        /*
-         * Validate OTP
-         */
-
-        if (!code) {
-
-            setOtpStatus(
-                'Please enter the verification code sent to your email.',
-                'error'
-            );
-
-            otpCodeInput.focus();
-
-            return;
-
-        }
-
-
-        if (code.length !== 6) {
-
-            setOtpStatus(
-                'Please enter the complete 6-digit verification code.',
-                'error'
-            );
-
-            otpCodeInput.focus();
-
-            return;
-
-        }
-
-
-        /*
-         * Disable button while verifying
-         */
-
-        verifyOtpBtn.disabled = true;
-
-        verifyOtpBtn.innerHTML =
-            '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Verifying...';
-
-
-        try {
-
-            const res = await fetch(
-                '{% url "public:verify_otp" %}',
-                {
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type': 'application/json',
-
-                        'X-CSRFToken': getCsrfToken()
-                    },
-
-                    body: JSON.stringify({
-                        email: email,
-                        code: code
-                    })
-                }
-            );
-
-
-            const data = await res.json();
-
-
-            if (data.success) {
-
-                /*
-                 * Success message
-                 */
-
-                setOtpStatus(
-                    'Email verified! You can now confirm your booking.',
-                    'success'
-                );
-
-
-                /*
-                 * Hide OTP verification area
-                 */
-
-                otpVerifyRow.classList.add('hidden');
-
-
-                /*
-                 * Disable email editing
-                 */
-
-                emailInput.readOnly = true;
-
-
-                /*
-                 * Disable Send Code button
-                 */
-
-                sendOtpBtn.disabled = true;
-
-                sendOtpBtn.innerHTML =
-                    '<i class="fa-solid fa-check mr-1"></i> Verified';
-
-
-                sendOtpBtn.style.color = '#5ee7b7';
-
-                sendOtpBtn.style.borderColor =
-                    'rgba(52, 211, 153, 0.35)';
-
-
-                /*
-                 * Show verified message
-                 */
-
-                emailVerifiedBox.classList.remove('hidden');
-
-                emailVerifiedBox.classList.add('flex');
-
-
-                /*
-                 * Enable Confirm Booking button
-                 */
-
-                confirmBtn.disabled = false;
-
-                confirmBtn.innerHTML =
-                    '<i class="fa-solid fa-lock text-[12px] mr-2"></i>' +
-                    'Confirm Booking';
-
-
-            } else {
-
-                setOtpStatus(
-                    data.message ||
-                    'Invalid verification code.',
-                    'error'
-                );
-
-            }
-
-
-        } catch (err) {
-
-            console.error('Verify OTP error:', err);
-
-            setOtpStatus(
-                'Something went wrong. Please try again.',
-                'error'
-            );
-
-        } finally {
-
-            verifyOtpBtn.disabled = false;
-
-            verifyOtpBtn.innerHTML =
-                '<i class="fa-solid fa-check mr-1"></i> Verify';
-
-        }
-
-    });
-
-
-    /*
-     * Allow pressing ENTER inside OTP field
-     */
-
-    otpCodeInput.addEventListener('keydown', function (event) {
-
-        if (event.key === 'Enter') {
-
-            event.preventDefault();
-
-            verifyOtpBtn.click();
-
-        }
-
-    });
-
-
-    /*
-     * Only allow numbers in OTP field
-     */
-
-    otpCodeInput.addEventListener('input', function () {
-
-        this.value = this.value
-            .replace(/\D/g, '')
-            .slice(0, 6);
-
-    });
-
+        sendOtpBtn.style.opacity = '0.5';
+        emailInput.readOnly = true;
+
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm booking';
+        confirmBtn.classList.add('enabled');
+      } else {
+        otpStatus.textContent = data.message;
+        otpStatus.className = 'otp-status bad';
+      }
+    } catch (err) {
+      otpStatus.textContent = 'Something went wrong. Please try again.';
+      otpStatus.className = 'otp-status bad';
+    } finally {
+      verifyOtpBtn.disabled = false;
+      verifyOtpBtn.textContent = 'Verify';
+    }
+  });
 </script>
-
 
 </body>
 </html>

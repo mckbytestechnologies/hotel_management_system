@@ -3,7 +3,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <title>M Square — Serviced Apartments</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,117 +14,195 @@
 
 <style>
   :root{
-    --ink:#15181B;
-    --paper:#F6F3EC;
-    --paper-2:#EFEAE0;
-    --bottle:#1F3D33;
-    --bottle-light:#2B5245;
-    --stone:#8B8375;
-    --stone-light:#B8B0A0;
-    --white:#FFFFFF;
-    --line: rgba(21,24,27,0.10);
-    --line-dark: rgba(246,243,236,0.12);
+    --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
+    --bottle:#1F3D33; --bottle-light:#2B5245;
+    --stone:#8B8375; --stone-light:#B8B0A0;
+    --white:#FFFFFF; --line:rgba(21,24,27,0.10);
+    --overlap:40px;   /* set by JS: 20% of the search panel height */
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    font-family:'Inter',sans-serif;
-    background:var(--paper);
-    color:var(--ink);
-    -webkit-font-smoothing:antialiased;
-  }
+  *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
+  html{ scroll-behavior:smooth; scroll-padding-top:76px; -webkit-text-size-adjust:100%; }
+  body{ margin:0; font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; overflow-x:clip; }
   h1,h2,h3,.serif{ font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em; }
-  p{ margin:0; }
-  a{ color:inherit; text-decoration:none; }
+  p{ margin:0; } a{ color:inherit; text-decoration:none; } ul{ list-style:none; margin:0; padding:0; }
   img{ display:block; max-width:100%; }
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  button{ font:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--bottle); outline-offset:2px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 20px; }
   @media (min-width:1024px){ .wrap{ padding:0 40px; } }
 
-  /* ---------- header ---------- */
-  header.site{
-    position:absolute; inset:0 0 auto 0; z-index:40;
-    padding:28px 0;
-  }
+  /* ---------- header: black, white text ---------- */
+  header.site{ position:sticky; top:0; z-index:60; background:#000; color:#fff; }
+  .head-row{ display:flex; align-items:center; justify-content:space-between; height:64px; }
   .brand{ display:flex; align-items:center; gap:12px; }
-  .brand-mark{
-    width:38px; height:38px; border-radius:8px;
-    background:var(--white); color:var(--bottle);
-    display:flex; align-items:center; justify-content:center;
-    font-size:15px;
-  }
-  .brand-name{ color:var(--white); font-size:17px; letter-spacing:0.01em; }
-  .brand-sub{ color:rgba(255,255,255,0.5); font-size:11px; letter-spacing:0.08em; margin-top:1px; }
+  .brand-mark{ width:36px; height:36px; border-radius:8px; background:#fff; color:#000; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .brand-name{ color:#fff; font-size:17px; font-family:'Fraunces',serif; }
+  .brand-sub{ color:rgba(255,255,255,0.6); font-size:11px; margin-top:1px; }
 
-  .nav{ display:none; align-items:center; gap:32px; font-size:14px; color:rgba(255,255,255,0.82); }
-  @media (min-width:860px){ .nav{ display:flex; } }
-  .nav a:hover{ color:var(--white); }
-
-  .staff-link{
-    display:none;
-    font-size:13.5px; color:rgba(255,255,255,0.85);
-    border:1px solid rgba(255,255,255,0.28);
-    padding:9px 18px; border-radius:100px;
-    transition:border-color .18s ease, color .18s ease;
+  .nav{ display:none; align-items:center; gap:4px; }
+  .nav a, .nav button{ background:none; border:none; cursor:pointer; color:#fff; font-size:14px; font-weight:500; padding:10px 14px; border-radius:4px; }
+  .nav a:hover, .nav button:hover{ background:rgba(255,255,255,0.14); }
+  .menu-btn{ width:44px; height:44px; border-radius:4px; border:1px solid rgba(255,255,255,0.3); background:none; color:#fff; cursor:pointer; font-size:16px; }
+  .mobile-nav{ display:none; background:#000; border-top:1px solid rgba(255,255,255,0.14); }
+  .mobile-nav.open{ display:block; }
+  .mobile-nav a, .mobile-nav button{ display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer; color:#fff; font-size:15px; font-weight:500; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+  @media (min-width:800px){
+    .nav{ display:flex; } .menu-btn{ display:none; } .mobile-nav{ display:none !important; }
   }
-  @media (min-width:640px){ .staff-link{ display:inline-block; } }
-  .staff-link:hover{ color:var(--white); border-color:rgba(255,255,255,0.6); }
 
-  header .wrap{ display:flex; align-items:center; justify-content:space-between; }
+  /* ---------- hero (short) ---------- */
+  .hero{ position:relative; background:var(--ink); overflow:hidden; padding:48px 0 calc(var(--overlap) + 44px); }
+  @media (min-width:800px){ .hero{ padding:84px 0 calc(var(--overlap) + 64px); } }
+  .hero-bg{ position:absolute; inset:0; background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2000&q=80') center/cover; }
+  .hero-scrim{ position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); }
+  .hero-inner{ position:relative; z-index:2; }
+  .hero-label{ color:var(--stone-light); font-family:'Fraunces',serif; font-style:italic; font-size:14px; margin-bottom:14px; }
+  h1.hero-title{ color:#fff; font-size:34px; line-height:1.1; letter-spacing:-0.015em; max-width:16ch; }
+  @media (min-width:640px){ h1.hero-title{ font-size:44px; } }
+  @media (min-width:1024px){ h1.hero-title{ font-size:54px; } }
+  .hero-copy{ color:rgba(255,255,255,0.82); font-size:15.5px; line-height:1.6; max-width:48ch; margin-top:16px; }
 
-  /* ---------- hero ---------- */
-  section.hero{
-    position:relative; min-height:100vh;
-    display:flex; align-items:flex-end;
-    background:var(--ink); overflow:hidden;
+  /* ---------- search panel: 20% overlaps the hero ---------- */
+  .search-wrap{ position:relative; z-index:20; margin-top:calc(var(--overlap) * -1); }
+  .search-panel{ background:#fff; border:1px solid var(--line); border-radius:6px; box-shadow:0 14px 34px rgba(0,0,0,0.16); overflow:hidden; }
+  .msg{ margin:14px 16px 0; background:#FBEDE8; border:1px solid #EBC2B5; color:#8A3A28; font-size:13.5px; padding:11px 14px; border-radius:4px; }
+  form.search{ display:grid; grid-template-columns:1fr 1fr; }
+  .field{ padding:13px 18px; border-bottom:1px solid var(--line); }
+  .field.wide{ grid-column:1 / -1; }
+  .field.in{ border-right:1px solid var(--line); }
+  .field:focus-within{ box-shadow:inset 0 0 0 2px var(--bottle); }
+  .field label{ display:block; font-size:11.5px; color:var(--stone); margin-bottom:4px; }
+  .field select, .field input{ width:100%; border:none; background:transparent; color:var(--ink); font-family:'Inter',sans-serif; font-size:16px; font-weight:500; padding:0; outline:none; min-height:24px; }
+  .field input[type="date"]{ -webkit-appearance:none; appearance:none; text-align:left; }
+  .btn-search{ grid-column:1 / -1; background:var(--bottle); color:#fff; border:none; min-height:54px; font-family:'Inter',sans-serif; font-weight:600; font-size:15px; cursor:pointer; transition:background .18s ease; }
+  .btn-search:hover{ background:var(--bottle-light); }
+  @media (min-width:1000px){
+    form.search{ grid-template-columns:1.5fr 1fr 1fr 0.8fr auto; }
+    .field{ padding:16px 20px; border-bottom:none; border-right:1px solid var(--line); }
+    .field.wide{ grid-column:auto; }
+    .btn-search{ grid-column:auto; padding:0 40px; }
   }
-  .hero-bg{
-    position:absolute; inset:0;
-    background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2200&q=80') center/cover;
-  }
-  .hero-scrim{
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(21,24,27,0.35) 0%, rgba(21,24,27,0.55) 55%, rgba(21,24,27,0.92) 100%);
-  }
-  .hero-inner{ position:relative; z-index:5; width:100%; padding-bottom:88px; padding-top:170px; }
-  .hero-grid{ display:grid; gap:40px; }
-  @media (min-width:960px){ .hero-grid{ grid-template-columns:1.3fr 0.7fr; align-items:end; } }
 
-  .hero-label{ color:var(--stone-light); font-size:13.5px; font-style:italic; font-family:'Fraunces',serif; margin-bottom:18px; }
-  h1.hero-title{
-    color:var(--white); font-size:44px; line-height:1.08; letter-spacing:-0.015em;
-    max-width:15ch;
-  }
-  @media (min-width:640px){ h1.hero-title{ font-size:58px; } }
-  @media (min-width:1180px){ h1.hero-title{ font-size:68px; } }
+  /* ---------- sections ---------- */
+  .section{ padding:56px 0; }
+  @media (min-width:760px){ .section{ padding:80px 0; } }
+  .section-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:28px; }
+  .section-head{ max-width:620px; }
+  .section-head h2{ font-size:28px; line-height:1.15; }
+  @media (min-width:760px){ .section-head h2{ font-size:38px; } }
+  .section-head p{ font-size:15px; color:var(--stone); line-height:1.6; margin-top:12px; }
+  .text-link{ font-size:14px; font-weight:600; color:var(--bottle); white-space:nowrap; padding:10px 0; }
+  .text-link:hover{ text-decoration:underline; }
 
-  .hero-copy{ color:rgba(246,243,236,0.72); font-size:16px; line-height:1.6; max-width:46ch; margin-top:22px; }
+  /* ---------- property cards ---------- */
+  .prop-grid{ display:grid; gap:20px; }
+  @media (min-width:700px){ .prop-grid{ grid-template-columns:repeat(2,1fr); gap:24px; } }
+  @media (min-width:1024px){ .prop-grid{ grid-template-columns:repeat(3,1fr); } }
+  .prop-card{ background:var(--white); border:1px solid var(--line); border-radius:4px; overflow:hidden; cursor:pointer; transition:border-color .18s ease; }
+  .prop-card:hover{ border-color:rgba(21,24,27,0.28); }
+  .slider{ position:relative; background:var(--paper-2); }
+  .slides{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior-x:contain; }
+  .slides::-webkit-scrollbar{ display:none; }
+  .slides img{ flex:0 0 100%; width:100%; height:220px; object-fit:cover; scroll-snap-align:start; }
+  @media (min-width:700px){ .slides img{ height:230px; } }
+  .slider-btn{ position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:100px; border:none; background:rgba(255,255,255,0.92); color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; opacity:0; transition:opacity .18s ease; }
+  .slider-btn.prev{ left:10px; } .slider-btn.next{ right:10px; }
+  .prop-card:hover .slider-btn, .slider-btn:focus-visible{ opacity:1; }
+  @media (hover:none){ .slider-btn{ opacity:1; width:40px; height:40px; } }
+  .slider-count{ position:absolute; right:10px; bottom:10px; background:rgba(21,24,27,0.72); color:#fff; font-size:11.5px; padding:4px 9px; border-radius:100px; }
+  .prop-body{ padding:18px 20px 20px; }
+  .prop-open{ background:none; border:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer; text-align:left; }
+  .prop-body h3{ font-size:19px; }
+  .prop-loc{ font-size:13px; color:var(--stone); margin-top:4px; }
+  .prop-meta{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); }
+  .prop-meta .types{ font-size:12.5px; color:var(--stone); }
+  .prop-meta .price{ font-family:'Fraunces',serif; font-size:19px; }
+  .prop-meta .price span{ font-family:'Inter',sans-serif; font-size:12px; color:var(--stone); }
 
-  .hero-stats{
-    display:grid; grid-template-columns:1fr 1fr; gap:1px;
-    background:rgba(246,243,236,0.14);
-    border:1px solid rgba(246,243,236,0.14);
-  }
-  .hero-stat{ background:rgba(21,24,27,0.35); padding:22px; }
-  .hero-stat .n{ color:var(--white); font-family:'Fraunces',serif; font-size:26px; }
-  .hero-stat .l{ color:rgba(246,243,236,0.55); font-size:12.5px; margin-top:4px; }
+  /* ---------- amenities (no slider — simple responsive grid) ---------- */
+  .amen-section{ background:var(--white); border-top:1px solid var(--line); }
+  .amen-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  @media (min-width:500px){ .amen-grid{ grid-template-columns:repeat(3,1fr); gap:14px; } }
+  @media (min-width:800px){ .amen-grid{ grid-template-columns:repeat(4,1fr); } }
+  @media (min-width:1000px){ .amen-grid{ grid-template-columns:repeat(6,1fr); gap:16px; } }
+  .amen{ background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:22px 16px; display:flex; flex-direction:column; align-items:flex-start; gap:14px; }
+  .amen i{ font-size:24px; color:var(--bottle); }
+  .amen span{ font-size:14px; font-weight:600; line-height:1.3; }
 
-  /* ---------- band ---------- */
-  section.band{ background:var(--white); border-bottom:1px solid var(--line); }
-  .band-grid{ display:grid; grid-template-columns:1fr; }
-  @media (min-width:760px){ .band-grid{ grid-template-columns:repeat(4,1fr); } }
-  .band-item{
-    display:flex; align-items:center; gap:14px; padding:24px 6px;
-    border-bottom:1px solid var(--line);
-  }
-  @media (min-width:760px){
-    .band-item{ border-bottom:none; border-right:1px solid var(--line); padding:26px; }
-    .band-item:last-child{ border-right:none; }
-  }
-  .band-item i{ color:var(--bottle); font-size:16px; width:20px; text-align:center; }
-  .band-item .t{ font-size:14px; font-weight:600; }
-  .band-item .s{ font-size:12.5px; color:var(--stone); margin-top:2px; }
+  /* ---------- footer: single line ---------- */
+  footer.site{ background:#000; color:rgba(255,255,255,0.7); padding:28px 0; }
+  .foot-line{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px 28px; }
+  .foot-brand{ display:flex; align-items:center; gap:12px; }
+  .foot-brand .brand-mark{ width:30px; height:30px; font-size:12px; }
+  .foot-brand .brand-name{ font-size:15px; }
+  .foot-brand .brand-sub{ font-size:10px; }
+  .foot-links{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 24px; }
+  .foot-links a, .foot-links button{ background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.85); font-size:14px; padding:8px 0; }
+  .foot-links a:hover, .foot-links button:hover{ color:#fff; text-decoration:underline; }
+  .foot-copy{ font-size:12.5px; color:rgba(255,255,255,0.45); white-space:nowrap; }
 
+  /* ---------- modals (property + contact) ---------- */
+  .modal{ position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,0.72); }
+  .modal-panel{ position:relative; background:var(--paper); width:100%; max-width:1000px; max-height:92vh; max-height:92dvh; overflow-y:auto; border-radius:6px; outline:none; }
+  .modal-panel.contact-panel{ max-width:880px; }
+  .modal-close{ position:absolute; top:12px; right:12px; z-index:3; width:44px; height:44px; border-radius:100px; border:none; background:rgba(255,255,255,0.95); color:var(--ink); cursor:pointer; font-size:15px; }
+  @media (max-width:639px){
+    .modal{ padding:0; align-items:flex-end; }
+    .modal-panel{ max-height:94vh; max-height:94dvh; border-radius:12px 12px 0 0; }
+  }
+
+  .gallery{ background:#000; }
+  .gallery-main{ position:relative; }
+  .gallery-main img{ width:100%; height:240px; object-fit:cover; }
+  @media (min-width:760px){ .gallery-main img{ height:420px; } }
+  .gallery-main .slider-btn{ opacity:1; }
+  .gallery-thumbs{ display:flex; gap:8px; padding:10px; overflow-x:auto; }
+  .gallery-thumbs button{ flex:0 0 auto; width:76px; height:54px; padding:0; border:2px solid transparent; border-radius:3px; overflow:hidden; cursor:pointer; opacity:0.55; background:none; }
+  .gallery-thumbs button[aria-current="true"]{ border-color:var(--paper); opacity:1; }
+  .gallery-thumbs img{ width:100%; height:100%; object-fit:cover; }
+
+  .modal-cols{ display:grid; gap:24px; padding:22px 20px 28px; }
+  @media (min-width:860px){ .modal-cols{ grid-template-columns:1fr 1fr; padding:36px; gap:28px; } }
+  .modal-info h2{ font-size:24px; padding-right:40px; }
+  .modal-address{ font-size:14px; color:var(--stone); margin-top:8px; line-height:1.55; }
+  .facts{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:18px; }
+  .facts > div{ background:var(--paper-2); padding:12px 14px; }
+  .facts .l{ font-size:11px; color:var(--stone); }
+  .facts .v{ font-size:13.5px; font-weight:600; margin-top:3px; }
+  .facts .wide{ grid-column:1 / -1; }
+  .type-list{ margin-top:20px; border-top:1px solid var(--line); }
+  .type-row{ display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
+  .type-row .sub{ color:var(--stone); font-size:12px; margin-top:2px; }
+  .btn-cta{ display:block; text-align:center; margin-top:20px; width:100%; background:var(--bottle); color:#fff; border:none; border-radius:4px; padding:15px; min-height:48px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer; transition:background .18s ease; }
+  .btn-cta:hover{ background:var(--bottle-light); }
+  .map-frame{ width:100%; height:280px; border:0; border-radius:4px; background:var(--paper-2); display:block; }
+  @media (min-width:860px){ .map-frame{ height:100%; min-height:380px; } }
+  .map-link{ display:inline-block; margin-top:12px; font-size:13px; font-weight:600; color:var(--bottle); padding:6px 0; }
+
+  /* contact popup */
+  .contact-cols{ display:grid; }
+  @media (min-width:800px){ .contact-cols{ grid-template-columns:0.95fr 1.05fr; } }
+  .contact-info{ padding:26px 20px 24px; }
+  @media (min-width:800px){ .contact-info{ padding:38px; } }
+  .contact-info h2{ font-size:26px; padding-right:40px; }
+  .contact-lead{ font-size:14px; color:var(--stone); line-height:1.6; margin-top:10px; }
+  .contact-list{ margin-top:22px; border-top:1px solid var(--line); }
+  .crow{ display:flex; align-items:flex-start; gap:14px; padding:16px 0; border-bottom:1px solid var(--line); min-height:44px; }
+  a.crow:hover .cv{ text-decoration:underline; }
+  .cicon{ width:38px; height:38px; border-radius:100px; background:var(--paper-2); color:var(--bottle); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; }
+  .cl{ display:block; font-size:12px; color:var(--stone); }
+  .cv{ display:block; font-size:15px; font-weight:600; margin-top:2px; line-height:1.45; word-break:break-word; }
+  address.cv{ font-style:normal; }
+  .contact-map{ min-height:260px; background:var(--paper-2); }
+  .contact-map .map-frame{ border-radius:0; height:100%; min-height:260px; }
+  @media (min-width:800px){ .contact-map .map-frame{ min-height:100%; } }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .slider-btn, .prop-card, .btn-search, .btn-cta{ transition:none; }
+  }
   /* ---------- section heading ---------- */
   .section{ padding:100px 0; }
   .section-head{ max-width:640px; margin-bottom:56px; }
@@ -158,72 +237,7 @@
   .flow-step h4{ font-size:17px; color:var(--white); font-weight:500; margin:0; }
   .flow-step p{ color:rgba(246,243,236,0.55); font-size:14px; line-height:1.6; margin-top:6px; max-width:44ch; }
 
-  /* ---------- rooms ---------- */
-  .room-feature{ display:grid; border:1px solid var(--line); overflow:hidden; }
-  @media (min-width:900px){ .room-feature{ grid-template-columns:1.2fr 0.8fr; } }
-  .room-feature .img{ position:relative; min-height:320px; background-size:cover; background-position:center; }
-  @media (min-width:900px){ .room-feature .img{ min-height:100%; } }
-  .room-feature .body{ padding:40px; display:flex; flex-direction:column; justify-content:space-between; background:var(--white); }
-  .room-tag{ font-size:12.5px; color:var(--bottle); font-style:italic; font-family:'Fraunces',serif; }
-  .room-feature h3{ font-size:27px; margin-top:14px; }
-  .room-feature .desc{ font-size:14.5px; color:var(--stone); line-height:1.65; margin-top:14px; }
-  .spec-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:26px; }
-  .spec{ background:var(--paper-2); padding:14px 16px; }
-  .spec .l{ font-size:11px; color:var(--stone); }
-  .spec .v{ font-size:13.5px; font-weight:600; margin-top:3px; }
-  .price-row{ margin-top:28px; padding-top:22px; border-top:1px solid var(--line); }
-  .price-row .l{ font-size:12px; color:var(--stone); }
-  .price-row .v{ font-family:'Fraunces',serif; font-size:26px; margin-top:2px; }
-  .price-row .v span{ font-family:'Inter',sans-serif; font-size:13px; color:var(--stone); font-weight:400; }
-
-  .room-small-grid{ display:grid; gap:20px; margin-top:20px; }
-  @media (min-width:700px){ .room-small-grid{ grid-template-columns:1fr 1fr; } }
-  .room-small{ border:1px solid var(--line); overflow:hidden; background:var(--white); }
-  .room-small .img{ height:220px; background-size:cover; background-position:center; }
-  .room-small .body{ padding:22px 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .room-small h4{ font-size:16.5px; font-weight:500; }
-  .room-small .s{ font-size:13px; color:var(--stone); margin-top:3px; }
-  .room-small .go{
-    width:38px; height:38px; border-radius:100px; border:1px solid var(--line);
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    transition:background .18s ease, color .18s ease, border-color .18s ease;
-  }
-  .room-small:hover .go{ background:var(--bottle); color:var(--white); border-color:var(--bottle); }
-
-  /* ---------- booking panel ---------- */
-  section.book{ background:var(--paper); }
-  .book-panel{ background:var(--ink); border-radius:6px; padding:44px 28px; position:relative; }
-  @media (min-width:760px){ .book-panel{ padding:56px; } }
-  .book-head p.eyebrow{ color:var(--stone-light); font-family:'Fraunces',serif; font-style:italic; font-size:14px; }
-  .book-head h2{ color:var(--white); font-size:32px; margin-top:12px; }
-  @media (min-width:760px){ .book-head h2{ font-size:38px; } }
-
-  .msg{ background:rgba(207,88,60,0.14); border:1px solid rgba(207,88,60,0.35); color:#E9B9AA; font-size:13.5px; padding:12px 16px; border-radius:4px; margin-top:22px; }
-
-  form.search{ margin-top:34px; display:grid; gap:12px; }
-  @media (min-width:1024px){ form.search{ grid-template-columns:1.3fr 1fr 1fr 0.8fr auto; align-items:stretch; } }
-
-  .field{ border:1px solid var(--line-dark); background:rgba(246,243,236,0.04); padding:14px 16px; border-radius:4px; }
-  .field label{ display:block; font-size:11px; color:var(--stone-light); margin-bottom:5px; }
-  .field select, .field input{
-    width:100%; background:transparent; border:none; color:var(--white);
-    font-family:'Inter',sans-serif; font-size:14px; font-weight:500; outline:none;
-  }
-  .field select option{ background:var(--ink); color:var(--white); }
-  input[type="date"]::-webkit-calendar-picker-indicator{ filter:invert(1); opacity:0.55; cursor:pointer; }
-
-  .btn-search{
-    background:var(--paper); color:var(--ink);
-    border:none; border-radius:4px; padding:14px 26px;
-    font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
-    cursor:pointer; transition:background .18s ease;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .btn-search:hover{ background:var(--white); }
-
-  .book-foot{ display:flex; flex-wrap:wrap; gap:20px; margin-top:22px; font-size:12.5px; color:rgba(246,243,236,0.4); }
-
-  /* ---------- philosophy ---------- */
+    /* ---------- philosophy ---------- */
   section.about{ background:var(--white); }
   .about-grid{ display:grid; gap:52px; align-items:center; }
   @media (min-width:960px){ .about-grid{ grid-template-columns:1fr 0.85fr; } }
@@ -240,24 +254,13 @@
   }
   @media (max-width:640px){ .quote{ position:static; margin-top:16px; max-width:none; } }
 
-  /* ---------- footer ---------- */
-  footer{ background:var(--ink); color:rgba(246,243,236,0.55); padding:72px 0 32px; }
-  .foot-grid{ display:grid; gap:44px; }
-  @media (min-width:760px){ .foot-grid{ grid-template-columns:1.4fr 1fr 1fr 1fr; } }
-  footer .brand-name, footer .brand-sub{ color:var(--white); }
-  footer .brand-sub{ color:rgba(246,243,236,0.4); }
-  .foot-desc{ font-size:13.5px; line-height:1.6; margin-top:18px; max-width:34ch; }
-  .foot-col h5{ font-size:12px; color:var(--white); letter-spacing:0.03em; }
-  .foot-col a, .foot-col p{ display:block; font-size:13.5px; margin-top:12px; }
-  .foot-col a:hover{ color:var(--white); }
-  .foot-bottom{ margin-top:56px; padding-top:24px; border-top:1px solid var(--line-dark); display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; font-size:12.5px; color:rgba(246,243,236,0.35); }
 </style>
 </head>
 
-<body>
+<body id="top">
 
 <header class="site">
-  <div class="wrap">
+  <div class="wrap head-row">
     <a class="brand" href="#top">
       <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
       <div>
@@ -265,52 +268,41 @@
         <p class="brand-sub">Serviced Apartments</p>
       </div>
     </a>
-    <nav class="nav">
+
+    <nav class="nav" aria-label="Main">
       <a href="#top">Home</a>
-      <a href="#rooms">Rooms</a>
-      <a href="#experience">Experience</a>
-      <a href="#about">About</a>
+      <a href="{% url 'public:stays' %}">Rooms</a>
+      <a href="#amenities">Amenities</a>
+      <button type="button" data-open-contact>Contact</button>
     </nav>
-    <a class="staff-link" href="{% url 'dashboard:login' %}">Staff login</a>
+
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
   </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile">
+    <a href="#top">Home</a>
+    <a href="{% url 'public:stays' %}">Rooms</a>
+    <a href="#amenities">Amenities</a>
+    <button type="button" data-open-contact>Contact</button>
+  </nav>
 </header>
 
-<section class="hero" id="top">
+<main>
+
+<section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-scrim"></div>
   <div class="hero-inner wrap">
-    <div class="hero-grid">
-      <div>
-        <p class="hero-label">A quieter kind of hospitality</p>
-        <h1 class="hero-title">Rooms built for staying, not just sleeping.</h1>
-        <p class="hero-copy">Serviced apartments designed for longer visits — real kitchens, real light, and a booking process that takes under two minutes.</p>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat"><p class="n">4.9</p><p class="l">Guest rating</p></div>
-        <div class="hero-stat"><p class="n">12min</p><p class="l">Avg. check-in</p></div>
-        <div class="hero-stat"><p class="n">24/7</p><p class="l">Front desk</p></div>
-        <div class="hero-stat"><p class="n">0</p><p class="l">Hidden fees</p></div>
-      </div>
-    </div>
+    <p class="hero-label">A quieter kind of hospitality</p>
+    <h1 class="hero-title">Rooms built for staying, not just sleeping.</h1>
+    <p class="hero-copy">Serviced apartments designed for longer visits — real kitchens, real light, and a booking process that takes under two minutes.</p>
   </div>
 </section>
 
-<section class="band">
-  <div class="wrap band-grid">
-    <div class="band-item"><i class="fa-solid fa-bed"></i><div><p class="t">Rooms</p><p class="s">Live availability</p></div></div>
-    <div class="band-item"><i class="fa-regular fa-calendar"></i><div><p class="t">Reservations</p><p class="s">Instant confirmation</p></div></div>
-    <div class="band-item"><i class="fa-solid fa-shield-halved"></i><div><p class="t">Guest data</p><p class="s">Kept private</p></div></div>
-    <div class="band-item"><i class="fa-solid fa-credit-card"></i><div><p class="t">Payments</p><p class="s">Clear, itemized</p></div></div>
-  </div>
-</section>
-
-<section class="section book" id="find-stay">
+<section class="search-wrap" id="find-stay" aria-label="Check availability">
   <div class="wrap">
-    <div class="book-panel">
-      <div class="book-head">
-        <p class="eyebrow">Check availability</p>
-        <h2>Find your dates.</h2>
-      </div>
+    <div class="search-panel" id="search-panel">
 
       {% if messages %}
         {% for message in messages %}
@@ -321,7 +313,7 @@
       <form method="post" class="search">
         {% csrf_token %}
 
-        <div class="field">
+        <div class="field wide">
           <label for="f-property">Property</label>
           <select id="f-property" name="property" required>
             {% for property in properties %}
@@ -332,7 +324,7 @@
           </select>
         </div>
 
-        <div class="field">
+        <div class="field in">
           <label for="f-checkin">Check-in</label>
           <input type="date" id="f-checkin" name="check_in" value="{{ default_checkin }}" min="{{ min_checkin }}" required>
         </div>
@@ -342,7 +334,7 @@
           <input type="date" id="f-checkout" name="check_out" value="{{ default_checkout }}" required>
         </div>
 
-        <div class="field">
+        <div class="field wide">
           <label for="f-adults">Guests</label>
           <select id="f-adults" name="adults">
             <option value="1">1 guest</option>
@@ -354,18 +346,85 @@
           </select>
         </div>
 
-        <button type="submit" class="btn-search">Search</button>
+        <button type="submit" class="btn-search">Search availability</button>
       </form>
-
-      <div class="book-foot">
-        <span>Real-time availability</span>
-        <span>No hidden fees</span>
-        <span>Free cancellation on most rooms</span>
-      </div>
     </div>
   </div>
 </section>
 
+<section class="section" id="rooms">
+  <div class="wrap">
+    <div class="section-row">
+      <div class="section-head">
+        <h2>Stays you can book today.</h2>
+        <p>Look through the photos and check the location before you pick your dates.</p>
+      </div>
+      <a class="text-link" href="{% url 'public:stays' %}">View all stays</a>
+    </div>
+
+    {% if property_cards %}
+    <div class="prop-grid">
+      {% for card in property_cards %}
+      <article class="prop-card" data-index="{{ forloop.counter0 }}">
+        <div class="slider">
+          <div class="slides">
+            {% for img in card.images %}
+            <img src="{{ img.url }}" alt="{{ img.caption|default:card.name }}" loading="lazy">
+            {% endfor %}
+          </div>
+          {% if card.images|length > 1 %}
+          <button type="button" class="slider-btn prev" data-dir="prev" aria-label="Previous photo"><i class="fa-solid fa-chevron-left"></i></button>
+          <button type="button" class="slider-btn next" data-dir="next" aria-label="Next photo"><i class="fa-solid fa-chevron-right"></i></button>
+          <span class="slider-count">1 / {{ card.images|length }}</span>
+          {% endif %}
+        </div>
+        <div class="prop-body">
+          <h3><button type="button" class="prop-open">{{ card.name }}</button></h3>
+          <p class="prop-loc">{{ card.city }}</p>
+          <div class="prop-meta">
+            <span class="types">{{ card.room_types|length }} room type{{ card.room_types|length|pluralize }}</span>
+            {% if card.starting_price %}
+            <span class="price">From ₹{{ card.starting_price|floatformat:0 }} <span>/ night</span></span>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--stone); font-size:15px;">No properties are listed yet.</p>
+    {% endif %}
+  </div>
+</section>
+
+<!-- AMENITIES: static responsive grid, no slider -->
+<section class="section amen-section" id="amenities" aria-labelledby="amenities-title">
+  <div class="wrap">
+    <div class="section-row">
+      <div class="section-head">
+        <h2 id="amenities-title">Amenities at our stays</h2>
+        <p>The comforts that make a longer stay easier.</p>
+      </div>
+    </div>
+
+    <ul class="amen-grid">
+      <li class="amen"><i class="fa-solid fa-wifi" aria-hidden="true"></i><span>Free Wi-Fi</span></li>
+      <li class="amen"><i class="fa-solid fa-snowflake" aria-hidden="true"></i><span>Air conditioning</span></li>
+      <li class="amen"><i class="fa-solid fa-kitchen-set" aria-hidden="true"></i><span>Equipped kitchen</span></li>
+      <li class="amen"><i class="fa-solid fa-square-parking" aria-hidden="true"></i><span>Free parking</span></li>
+      <li class="amen"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Power backup</span></li>
+      <li class="amen"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i><span>24/7 front desk</span></li>
+      <li class="amen"><i class="fa-solid fa-broom" aria-hidden="true"></i><span>Housekeeping</span></li>
+      <li class="amen"><i class="fa-solid fa-shower" aria-hidden="true"></i><span>Hot water</span></li>
+      <li class="amen"><i class="fa-solid fa-tv" aria-hidden="true"></i><span>Smart TV</span></li>
+      <li class="amen"><i class="fa-solid fa-shirt" aria-hidden="true"></i><span>Laundry</span></li>
+      <li class="amen"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>Secure access</span></li>
+      <li class="amen"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i><span>Tea &amp; coffee</span></li>
+    </ul>
+  </div>
+</section>
+
+</main>
 
 <section class="section">
   <div class="wrap">
@@ -393,117 +452,6 @@
   </div>
 </section>
 
-<section class="flow">
-  <div class="wrap section">
-    <div class="flow-grid">
-      <div class="flow-head">
-        <h2>From search to checkout, in order.</h2>
-        <p>A stay has a natural sequence — this is ours, kept short on purpose.</p>
-      </div>
-      <div class="flow-steps">
-        <div class="flow-step">
-          <span class="num">01</span>
-          <div><h4>Search</h4><p>Pick dates and see what's actually free, priced for those exact nights.</p></div>
-        </div>
-        <div class="flow-step">
-          <span class="num">02</span>
-          <div><h4>Reserve</h4><p>Confirm guest details and hold the room — no waiting on a callback.</p></div>
-        </div>
-        <div class="flow-step">
-          <span class="num">03</span>
-          <div><h4>Arrive</h4><p>Front desk already has the reservation; check-in takes minutes.</p></div>
-        </div>
-        <div class="flow-step">
-          <span class="num">04</span>
-          <div><h4>Settle up</h4><p>One itemized bill, sent to your inbox the moment you check out.</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="rooms">
-  <div class="wrap">
-    <div class="section-head">
-      <h2>A room for every <span class="accent">length of stay</span>.</h2>
-      <p>Three layouts, each built around comfort for more than a night or two.</p>
-    </div>
-
-    <div class="room-feature">
-      <div class="img" style="background-image:url('https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=80')"></div>
-      <div class="body">
-        <div>
-          <p class="room-tag">Most booked</p>
-          <h3>The Double</h3>
-          <p class="desc">A comfortable double room with a proper desk and a kitchenette — built for the stay that runs longer than expected.</p>
-          <div class="spec-grid">
-            <div class="spec"><p class="l">Guests</p><p class="v">Up to 2</p></div>
-            <div class="spec"><p class="l">Floor</p><p class="v">1st floor</p></div>
-            <div class="spec"><p class="l">Size</p><p class="v">28 m²</p></div>
-            <div class="spec"><p class="l">Status</p><p class="v">Available</p></div>
-          </div>
-        </div>
-        <div class="price-row">
-          <p class="l">Starting from</p>
-          <p class="v">₹3,000 <span>/ night</span></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="room-small-grid">
-      <a class="room-small" href="#find-stay">
-        <div class="img" style="background-image:url('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80')"></div>
-        <div class="body">
-          <div><h4>The Deluxe</h4><p class="s">More space to spread out.</p></div>
-          <div class="go"><i class="fa-solid fa-arrow-right" style="font-size:13px;"></i></div>
-        </div>
-      </a>
-      <a class="room-small" href="#find-stay">
-        <div class="img" style="background-image:url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80')"></div>
-        <div class="body">
-          <div><h4>The Suite</h4><p class="s">A separate room to work from.</p></div>
-          <div class="go"><i class="fa-solid fa-arrow-right" style="font-size:13px;"></i></div>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
-
-
-<section class="section" id="experience">
-  <div class="wrap">
-    <div class="section-head">
-      <h2>Details that make a stay <span class="accent">easier</span>, not louder.</h2>
-      <p>The quiet parts of a good stay — the ones you only notice when they're missing.</p>
-    </div>
-    <div class="room-small-grid" style="grid-template-columns:1.4fr 1fr;">
-      <div class="room-small" style="cursor:default;">
-        <div class="img" style="height:320px;background-image:url('https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1600&q=80')"></div>
-        <div class="body" style="display:block;">
-          <h4 style="font-size:19px;">Common spaces, actually usable</h4>
-          <p class="s" style="margin-top:8px;line-height:1.6;">Quiet corners for calls, a proper table for meals, and light that doesn't disappear by 4pm.</p>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:20px;">
-        <div class="room-small" style="cursor:default;">
-          <div class="img" style="height:140px;background-image:url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80')"></div>
-          <div class="body" style="display:block;padding:18px 20px;">
-            <h4 style="font-size:15.5px;">Dining, nearby</h4>
-            <p class="s" style="margin-top:4px;">Curated picks within walking distance.</p>
-          </div>
-        </div>
-        <div class="room-small" style="cursor:default;">
-          <div class="img" style="height:140px;background-image:url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1000&q=80')"></div>
-          <div class="body" style="display:block;padding:18px 20px;">
-            <h4 style="font-size:15.5px;">Wellness on request</h4>
-            <p class="s" style="margin-top:4px;">In-room or at a partner studio close by.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section class="section about" id="about">
   <div class="wrap about-grid">
@@ -521,60 +469,298 @@
   </div>
 </section>
 
-<footer>
+
+<!-- FOOTER: all content in one single line -->
+<footer class="site">
   <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <a class="brand" href="#top">
-          <div class="brand-mark" style="background:var(--bottle-light);color:var(--white);"><i class="fa-solid fa-hotel"></i></div>
-          <div><p class="brand-name">M Square</p><p class="brand-sub">Serviced Apartments</p></div>
-        </a>
-        <p class="foot-desc">A modern serviced-apartment stay, built around comfort and a booking process that gets out of the way.</p>
+    <div class="foot-line">
+      <div class="foot-brand">
+        <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
+        <div>
+          <p class="brand-name">M Square</p>
+          <p class="brand-sub">Serviced Apartments</p>
+        </div>
       </div>
-      <div class="foot-col">
-        <h5>Explore</h5>
-        <a href="#rooms">Rooms</a>
-        <a href="#experience">Experience</a>
-        <a href="#about">About</a>
-      </div>
-      <div class="foot-col">
-        <h5>Guest</h5>
-        <a href="#find-stay">Find a room</a>
-        <a href="#about">Contact</a>
-      </div>
-      <div class="foot-col">
-        <h5>Management</h5>
-        <p style="max-width:24ch;">Staff access the booking system separately from the guest site.</p>
-        <a href="{% url 'dashboard:login' %}" style="color:var(--white);">Staff login →</a>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <p>© 2026 M Square Hotel. All rights reserved.</p>
-      <div style="display:flex;gap:20px;">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="{% url 'public:stays' %}">Rooms</a>
+        <a href="#amenities">Amenities</a>
+        <button type="button" data-open-contact>Contact</button>
+      </nav>
+      <p class="foot-copy">© 2026 M Square Hotel. All rights reserved.</p>
     </div>
   </div>
 </footer>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const checkIn = document.getElementById('f-checkin');
-    const checkOut = document.getElementById('f-checkout');
-    if (!checkIn || !checkOut) return;
 
-    function updateCheckoutMin() {
-      if (!checkIn.value) return;
-      const d = new Date(checkIn.value);
-      d.setDate(d.getDate() + 1);
-      const min = d.toISOString().split('T')[0];
-      checkOut.min = min;
-      if (!checkOut.value || checkOut.value < min) checkOut.value = min;
+<!-- ================= CONTACT POPUP ================= -->
+<div id="contact-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="contact-title">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel contact-panel" tabindex="-1">
+    <button type="button" class="modal-close" data-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="contact-cols">
+      <div class="contact-info">
+        <h2 id="contact-title">Contact us</h2>
+        <p class="contact-lead">Questions about a booking, directions or a longer stay? Reach us any time.</p>
+
+        <ul class="contact-list">
+          <li>
+            <a class="crow" href="mailto:reservations@yourdomain.com">
+              <span class="cicon"><i class="fa-solid fa-envelope"></i></span>
+              <span><span class="cl">Email</span><span class="cv">reservations@yourdomain.com</span></span>
+            </a>
+          </li>
+          <li>
+            <a class="crow" href="tel:+910000000000">
+              <span class="cicon"><i class="fa-solid fa-phone"></i></span>
+              <span><span class="cl">Phone</span><span class="cv">+91 00000 00000</span></span>
+            </a>
+          </li>
+          <li>
+            <div class="crow">
+              <span class="cicon"><i class="fa-solid fa-location-dot"></i></span>
+              <span>
+                <span class="cl">Address</span>
+                <address class="cv" id="contact-address">M Square Serviced Apartments, Your street address, Vellore, Tamil Nadu 632001</address>
+              </span>
+            </div>
+          </li>
+        </ul>
+
+        <a id="contact-directions" class="btn-cta" target="_blank" rel="noopener">Get directions</a>
+      </div>
+
+      <div class="contact-map">
+        <iframe id="contact-map" class="map-frame" title="Map showing our location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================= PROPERTY POPUP ================= -->
+{{ property_cards|json_script:"property-data" }}
+
+<div id="property-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-name">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" tabindex="-1">
+    <button type="button" class="modal-close" data-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+
+    <div class="gallery">
+      <div class="gallery-main">
+        <img id="modal-main-img" alt="">
+        <button type="button" class="slider-btn prev" id="gal-prev" aria-label="Previous photo"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" class="slider-btn next" id="gal-next" aria-label="Next photo"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div class="gallery-thumbs" id="modal-thumbs"></div>
+    </div>
+
+    <div class="modal-cols">
+      <div class="modal-info">
+        <h2 id="modal-name"></h2>
+        <p class="modal-address" id="modal-address"></p>
+        <div class="facts">
+          <div><p class="l">Check-in</p><p class="v" id="fact-in"></p></div>
+          <div><p class="l">Check-out</p><p class="v" id="fact-out"></p></div>
+          <div class="wide" id="fact-phone-wrap"><p class="l">Phone</p><p class="v" id="fact-phone"></p></div>
+        </div>
+        <div class="type-list" id="modal-types"></div>
+        <button type="button" class="btn-cta" id="modal-cta">Check dates for this property</button>
+      </div>
+      <div class="modal-map">
+        <iframe id="modal-map" class="map-frame" title="Property location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a id="modal-map-link" class="map-link" target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- shared modal helper ---------- */
+  function createModal(el) {
+    var lastFocus = null;
+    function focusables() {
+      return Array.prototype.slice.call(el.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+        .filter(function (n) { return !n.disabled && n.offsetParent !== null; });
     }
-    checkIn.addEventListener('change', updateCheckoutMin);
-    updateCheckoutMin();
+    function open() {
+      lastFocus = document.activeElement;
+      el.hidden = false;
+      document.body.style.overflow = 'hidden';
+      el.dispatchEvent(new Event('modal:open'));
+      var first = el.querySelector('.modal-close') || el.querySelector('.modal-panel');
+      first.focus();
+    }
+    function close() {
+      if (el.hidden) return;
+      el.hidden = true;
+      document.body.style.overflow = '';
+      el.dispatchEvent(new Event('modal:close'));
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    el.querySelectorAll('[data-close]').forEach(function (n) { n.addEventListener('click', close); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.stopPropagation(); close(); return; }
+      if (e.key !== 'Tab') return;
+      var f = focusables(); if (!f.length) return;
+      var first = f[0], last = f[f.length - 1], panel = el.querySelector('.modal-panel');
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    return { open: open, close: close, el: el };
+  }
+
+  /* ---------- mobile menu ---------- */
+  var menuBtn = $('menu-btn'), mobileNav = $('mobile-nav');
+  function closeMenu() {
+    mobileNav.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.querySelector('i').className = 'fa-solid fa-bars';
+  }
+  menuBtn.addEventListener('click', function () {
+    var open = mobileNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.querySelector('i').className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
   });
+  mobileNav.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mobileNav.classList.contains('open')) { closeMenu(); menuBtn.focus(); }
+  });
+
+  /* ---------- search panel sits 20% inside the hero ---------- */
+  var panel = $('search-panel');
+  function setOverlap() {
+    document.documentElement.style.setProperty('--overlap', Math.round(panel.offsetHeight * 0.2) + 'px');
+  }
+  setOverlap();
+  if ('ResizeObserver' in window) new ResizeObserver(setOverlap).observe(panel);
+  else window.addEventListener('resize', setOverlap);
+
+  /* ---------- check-out stays after check-in ---------- */
+  var cin = $('f-checkin'), cout = $('f-checkout');
+  function syncCheckout() {
+    if (!cin.value) return;
+    var d = new Date(cin.value); d.setDate(d.getDate() + 1);
+    var min = d.toISOString().split('T')[0];
+    cout.min = min;
+    if (!cout.value || cout.value < min) cout.value = min;
+  }
+  cin.addEventListener('change', syncCheckout);
+  syncCheckout();
+
+  /* ---------- contact popup ---------- */
+  var contactEl = $('contact-modal');
+  var contact = createModal(contactEl);
+  var addrText = $('contact-address').textContent.replace(/\s+/g, ' ').trim();
+  var addrQuery = encodeURIComponent(addrText);
+  $('contact-directions').href = 'https://www.google.com/maps/dir/?api=1&destination=' + addrQuery;
+  contactEl.addEventListener('modal:open', function () { $('contact-map').src = 'https://www.google.com/maps?q=' + addrQuery + '&output=embed'; });
+  contactEl.addEventListener('modal:close', function () { $('contact-map').src = 'about:blank'; });
+  document.querySelectorAll('[data-open-contact]').forEach(function (b) {
+    b.addEventListener('click', function () { closeMenu(); contact.open(); });
+  });
+
+  /* ---------- property cards + popup ---------- */
+  var dataEl = $('property-data');
+  if (!dataEl) return;
+  var properties = JSON.parse(dataEl.textContent);
+
+  document.querySelectorAll('.prop-card').forEach(function (card) {
+    var slides = card.querySelector('.slides');
+    var count = card.querySelector('.slider-count');
+    slides.addEventListener('scroll', function () {
+      if (!count) return;
+      count.textContent = (Math.round(slides.scrollLeft / slides.clientWidth) + 1) + ' / ' + slides.children.length;
+    }, { passive: true });
+    card.querySelectorAll('.slider-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        slides.scrollBy({ left: (btn.dataset.dir === 'next' ? 1 : -1) * slides.clientWidth, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    });
+    card.addEventListener('click', function () { openProperty(Number(card.dataset.index)); });
+  });
+
+  var propEl = $('property-modal');
+  var prop = createModal(propEl);
+  var mainImg = $('modal-main-img'), thumbs = $('modal-thumbs');
+  var galPrev = $('gal-prev'), galNext = $('gal-next');
+  var current = null, gIndex = 0;
+
+  function setGallery(i) {
+    var imgs = current.images;
+    gIndex = (i + imgs.length) % imgs.length;
+    mainImg.src = imgs[gIndex].url;
+    mainImg.alt = imgs[gIndex].caption || current.name;
+    thumbs.querySelectorAll('button').forEach(function (b, idx) {
+      b.setAttribute('aria-current', idx === gIndex ? 'true' : 'false');
+    });
+  }
+
+  function typeRow(t) {
+    var row = document.createElement('div'); row.className = 'type-row';
+    var left = document.createElement('div');
+    var n = document.createElement('p'); n.textContent = t.name;
+    var s = document.createElement('p'); s.className = 'sub'; s.textContent = 'Up to ' + t.max_occupancy + ' guests';
+    left.append(n, s);
+    var right = document.createElement('p');
+    right.textContent = t.price ? '₹' + Number(t.price).toLocaleString('en-IN') + ' / night' : 'Rates shown on search';
+    row.append(left, right);
+    return row;
+  }
+
+  function openProperty(index) {
+    current = properties[index];
+    if (!current) return;
+    $('modal-name').textContent = current.name;
+    $('modal-address').textContent = current.address;
+    $('fact-in').textContent = current.check_in_time;
+    $('fact-out').textContent = current.check_out_time;
+    $('fact-phone').textContent = current.phone;
+    $('fact-phone-wrap').hidden = !current.phone;
+
+    thumbs.replaceChildren();
+    current.images.forEach(function (img, idx) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.setAttribute('aria-label', 'Show photo ' + (idx + 1));
+      var im = document.createElement('img'); im.src = img.url; im.alt = '';
+      b.appendChild(im);
+      b.addEventListener('click', function () { setGallery(idx); });
+      thumbs.appendChild(b);
+    });
+    var multi = current.images.length > 1;
+    thumbs.hidden = !multi; galPrev.hidden = !multi; galNext.hidden = !multi;
+    setGallery(0);
+
+    var list = $('modal-types');
+    list.replaceChildren();
+    current.room_types.forEach(function (t) { list.appendChild(typeRow(t)); });
+
+    $('modal-map-link').href = current.map_link;
+    prop.open();
+    $('modal-map').src = current.map_embed_url;
+  }
+
+  propEl.addEventListener('modal:close', function () { $('modal-map').src = 'about:blank'; });
+  propEl.addEventListener('keydown', function (e) {
+    if (!current || current.images.length < 2) return;
+    if (e.key === 'ArrowLeft') setGallery(gIndex - 1);
+    if (e.key === 'ArrowRight') setGallery(gIndex + 1);
+  });
+  galPrev.addEventListener('click', function () { setGallery(gIndex - 1); });
+  galNext.addEventListener('click', function () { setGallery(gIndex + 1); });
+
+  $('modal-cta').addEventListener('click', function () {
+    var select = $('f-property');
+    if (select) select.value = current.id;
+    prop.close();
+    $('find-stay').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+})();
 </script>
 
 </body>

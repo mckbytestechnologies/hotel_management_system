@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 from .views import (
-    DashboardHomeView,
+    DashboardHomeView, GlobalSearchView,
     PropertyListView, PropertyCreateView, PropertyUpdateView, PropertyDeleteView,
     RoomTypeListView, RoomTypeCreateView, RoomTypeUpdateView, RoomTypeDeleteView,
     RoomListView, RoomCreateView, RoomUpdateView, RoomDeleteView,
@@ -11,7 +11,7 @@ from .views import (
     BulkRateGenerateView,
     PaymentListView, InvoiceListView, InvoiceViewByPk,
     SyncLogListView, ChannelMappingListView, ChannelMappingCreateView,
-    ChannelMappingUpdateView, ChannelMappingDeleteView,
+    ChannelMappingUpdateView, ChannelMappingDeleteView, PropertyImageCoverView, PropertyImageDeleteView,
 )
 
 app_name = 'dashboard'
@@ -27,6 +27,9 @@ urlpatterns = [
     path('properties/add/', PropertyCreateView.as_view(), name='property_add'),
     path('properties/<int:pk>/edit/', PropertyUpdateView.as_view(), name='property_edit'),
     path('properties/<int:pk>/delete/', PropertyDeleteView.as_view(), name='property_delete'),
+
+    path('property-images/<int:pk>/delete/', PropertyImageDeleteView.as_view(), name='propertyimage_delete'),
+    path('property-images/<int:pk>/cover/', PropertyImageCoverView.as_view(), name='propertyimage_cover'),
 
     path('room-types/', RoomTypeListView.as_view(), name='roomtype_list'),
     path('room-types/add/', RoomTypeCreateView.as_view(), name='roomtype_add'),
@@ -64,4 +67,7 @@ urlpatterns = [
     path('channel-mappings/add/', ChannelMappingCreateView.as_view(), name='channelmapping_add'),
     path('channel-mappings/<int:pk>/edit/', ChannelMappingUpdateView.as_view(), name='channelmapping_edit'),
     path('channel-mappings/<int:pk>/delete/', ChannelMappingDeleteView.as_view(), name='channelmapping_delete'),
+
+
+    path('search/', GlobalSearchView.as_view(), name='search'),
 ]

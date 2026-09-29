@@ -10,7 +10,7 @@
             <h2 class="text-[15px] font-bold text-ink-900 tracking-tight">{{ page_title }}</h2>
         </div>
 
-        <form method="post" class="p-6 space-y-5">
+        <form method="post" enctype="multipart/form-data" class="p-6 space-y-5">
             {% csrf_token %}
 
             {% if form.non_field_errors %}
@@ -49,6 +49,32 @@
                 </a>
             </div>
         </form>
+        {% if existing_images %}
+        <div class="px-6 pb-6 border-t border-ink-100 pt-5">
+            <h3 class="text-[12.5px] font-bold text-ink-900 mb-3">Current images</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {% for img in existing_images %}
+                <div class="border border-ink-200 rounded-lg overflow-hidden">
+                    <img src="{{ img.image.url }}" alt="{{ img.caption }}" class="w-full h-28 object-cover">
+                    <div class="p-2.5 flex items-center justify-between gap-2">
+                        {% if img.is_cover %}
+                        <span class="text-[10.5px] font-bold text-emerald-600">Cover</span>
+                        {% else %}
+                        <form method="post" action="{% url 'dashboard:propertyimage_cover' img.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-[10.5px] font-bold text-brand-600 hover:underline">Make cover</button>
+                        </form>
+                        {% endif %}
+                        <form method="post" action="{% url 'dashboard:propertyimage_delete' img.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-[10.5px] font-bold text-rose-600 hover:underline">Remove</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

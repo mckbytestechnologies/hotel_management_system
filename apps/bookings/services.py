@@ -353,89 +353,97 @@ def process_refund(*, payment_id, amount, reason='', processed_by=None):
     booking.save(update_fields=['paid_amount', 'updated_at'])
 
     return refund
-
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.conf import settings as django_settings
 
 
 def send_booking_confirmation_email(booking):
     """
-    Sends the guest their booking details by email. Called after
-    successful payment verification (Razorpay verify_payment / webhook),
-    so the guest has a permanent record beyond the confirmation page.
+    Sends the guest a styled HTML booking confirmation, with a plain-text
+    fallback for email clients that don't render HTML. Called after
+    successful payment verification (Razorpay verify_payment / webhook).
     """
-    room_lines = "\n".join(
-        f"- {br.room_type.name} (Room {br.room.room_number}): {br.check_in_date} to {br.check_out_date} — ₹{br.rate_amount}"
+    rooms = [
+        {
+            'room_type': br.room_type.name,
+            'room_number': br.room.room_number,
+            'check_in': br.check_in_date,
+            'check_out': br.check_out_date,
+            'amount': br.rate_amount,
+        }
         for br in booking.booking_rooms.all()
-    )
+    ]
 
-    message = f"""Dear {booking.guest.full_name},
+    context = {
+        'guest_name': booking.guest.full_name,
+        'property_name': booking.property.name,
+        'booking_number': booking.booking_number,
+        'check_in': booking.check_in_date,
+        'check_out': booking.check_out_date,
+        'rooms': rooms,
+        'total_amount': booking.total_amount,
+        'paid_amount': booking.paid_amount,
+    }
 
-Your booking at {booking.property.name} is confirmed!
+    html_content = render_to_string('emails/booking_confirmation.html', context)
+    text_content = strip_tags(html_content)
 
-Booking Number: {booking.booking_number}
-Check-in: {booking.check_in_date}
-Check-out: {booking.check_out_date}
-
-Rooms:
-{room_lines}
-
-Total Amount: ₹{booking.total_amount}
-Paid Amount: ₹{booking.paid_amount}
-
-Thank you for choosing {booking.property.name}. We look forward to hosting you!
-"""
-
-    send_mail(
+    email = EmailMultiAlternatives(
         subject=f'Booking Confirmed - {booking.booking_number}',
-        message=message,
+        body=text_content,
         from_email=django_settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[booking.guest.email],
-        fail_silently=False,
+        to=[booking.guest.email],
     )
+    email.attach_alternative(html_content, "text/html")
+    email.send(fail_silently=False)
+
 
 def send_admin_booking_notification(booking):
     """
     Notifies the property/admin email whenever a booking is confirmed,
-    so front desk sees new reservations without needing to check the
-    dashboard constantly. Separate function from the guest email since
-    the two have different audiences and could diverge in content later
-    (e.g. admin version could include guest phone/notes, internal flags).
+    styled to match the guest email but with internal-facing details
+    (phone, source, balance due, special requests).
     """
     if not django_settings.ADMIN_NOTIFICATION_EMAIL:
         return  # not configured — skip silently rather than erroring
 
-    room_lines = "\n".join(
-        f"- {br.room_type.name} (Room {br.room.room_number}): {br.check_in_date} to {br.check_out_date} — ₹{br.rate_amount}"
+    rooms = [
+        {
+            'room_type': br.room_type.name,
+            'room_number': br.room.room_number,
+            'amount': br.rate_amount,
+        }
         for br in booking.booking_rooms.all()
-    )
+    ]
 
-    message = f"""New booking received.
+    context = {
+        'booking_number': booking.booking_number,
+        'property_name': booking.property.name,
+        'source': booking.get_source_display(),
+        'guest_name': booking.guest.full_name,
+        'guest_email': booking.guest.email,
+        'guest_phone': booking.guest.phone,
+        'check_in': booking.check_in_date,
+        'check_out': booking.check_out_date,
+        'rooms': rooms,
+        'total_amount': booking.total_amount,
+        'paid_amount': booking.paid_amount,
+        'balance_due': booking.balance_due(),
+        'special_requests': booking.special_requests,
+    }
 
-Booking Number: {booking.booking_number}
-Property: {booking.property.name}
-Source: {booking.get_source_display()}
-Guest: {booking.guest.full_name}
-Guest Email: {booking.guest.email}
-Guest Phone: {booking.guest.phone}
+    html_content = render_to_string('emails/admin_notification.html', context)
+    text_content = strip_tags(html_content)
 
-Check-in: {booking.check_in_date}
-Check-out: {booking.check_out_date}
-
-Rooms:
-{room_lines}
-
-Total Amount: ₹{booking.total_amount}
-Paid Amount: ₹{booking.paid_amount}
-Balance Due: ₹{booking.balance_due()}
-
-Special Requests: {booking.special_requests or 'None'}
-"""
-
-    send_mail(
+    email = EmailMultiAlternatives(
         subject=f'New Booking - {booking.booking_number}',
-        message=message,
+        body=text_content,
         from_email=django_settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[django_settings.ADMIN_NOTIFICATION_EMAIL],
-        fail_silently=False,
+        to=[django_settings.ADMIN_NOTIFICATION_EMAIL],
     )
+    email.attach_alternative(html_content, "text/html")
+    email.send(fail_silently=False)
+
+    

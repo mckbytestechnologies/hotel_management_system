@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0; padding:0; background-color:#F6F3EC; font-family:Georgia, 'Times New Roman', serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F6F3EC; padding:32px 16px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px; background-color:#FFFFFF; border:1px solid #E5E0D4;">
+
+  <!-- Header -->
+  <tr>
+    <td style="background-color:#15181B; padding:28px 32px;">
+      <table role="presentation" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="width:34px; height:34px; background-color:#2B5245; border-radius:6px; text-align:center; vertical-align:middle;">
+            <span style="color:#FFFFFF; font-size:14px; font-family:Arial, sans-serif;">&#127976;</span>
+          </td>
+          <td style="padding-left:12px;">
+            <span style="color:#FFFFFF; font-size:16px; font-family:Georgia, serif;">{{ property_name }}</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Confirmation banner -->
+  <tr>
+    <td style="padding:36px 32px 8px; text-align:center;">
+      <div style="width:48px; height:48px; background-color:rgba(31,61,51,0.10); border-radius:100px; margin:0 auto; line-height:48px; text-align:center;">
+        <span style="color:#1F3D33; font-size:20px; font-family:Arial, sans-serif;">&#10003;</span>
+      </div>
+      <h1 style="font-family:Georgia, serif; font-size:22px; color:#15181B; margin:20px 0 6px; font-weight:normal;">Booking confirmed</h1>
+      <p style="font-family:Arial, sans-serif; font-size:13px; color:#8B8375; margin:0;">Dear {{ guest_name }}, thank you for choosing us.</p>
+    </td>
+  </tr>
+
+  <!-- Details box -->
+  <tr>
+    <td style="padding:24px 32px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#EFEAE0; border-radius:4px;">
+        <tr>
+          <td style="padding:20px 22px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial, sans-serif; font-size:13px;">
+              <tr>
+                <td style="color:#8B8375; padding:6px 0;">Booking number</td>
+                <td align="right" style="color:#15181B; font-weight:bold; padding:6px 0;">{{ booking_number }}</td>
+              </tr>
+              <tr>
+                <td style="color:#8B8375; padding:6px 0;">Check-in</td>
+                <td align="right" style="color:#15181B; font-weight:bold; padding:6px 0;">{{ check_in }}</td>
+              </tr>
+              <tr>
+                <td style="color:#8B8375; padding:6px 0;">Check-out</td>
+                <td align="right" style="color:#15181B; font-weight:bold; padding:6px 0;">{{ check_out }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Rooms -->
+  <tr>
+    <td style="padding:0 32px 24px;">
+      <p style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:0.04em; color:#8B8375; text-transform:uppercase; margin:0 0 12px;">Rooms</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        {% for room in rooms %}
+        <tr>
+          <td style="padding:10px 0; border-top:1px solid #EFEAE0; font-family:Arial, sans-serif; font-size:13px; color:#15181B;">
+            {{ room.room_type }} — Room {{ room.room_number }}
+            <div style="color:#8B8375; font-size:12px; margin-top:2px;">{{ room.check_in }} to {{ room.check_out }}</div>
+          </td>
+          <td align="right" style="padding:10px 0; border-top:1px solid #EFEAE0; font-family:Arial, sans-serif; font-size:13px; color:#15181B; font-weight:bold; white-space:nowrap;">
+            ₹{{ room.amount }}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+
+  <!-- Total -->
+  <tr>
+    <td style="padding:0 32px 32px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #15181B; padding-top:16px;">
+        <tr>
+          <td style="font-family:Arial, sans-serif; font-size:14px; color:#15181B; padding-top:16px;">Total amount</td>
+          <td align="right" style="font-family:Georgia, serif; font-size:22px; color:#15181B; padding-top:16px;">₹{{ total_amount }}</td>
+        </tr>
+        <tr>
+          <td style="font-family:Arial, sans-serif; font-size:12px; color:#8B8375; padding-top:6px;">Paid amount</td>
+          <td align="right" style="font-family:Arial, sans-serif; font-size:12px; color:#1F3D33; font-weight:bold; padding-top:6px;">₹{{ paid_amount }}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Footer -->
+  <tr>
+    <td style="background-color:#15181B; padding:24px 32px; text-align:center;">
+      <p style="font-family:Arial, sans-serif; font-size:12px; color:rgba(255,255,255,0.5); margin:0;">We look forward to hosting you at {{ property_name }}.</p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>

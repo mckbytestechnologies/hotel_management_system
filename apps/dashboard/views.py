@@ -8,7 +8,8 @@ from datetime import date
 from django.db.models import Count
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-
+from django.db.models import Q
+from apps.guests.models import Guest
 from apps.bookings.models import Booking
 from apps.bookings.forms import BookingForm
 from datetime import timedelta
@@ -25,6 +26,12 @@ from django.views import View
 from apps.bookings.models import Payment, Invoice
 
 from apps.integrations.models import ChannelMapping, SyncLog
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from django.views import View
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
+from apps.properties.models import Property, PropertyImage
 
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/home.html'
@@ -91,7 +98,23 @@ class PropertyListView(BaseListView):
     ]
 
 
-class PropertyCreateView(BaseCreateView):
+class PropertyImageSaveMixin:
+    """Saves any newly uploaded images after the property itself is saved."""
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        files = form.cleaned_data.get('new_images') or []
+        if files:
+            has_cover = self.object.images.filter(is_cover=True).exists()
+            start = self.object.images.count()
+            for i, f in enumerate(files):
+                PropertyImage.objects.create(
+                    property=self.object, image=f, sort_order=start + i,
+                    is_cover=(not has_cover and i == 0),
+                )
+        return response
+
+
+class PropertyCreateView(PropertyImageSaveMixin, BaseCreateView):
     module = Module.PROPERTIES
     model = Property
     form_class = PropertyForm
@@ -100,7 +123,7 @@ class PropertyCreateView(BaseCreateView):
     success_url = reverse_lazy('dashboard:property_list')
 
 
-class PropertyUpdateView(BaseUpdateView):
+class PropertyUpdateView(PropertyImageSaveMixin, BaseUpdateView):
     module = Module.PROPERTIES
     model = Property
     form_class = PropertyForm
@@ -108,6 +131,37 @@ class PropertyUpdateView(BaseUpdateView):
     success_message = 'Property updated successfully.'
     success_url = reverse_lazy('dashboard:property_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['existing_images'] = self.object.images.all()
+        return context
+
+
+@method_decorator(require_POST, name='dispatch')
+class PropertyImageDeleteView(ModulePermissionRequiredMixin, View):
+    module = Module.PROPERTIES
+    permission_action = 'edit'
+
+    def post(self, request, pk):
+        img = get_object_or_404(PropertyImage, pk=pk)
+        property_id = img.property_id
+        img.image.delete(save=False)  # remove the file from disk too
+        img.delete()
+        messages.success(request, 'Image removed.')
+        return redirect('dashboard:property_edit', pk=property_id)
+
+
+@method_decorator(require_POST, name='dispatch')
+class PropertyImageCoverView(ModulePermissionRequiredMixin, View):
+    module = Module.PROPERTIES
+    permission_action = 'edit'
+
+    def post(self, request, pk):
+        img = get_object_or_404(PropertyImage, pk=pk)
+        img.is_cover = True
+        img.save()
+        messages.success(request, 'Cover image updated.')
+        return redirect('dashboard:property_edit', pk=img.property_id)
 
 class PropertyDeleteView(BaseDeleteView):
     module = Module.PROPERTIES
@@ -511,3 +565,48 @@ class ChannelMappingDeleteView(BaseDeleteView):
     module = Module.INTEGRATIONS
     model = ChannelMapping
     success_url = reverse_lazy('dashboard:channelmapping_list')
+
+class GlobalSearchView(LoginRequiredMixin, TemplateView):
+    """
+    Searches across the models staff actually look things up by:
+    bookings (number, guest name/email/phone), guests, properties, rooms.
+    Kept as simple icontains queries — fine at this data scale; if this
+    ever needs to scale to tens of thousands of rows, swap to Postgres
+    full-text search or a dedicated search index.
+    """
+    template_name = 'dashboard/search_results.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q', '').strip()
+        context['query'] = query
+
+        if not query:
+            context['bookings'] = context['guests'] = context['properties'] = context['rooms'] = []
+            return context
+
+        context['bookings'] = Booking.objects.filter(
+            Q(booking_number__icontains=query) |
+            Q(guest__first_name__icontains=query) |
+            Q(guest__last_name__icontains=query) |
+            Q(guest__email__icontains=query) |
+            Q(guest__phone__icontains=query) |
+            Q(ota_reference__icontains=query)
+        ).select_related('guest', 'property')[:20]
+
+        context['guests'] = Guest.objects.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(phone__icontains=query)
+        )[:20]
+
+        context['properties'] = Property.objects.filter(
+            Q(name__icontains=query) | Q(code__icontains=query) | Q(city__icontains=query)
+        )[:20]
+
+        context['rooms'] = Room.objects.filter(
+            room_number__icontains=query
+        ).select_related('property', 'room_type')[:20]
+
+        return context
