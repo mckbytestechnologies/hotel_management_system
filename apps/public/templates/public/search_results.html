@@ -109,6 +109,7 @@
   footer.site p{ color:rgba(255,255,255,0.3); }
   footer.site a{ color:rgba(255,255,255,0.4); }
   footer.site a:hover{ color:var(--white); }
+    .brand-logo{ height:36px; width:auto; display:block; }
 </style>
 </head>
 
@@ -118,7 +119,7 @@
   <div class="wrap row">
     <a class="brand" href="{% url 'public:landing' %}">
       <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
-      <div><p class="brand-name">M Square</p><p class="brand-sub">Serviced Apartments</p></div>
+      <div><span class="brand-name"><img src="{% static 'img/logo.png' %}" alt="M Square" class="brand-logo"></span></div>
     </a>
     <a class="back-link" href="{% url 'public:landing' %}#find-stay">
       <i class="fa-solid fa-arrow-left"></i> New search

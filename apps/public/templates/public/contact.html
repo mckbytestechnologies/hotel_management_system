@@ -1,0 +1,541 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Contact — M Square Serviced Apartments</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  :root{
+    --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
+    --bottle:#000000; --bottle-light:#2A2D30;
+    --stone:#8B8375; --stone-light:#B8B0A0;
+    --white:#FFFFFF; --line:rgba(21,24,27,0.10);
+    --gold:#D4A843;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
+  html{ scroll-behavior:smooth; scroll-padding-top:72px; -webkit-text-size-adjust:100%; }
+  body{ margin:0; font-family:var(--font); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overflow-x:clip; line-height:1.5; }
+  h1,h2,h3,h4,p,ul{ margin:0; padding:0; }
+  h1,h2,h3{ font-weight:600; letter-spacing:-0.03em; }
+  ul{ list-style:none; }
+  a{ color:inherit; text-decoration:none; }
+  img{ display:block; max-width:100%; }
+  button{ font:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  @media (min-width:1024px){ .wrap{ padding:0 40px; } }
+
+  /* ---------- header ---------- */
+  .brand-logo{ height:36px; width:auto; display:block; }
+  header.site{ position:sticky; top:0; z-index:60; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:saturate(180%) blur(18px); backdrop-filter:saturate(180%) blur(18px); color:#fff; padding-top:env(safe-area-inset-top,0px); border-bottom:1px solid transparent; transition:border-color .25s ease; }
+  header.site.scrolled{ border-bottom-color:rgba(255,255,255,0.14); }
+  .head-row{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; height:68px; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:12px; justify-self:start; }
+  .brand-name{ font-size:21px; font-weight:600; letter-spacing:-0.04em; color:#fff; line-height:1; }
+  .brand-sub{ font-size:12px; font-weight:400; color:rgba(255,255,255,0.55); line-height:1; padding-left:12px; border-left:1px solid rgba(255,255,255,0.3); }
+  @media (max-width:420px){ .brand-sub{ display:none; } }
+
+  .nav{ display:none; align-items:center; gap:4px; justify-self:end; }
+  .nav a, .nav-dropdown > button{ background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.8); font-size:14px; font-weight:500; letter-spacing:-0.01em; padding:10px 14px; border-radius:980px; transition:background .2s ease; }
+  .nav a:hover, .nav-dropdown > button:hover, .nav-dropdown.open > button{ background:rgba(255,255,255,0.12); color:#fff; }
+
+  .head-cta{ display:none; justify-self:end; align-items:center; background:#fff; color:#000; font-size:14px; font-weight:500; letter-spacing:-0.01em; padding:10px 20px; border-radius:980px; transition:background .2s ease; }
+  .head-cta:hover{ background:var(--paper-2); }
+
+  .nav-dropdown{ position:relative; }
+  .nav-dropdown > button{ display:flex; align-items:center; gap:8px; }
+  .nav-dropdown > button i{ font-size:8px; transition:transform .25s ease; }
+  .nav-dropdown.open > button i{ transform:rotate(180deg); }
+
+  .dropdown-panel{
+    position:absolute; top:calc(100% + 16px); left:50%; margin-left:-340px;
+    width:680px; background:#fff; color:var(--ink);
+    border-radius:10px; box-shadow:0 28px 70px rgba(21,24,27,0.16); border:1px solid var(--line);
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .2s ease, transform .2s ease, visibility .2s;
+    z-index:80; overflow:hidden;
+  }
+  .nav-dropdown.open .dropdown-panel{ opacity:1; visibility:visible; transform:translateY(0); }
+  .dropdown-inner{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px; }
+  .dropdown-col{ padding:16px 14px 14px; border-radius:6px; transition:background .2s ease; }
+  .dropdown-col:hover{ background:var(--paper); }
+  .dropdown-city{ font-size:12.5px; font-weight:400; color:var(--stone); margin-bottom:6px; }
+  .dropdown-hotel{ display:block; font-size:16px; font-weight:600; letter-spacing:-0.02em; line-height:1.25; color:var(--ink) !important; cursor:pointer; }
+  .dropdown-footer{ border-top:1px solid var(--line); padding:14px 26px; background:var(--paper); }
+  .dropdown-footer a{ font-size:13.5px; font-weight:500; color:var(--bottle) !important; display:inline-block; }
+  .dropdown-footer a:hover{ text-decoration:underline; text-underline-offset:3px; }
+
+  .menu-btn{ justify-self:end; width:44px; height:44px; margin-right:-12px; border:none; background:none; color:#fff; cursor:pointer; font-size:18px; grid-column:3; }
+  .mobile-nav{ display:none; background:#000; border-top:1px solid rgba(255,255,255,0.14); padding:8px 24px 28px; max-height:calc(100vh - 68px); overflow-y:auto; }
+  .mobile-nav.open{ display:block; }
+  .mobile-nav a{ display:block; color:#fff; font-size:26px; font-weight:600; letter-spacing:-0.03em; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.12); }
+  .mobile-nav .sub{ font-size:16px; font-weight:400; letter-spacing:-0.01em; color:rgba(255,255,255,0.6); padding:12px 0 12px 16px; border-bottom:none; }
+  .mobile-nav .sub:last-of-type{ margin-bottom:6px; }
+  @media (min-width:900px){
+    .nav{ display:flex; } .head-cta{ display:inline-flex; } .menu-btn{ display:none; } .mobile-nav{ display:none !important; }
+  }
+
+  /* ---------- hero ---------- */
+  .c-hero{ position:relative; background:var(--ink); overflow:hidden; padding:72px 0 112px; }
+  @media (min-width:800px){ .c-hero{ padding:112px 0 136px; } }
+  .c-hero .bg{ position:absolute; inset:0; background:url("{% static 'img/hero.png' %}") center/cover; }
+  .c-hero .scrim{ position:absolute; inset:0; background:rgba(0,0,0,0.62); }
+  .c-hero .wrap{ position:relative; z-index:2; }
+  .c-hero h1{ color:#fff; font-size:clamp(40px,7vw,76px); line-height:1.04; letter-spacing:-0.045em; max-width:14ch; }
+  .c-hero p{ color:rgba(255,255,255,0.8); font-size:clamp(17px,1.8vw,20px); line-height:1.5; letter-spacing:-0.01em; max-width:42ch; margin-top:22px; }
+
+  /* ---------- quick contact strip (overlaps hero) ---------- */
+  .quick{ position:relative; z-index:10; margin-top:-64px; }
+  .quick-grid{ display:grid; background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 20px 50px rgba(0,0,0,0.16); overflow:hidden; }
+  @media (min-width:800px){ .quick-grid{ grid-template-columns:repeat(3,1fr); } }
+  .q-item{ display:flex; align-items:center; gap:16px; padding:22px 24px; border-bottom:1px solid var(--line); transition:background .2s ease; min-height:84px; }
+  .q-item:last-child{ border-bottom:none; }
+  @media (min-width:800px){ .q-item{ border-bottom:none; border-right:1px solid var(--line); } .q-item:last-child{ border-right:none; } }
+  a.q-item:hover{ background:var(--paper); }
+  .q-icon{ width:44px; height:44px; border-radius:100px; background:var(--bottle); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .q-label{ display:block; font-size:12.5px; color:var(--stone); }
+  .q-value{ display:block; font-size:16px; font-weight:600; letter-spacing:-0.02em; margin-top:2px; word-break:break-word; }
+
+  /* ---------- section headings ---------- */
+  .c-section{ padding:72px 0 24px; }
+  @media (min-width:760px){ .c-section{ padding:104px 0 32px; } }
+  .c-head{ max-width:620px; margin-bottom:40px; }
+  .c-head h2{ font-size:clamp(28px,4vw,42px); line-height:1.08; letter-spacing:-0.04em; }
+  .c-head p{ font-size:17px; color:var(--stone); line-height:1.5; letter-spacing:-0.01em; margin-top:14px; max-width:46ch; }
+
+  /* ---------- location cards ---------- */
+  .loc-list{ display:grid; gap:24px; }
+  .loc-card{ display:grid; background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  @media (min-width:860px){ .loc-card{ grid-template-columns:0.8fr 1.2fr; } }
+  .loc-img{ min-height:220px; background:var(--paper-2); }
+  .loc-img img{ width:100%; height:100%; object-fit:cover; min-height:220px; }
+  .loc-body{ padding:28px 24px 28px; }
+  @media (min-width:860px){ .loc-body{ padding:40px; } }
+  .loc-city{ font-size:13px; color:var(--stone); }
+  .loc-body h3{ font-size:clamp(24px,3vw,30px); letter-spacing:-0.035em; margin-top:4px; }
+  .loc-rows{ margin-top:22px; border-top:1px solid var(--line); }
+  .loc-row{ display:grid; grid-template-columns:36px 1fr; gap:14px; padding:16px 0; border-bottom:1px solid var(--line); }
+  .loc-row > i{ width:36px; height:36px; border-radius:100px; background:var(--paper-2); display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .loc-row .l{ display:block; font-size:12px; color:var(--stone); }
+  .loc-row .v{ display:block; font-size:15px; line-height:1.55; margin-top:2px; }
+  .loc-row .v a{ display:block; font-weight:500; word-break:break-word; }
+  .loc-row .v a:hover{ text-decoration:underline; text-underline-offset:3px; }
+  .loc-row .v em{ font-style:normal; color:var(--stone); font-size:13px; }
+  .loc-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+  .btn-dark, .btn-line{ display:inline-flex; align-items:center; gap:8px; min-height:46px; padding:0 22px; border-radius:980px; font-size:14.5px; font-weight:500; letter-spacing:-0.01em; transition:background .2s ease, border-color .2s ease; }
+  .btn-dark{ background:var(--bottle); color:#fff; }
+  .btn-dark:hover{ background:var(--bottle-light); }
+  .btn-line{ border:1px solid rgba(21,24,27,0.25); }
+  .btn-line:hover{ border-color:var(--ink); background:var(--paper); }
+
+  /* ---------- enquiry band ---------- */
+  .form-band{ background:var(--white); border-top:1px solid var(--line); margin-top:64px; padding-top:72px; }
+  @media (min-width:760px){ .form-band{ padding-top:96px; } }
+  .form-band .c-head{ text-align:center; margin-left:auto; margin-right:auto; }
+  .form-band .c-head p{ margin-left:auto; margin-right:auto; }
+
+  /* ---------- inquiry form (from include) ---------- */
+  .inquiry-section{ padding:0 0 88px; }
+  .inquiry-title{ text-align:center; font-size:clamp(28px,4vw,38px); font-weight:600; letter-spacing:-0.03em; margin-bottom:36px; }
+  .inquiry-form{ max-width:680px; margin:0 auto; }
+  .form-row{ display:flex; align-items:flex-start; gap:24px; margin-bottom:20px; }
+  .form-row label{ flex:0 0 110px; font-size:14px; font-weight:600; padding-top:12px; }
+  .form-row .field-wrap{ flex:1; }
+  .form-control{
+    width:100%; background:#fff; border:1px solid rgba(21,24,27,0.18); border-radius:8px;
+    padding:12px 14px; font-family:var(--font); font-size:15px; color:var(--ink);
+    outline:none; transition:border-color .15s, box-shadow .15s;
+  }
+  .form-control:focus{ border-color:var(--bottle); box-shadow:0 0 0 3px rgba(0,0,0,0.08); }
+  textarea.form-control{ min-height:120px; resize:vertical; }
+  .phone-group{ display:flex; gap:8px; }
+  .phone-flag{ flex:0 0 56px; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(21,24,27,0.18); border-radius:8px; font-size:18px; padding:10px 0; }
+  .phone-flag img{ width:24px; height:auto; }
+  .form-select{
+    width:100%; background:#fff; border:1px solid rgba(21,24,27,0.18); border-radius:8px;
+    padding:12px 14px; font-family:var(--font); font-size:15px; color:var(--ink);
+    outline:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238B8375' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; background-size:12px;
+  }
+  .form-select:focus{ border-color:var(--bottle); box-shadow:0 0 0 3px rgba(0,0,0,0.08); }
+  .btn-submit{
+    width:100%; background:var(--bottle); color:#fff; border:none; border-radius:980px;
+    padding:16px; font-family:var(--font); font-weight:600; font-size:15px; letter-spacing:-0.01em;
+    cursor:pointer; transition:background .18s ease; margin-top:8px;
+  }
+  .btn-submit:hover{ background:var(--bottle-light); }
+  @media (max-width:639px){
+    .form-row{ flex-direction:column; gap:6px; }
+    .form-row label{ flex:none; padding-top:0; }
+  }
+
+  /* ---------- footer ---------- */
+  footer.site{ background:var(--paper-2); color:var(--bottle); padding:80px 0 0; border-top:1px solid var(--line); }
+  .foot-top{ display:grid; gap:56px; padding-bottom:64px; }
+  @media (min-width:900px){ .foot-top{ grid-template-columns:1.25fr 1fr; gap:80px; } }
+  .foot-wordmark{ line-height:1; }
+  .foot-lede{ font-size:17px; line-height:1.45; letter-spacing:-0.01em; margin-top:18px; max-width:38ch; }
+  .foot-note{ font-size:12px; line-height:1.5; color:var(--stone); margin-top:16px; max-width:46ch; }
+  .foot-note a{ color:var(--bottle); text-decoration:underline; text-underline-offset:2px; }
+  .foot-cols{ display:grid; grid-template-columns:1fr 1fr; gap:40px 32px; align-content:start; }
+  @media (min-width:900px){ .foot-cols{ grid-template-columns:auto auto auto; justify-content:end; gap:48px; } }
+  .foot-col h4{ font-size:14px; font-weight:600; letter-spacing:-0.01em; margin-bottom:18px; }
+  .foot-col ul{ display:flex; flex-direction:column; gap:12px; }
+  .foot-col li{ font-size:14px; line-height:1.4; }
+  .foot-col a{ transition:opacity .2s ease; }
+  .foot-col a:hover{ opacity:.6; }
+  .foot-social a{ display:flex; align-items:center; gap:12px; }
+  .foot-social i{ width:16px; text-align:center; font-size:16px; }
+  .foot-bottom{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px 32px; padding:26px 0 calc(28px + env(safe-area-inset-bottom,0px)); border-top:1px solid rgba(0,0,0,0.25); font-size:13px; }
+  .foot-bottom-l{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 28px; }
+  .foot-bottom-r{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:12px 32px; margin-left:auto; }
+  .foot-links{ display:flex; flex-wrap:wrap; gap:10px 28px; }
+  .foot-links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px; transition:opacity .2s ease; }
+  .foot-links a:hover{ opacity:.6; }
+  .mck-credit{ display:flex; align-items:center; gap:8px; color:var(--stone); transition:color .2s ease; }
+  .mck-credit:hover{ color:var(--bottle); }
+  .mck-credit img{ height:18px; width:auto; opacity:.9; }
+
+  /* ---------- floating action button ---------- */
+  .fab{
+    position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:20px; z-index:90;
+    width:52px; height:52px; border-radius:50%;
+    background:var(--bottle); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    transition:transform .2s ease, background .2s ease;
+  }
+  .fab:hover{ transform:scale(1.06); background:var(--bottle-light); }
+  .fab-call{ display:flex; }
+  .fab-whatsapp{ display:none; }
+  @media (min-width:800px){
+    .fab-call{ display:none; }
+    .fab-whatsapp{ display:flex; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+
+<body id="top">
+
+<header class="site" id="site-header">
+  <div class="wrap head-row">
+    <a class="brand" href="{% url 'public:landing' %}">
+      <span class="brand-name"><img src="{% static 'img/logo.png' %}" alt="M Square" class="brand-logo"></span>
+      <span class="brand-sub">Serviced Apartments</span>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <a href="{% url 'public:landing' %}">Home</a>
+
+      <div class="nav-dropdown" id="hotels-dropdown">
+        <button type="button" aria-expanded="false" aria-haspopup="true">
+          Our Hotels <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-panel" role="menu">
+          <div class="dropdown-inner">
+            <div class="dropdown-col">
+              <p class="dropdown-city">Vellore, Tamil Nadu</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#vellore" role="menuitem">M Square — Vellore</a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-city">Chennai, Tamil Nadu</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#chennai" role="menuitem">M Square — Chennai</a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-city">Bengaluru, Karnataka</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#bengaluru" role="menuitem">M Square — Bengaluru</a>
+            </div>
+          </div>
+          <div class="dropdown-footer">
+            <a href="{% url 'public:locations' %}" role="menuitem">Our Hotels Directory</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="{% url 'public:landing' %}#amenities">Amenities</a>
+      <a href="{% url 'public:about' %}">About Us</a>
+      <a href="{% url 'public:gallery' %}">Gallery</a>
+    </nav>
+
+    <a class="head-cta" href="{% url 'public:contact' %}">Contact</a>
+
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile">
+    <a href="{% url 'public:landing' %}">Home</a>
+    <a href="{% url 'public:locations' %}">Our Hotels</a>
+    <a class="sub" href="{% url 'public:locations' %}#vellore">M Square — Vellore</a>
+    <a class="sub" href="{% url 'public:locations' %}#chennai">M Square — Chennai</a>
+    <a class="sub" href="{% url 'public:locations' %}#bengaluru">M Square — Bengaluru</a>
+    <a href="{% url 'public:landing' %}#amenities">Amenities</a>
+    <a href="{% url 'public:about' %}">About Us</a>
+    <a href="{% url 'public:gallery' %}">Gallery</a>
+    <a href="{% url 'public:contact' %}">Contact</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="c-hero">
+    <div class="bg"></div>
+    <div class="scrim"></div>
+    <div class="wrap">
+      <h1>Talk to the people who run your stay.</h1>
+      <p>Questions about a booking, a longer stay or a group? Call, write or send an enquiry and the team will reply.</p>
+    </div>
+  </section>
+
+  <!-- QUICK CONTACT STRIP -->
+  <section class="quick" aria-label="Quick contact">
+    <div class="wrap">
+      <div class="quick-grid">
+        <a class="q-item" href="tel:+914442257777">
+          <span class="q-icon"><i class="fa-solid fa-phone"></i></span>
+          <span><span class="q-label">Call reservations</span><span class="q-value">+91 44 4225 7777</span></span>
+        </a>
+        <a class="q-item" href="mailto:info@msquarehotels.com">
+          <span class="q-icon"><i class="fa-solid fa-envelope"></i></span>
+          <span><span class="q-label">Email us</span><span class="q-value">info@msquarehotels.com</span></span>
+        </a>
+        <a class="q-item" href="tel:+919841017125">
+          <span class="q-icon"><i class="fa-solid fa-people-group"></i></span>
+          <span><span class="q-label">Group enquiries</span><span class="q-value">+91 98410 17125</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATIONS -->
+  <section class="c-section" id="locations" aria-labelledby="loc-title">
+    <div class="wrap">
+      <div class="c-head">
+        <h2 id="loc-title">Find us.</h2>
+        <p>Contact the property you're planning to stay at, or use the enquiry form below.</p>
+      </div>
+
+      <div class="loc-list">
+
+        <!-- Chennai -->
+        <article class="loc-card">
+          <div class="loc-img">
+            <img src="{% static 'img/about.png' %}" alt="M Square Chennai" loading="lazy">
+          </div>
+          <div class="loc-body">
+            <p class="loc-city">Tamil Nadu</p>
+            <h3>M Square — Chennai</h3>
+            <div class="loc-rows">
+              <div class="loc-row">
+                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                <div><span class="l">Address</span><address class="v" style="font-style:normal">180, TT Krishnamachari Road, Alwarpet, Chennai, Tamil Nadu - 600018</address></div>
+              </div>
+              <div class="loc-row">
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
+                <div><span class="l">Phone</span><span class="v"><a href="tel:+914442257777">+91 44 4225 7777</a><a href="tel:+919841017125">+91 98410 17125 <em>(Group enquiries)</em></a></span></div>
+              </div>
+              <div class="loc-row">
+                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                <div><span class="l">Email</span><span class="v"><a href="mailto:reservations.chn@msquarehotels.com">reservations.chn@msquarehotels.com</a><a href="mailto:info@msquarehotels.com">info@msquarehotels.com</a></span></div>
+              </div>
+            </div>
+            <div class="loc-actions">
+              <a class="btn-dark" href="tel:+914442257777"><i class="fa-solid fa-phone"></i> Call</a>
+              <a class="btn-line" href="https://www.google.com/maps/search/?api=1&query=180+TT+Krishnamachari+Road+Alwarpet+Chennai+600018" target="_blank" rel="noopener"><i class="fa-solid fa-location-arrow"></i> Get directions</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Tirupati -->
+        <article class="loc-card">
+          <div class="loc-img">
+            <img src="{% static 'img/about.png' %}" alt="M Square Tirupati" loading="lazy">
+          </div>
+          <div class="loc-body">
+            <p class="loc-city">Andhra Pradesh</p>
+            <h3>M Square — Tirupati</h3>
+            <div class="loc-rows">
+              <div class="loc-row">
+                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                <div><span class="l">Address</span><address class="v" style="font-style:normal">18-1-5/4, Kapila Theertham, Tirumala Road, Near Nandhi Circle, Tirupati, Andhra Pradesh - 517501</address></div>
+              </div>
+              <div class="loc-row">
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
+                <div><span class="l">Phone</span><span class="v"><a href="tel:+918772223666">+91 877 222 3666</a><a href="tel:+919963475544">+91 99634 75544 <em>(Group enquiries)</em></a></span></div>
+              </div>
+              <div class="loc-row">
+                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                <div><span class="l">Email</span><span class="v"><a href="mailto:reservations.tpt@msquarehotels.com">reservations.tpt@msquarehotels.com</a><a href="mailto:gom.tpt@msquarehotels.com">gom.tpt@msquarehotels.com</a><a href="mailto:gm.tpt@msquarehotels.com">gm.tpt@msquarehotels.com</a></span></div>
+              </div>
+            </div>
+            <div class="loc-actions">
+              <a class="btn-dark" href="tel:+918772223666"><i class="fa-solid fa-phone"></i> Call</a>
+              <a class="btn-line" href="https://www.google.com/maps/search/?api=1&query=18-1-5/4+Kapila+Theertham+Tirumala+Road+Tirupati+517501" target="_blank" rel="noopener"><i class="fa-solid fa-location-arrow"></i> Get directions</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ENQUIRY FORM -->
+  <section class="form-band" id="enquiry" aria-labelledby="enq-title">
+    <div class="wrap">
+      <div class="c-head">
+        <h2 id="enq-title">Send an enquiry.</h2>
+        <p>Share your dates and requirements. We'll get back to you with availability and rates.</p>
+      </div>
+    </div>
+    {% include 'public/_inquiry_form.html' %}
+  </section>
+
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-top">
+
+      <div class="foot-news">
+        <p class="foot-wordmark">
+            <img src="{% static 'img/black-logo.png' %}" alt="M Square" style="width: 150px; height: auto;">
+        </p>
+        <p class="foot-lede">Join our newsletter to stay up to date on new stays and offers.</p>
+        <!-- TODO: set the form action to your newsletter endpoint -->
+
+        <p class="foot-note">By subscribing you agree to our <a href="{% url 'public:privacy' %}">Privacy Policy</a> and provide consent to receive updates from our company.</p>
+      </div>
+
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Our Locations</h4>
+          <ul>
+            <li><a href="{% url 'public:locations' %}#vellore">Vellore</a></li>
+            <li><a href="{% url 'public:locations' %}#chennai">Chennai</a></li>
+            <li><a href="{% url 'public:locations' %}#bengaluru">Bengaluru</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{% url 'public:stays' %}">Rooms</a></li>
+            <li><a href="{% url 'public:landing' %}#amenities">Amenities</a></li>
+            <li><a href="{% url 'public:contact' %}">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="foot-col foot-social">
+          <h4>Follow Us</h4>
+          <ul>
+            <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i> Facebook</a></li>
+            <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i> Instagram</a></li>
+            <li><a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="foot-bottom">
+      <div class="foot-bottom-l">
+        <p>© 2026 M Square Hotel. All rights reserved.</p>
+      </div>
+      <div class="foot-bottom-r">
+        <div class="foot-links">
+          <a href="{% url 'public:privacy' %}">Privacy Policy</a>
+          <a href="{% url 'public:terms' %}">Terms and Conditions</a>
+          <a href="{% url 'public:contact' %}">Contact Us</a>
+        </div>
+        <a class="mck-credit" href="https://mckbytes.com/" target="_blank" rel="noopener">
+          <span>Created by</span>
+          <img src="https://mckbytes.com/static/img/LOGO/logo.png" alt="MCK Bytes">
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= FLOATING ACTION BUTTON ================= -->
+<a class="fab fab-call" href="tel:+914442257777" aria-label="Call us">
+  <i class="fa-solid fa-phone"></i>
+</a>
+<a class="fab fab-whatsapp" href="https://wa.me/919841017125" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- mobile menu ---------- */
+  var menuBtn = $('menu-btn'), mobileNav = $('mobile-nav');
+  function closeMenu() {
+    mobileNav.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.querySelector('i').className = 'fa-solid fa-bars';
+  }
+  menuBtn.addEventListener('click', function () {
+    var open = mobileNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.querySelector('i').className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  });
+  mobileNav.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mobileNav.classList.contains('open')) { closeMenu(); menuBtn.focus(); }
+  });
+
+  /* ---------- header border on scroll ---------- */
+  var header = $('site-header');
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- Our Hotels dropdown ---------- */
+  var dropdown = $('hotels-dropdown');
+  if (dropdown) {
+    var toggleBtn = dropdown.querySelector('button');
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+    toggleBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = dropdown.classList.toggle('open');
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!dropdown.contains(e.target)) closeDropdown();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && dropdown.classList.contains('open')) {
+        closeDropdown();
+        toggleBtn.focus();
+      }
+    });
+    dropdown.querySelectorAll('.dropdown-hotel, .dropdown-footer a').forEach(function (link) {
+      link.addEventListener('click', closeDropdown);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

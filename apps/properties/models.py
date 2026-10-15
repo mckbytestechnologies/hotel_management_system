@@ -153,3 +153,24 @@ class RatePlan(BaseModel):
 
     def __str__(self):
         return f"{self.property.code} - {self.name}"
+
+class PropertyPaymentAccount(BaseModel):
+    """
+    Razorpay credentials for ONE property. Each location collects money
+    into its own Razorpay account, so payments, signature checks and
+    webhooks must use the keys of the property being booked.
+    """
+    property = models.OneToOneField(
+        Property, on_delete=models.CASCADE, related_name='payment_account'
+    )
+    razorpay_key_id = models.CharField(max_length=100)
+    razorpay_key_secret = models.CharField(max_length=100)
+    razorpay_webhook_secret = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        db_table = 'property_payment_accounts'
+        verbose_name = 'Property Payment Account'
+        verbose_name_plural = 'Property Payment Accounts'
+
+    def __str__(self):
+        return f"{self.property.code} - {self.razorpay_key_id}"

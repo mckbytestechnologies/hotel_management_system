@@ -33,6 +33,15 @@ class ChannexWebhookView(View):
         print("=================================")
 
         if event == 'booking':
-            handle_channex_booking_webhook(payload)
+            try:
+                handle_channex_booking_webhook(payload)
+            except Exception as e:
+                # Log it, but still return 200 — this is a business-logic
+                # failure (missing mapping, room unavailable, etc.), not a
+                # server error. Returning 500 here makes Channex retry the
+                # same booking indefinitely, flooding the logs without
+                # fixing anything. The failure is already recorded in
+                # SyncLog for staff to see and resolve.
+                print(f"Webhook handling failed (logged, not retried): {e}")
 
         return JsonResponse({'status': 'ok'})

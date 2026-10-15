@@ -19,7 +19,10 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .razorpay_client import create_razorpay_order, verify_payment_signature, verify_webhook_signature
+from .razorpay_client import (
+    get_credentials, PaymentAccountNotConfigured,
+    create_razorpay_order, verify_payment_signature, verify_webhook_signature,
+)
 from .services import record_payment
 from .models import Payment
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -119,25 +122,21 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 @authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
 def create_payment_order(request):
-    """
-    POST /api/bookings/{booking_id}/create-payment-order/
-    Body: {"amount": 7000}  (optional — defaults to booking's balance_due)
-
-    Creates a Razorpay order and a PENDING Payment row to track it.
-    Frontend uses the returned order_id + key_id to open Razorpay Checkout.
-    """
-    booking_id = request.data.get('booking_id')
-    booking = get_object_or_404(Booking, id=booking_id)
+    booking = get_object_or_404(Booking, id=request.data.get('booking_id'))
     amount = request.data.get('amount') or booking.balance_due()
 
     if amount <= 0:
         return Response({'detail': 'Nothing due to pay.'}, status=400)
 
-    order = create_razorpay_order(amount=amount, receipt=booking.booking_number)
+    try:
+        creds = get_credentials(booking.property)
+    except PaymentAccountNotConfigured as e:
+        return Response({'detail': str(e)}, status=503)
+
+    order = create_razorpay_order(creds, amount=amount, receipt=booking.booking_number)
 
     payment = Payment.objects.create(
-        booking=booking,
-        amount=amount,
+        booking=booking, amount=amount,
         method=Payment.Method.ONLINE_GATEWAY,
         status=Payment.Status.PENDING,
         gateway_order_id=order['id'],
@@ -145,12 +144,13 @@ def create_payment_order(request):
 
     return Response({
         'razorpay_order_id': order['id'],
-        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'razorpay_key_id': creds['key_id'],      # this property's key, not a global one
         'amount': order['amount'],
         'currency': order['currency'],
         'payment_id': payment.id,
         'booking_number': booking.booking_number,
     })
+
 
 @api_view(['POST'])
 @authentication_classes([CsrfExemptSessionAuthentication])
@@ -163,33 +163,33 @@ def verify_payment(request):
     if not all([order_id, payment_id, signature]):
         return Response({'detail': 'Missing verification fields.'}, status=400)
 
+    # Find the payment first: it tells us which property's keys to verify with.
+    payment = get_object_or_404(Payment.objects.select_related('booking__property'), gateway_order_id=order_id)
+    booking = payment.booking
+
+    try:
+        creds = get_credentials(booking.property)
+    except PaymentAccountNotConfigured as e:
+        return Response({'detail': str(e)}, status=503)
+
     if not verify_payment_signature(
-        razorpay_order_id=order_id, razorpay_payment_id=payment_id, razorpay_signature=signature
+        creds, razorpay_order_id=order_id,
+        razorpay_payment_id=payment_id, razorpay_signature=signature,
     ):
         return Response({'detail': 'Payment signature verification failed.'}, status=400)
 
-    payment = get_object_or_404(Payment, gateway_order_id=order_id)
-
     if payment.status == Payment.Status.SUCCESS:
-        return Response({'detail': 'Payment already verified.'})  # idempotent
+        return Response({'detail': 'Payment already verified.'})
 
     payment.status = Payment.Status.SUCCESS
     payment.transaction_reference = payment_id
     payment.paid_at = timezone.now()
     payment.save(update_fields=['status', 'transaction_reference', 'paid_at', 'updated_at'])
 
-    booking = payment.booking
     booking.paid_amount = booking.paid_amount + payment.amount
     booking.save(update_fields=['paid_amount', 'updated_at'])
 
-    # Generate/refresh the invoice now that payment succeeded — this is
-    # the natural trigger point, since an invoice should reflect actual
-    # charges once money has changed hands.
     invoice = generate_invoice(booking.id)
-
-    # Email the guest their room/booking details now that payment is
-    # confirmed — this is the permanent record beyond the on-screen
-    # confirmation page, which the guest could lose by closing the tab.
     send_booking_confirmation_email(booking)
     send_admin_booking_notification(booking)
 
@@ -202,37 +202,62 @@ def verify_payment(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RazorpayWebhookView(View):
-    def post(self, request):
+    """
+    One webhook URL per property:  /api/bookings/razorpay-webhook/<property_id>/
+    Each Razorpay account signs with its own secret, so the property in the
+    URL decides which secret is used to verify the request.
+    """
+    def post(self, request, property_id=None):
         from django.http import JsonResponse
 
+        property_obj = Property.objects.filter(id=property_id).first() if property_id else None
+        if property_id and not property_obj:
+            return JsonResponse({'detail': 'Unknown property'}, status=404)
+
+        try:
+            creds = get_credentials(property_obj)
+        except PaymentAccountNotConfigured:
+            return JsonResponse({'detail': 'Payment account not configured'}, status=503)
+
         signature = request.headers.get('X-Razorpay-Signature', '')
-        if not verify_webhook_signature(payload_body=request.body, signature=signature):
+        if not verify_webhook_signature(creds, payload_body=request.body, signature=signature):
             return JsonResponse({'detail': 'Invalid signature'}, status=400)
 
         payload = json.loads(request.body)
         event = payload.get('event')
 
         if event == 'payment.captured':
-            payment_entity = payload['payload']['payment']['entity']
-            order_id = payment_entity.get('order_id')
-            payment = Payment.objects.filter(gateway_order_id=order_id).first()
+            entity = payload['payload']['payment']['entity']
+            payment = Payment.objects.select_related('booking').filter(
+                gateway_order_id=entity.get('order_id')
+            ).first()
+
+            # A webhook for property A must never mark property B's payment paid.
+            if payment and property_obj and payment.booking.property_id != property_obj.id:
+                return JsonResponse({'detail': 'Property mismatch'}, status=400)
+
             if payment and payment.status != Payment.Status.SUCCESS:
                 payment.status = Payment.Status.SUCCESS
-                payment.transaction_reference = payment_entity.get('id')
+                payment.transaction_reference = entity.get('id')
                 payment.paid_at = timezone.now()
                 payment.save(update_fields=['status', 'transaction_reference', 'paid_at', 'updated_at'])
+
                 booking = payment.booking
                 booking.paid_amount = booking.paid_amount + payment.amount
                 booking.save(update_fields=['paid_amount', 'updated_at'])
                 generate_invoice(booking.id)
+                send_booking_confirmation_email(booking)
+                send_admin_booking_notification(booking)
 
         elif event == 'payment.failed':
-            payment_entity = payload['payload']['payment']['entity']
-            order_id = payment_entity.get('order_id')
-            Payment.objects.filter(gateway_order_id=order_id).update(status=Payment.Status.FAILED)
+            entity = payload['payload']['payment']['entity']
+            Payment.objects.filter(
+                gateway_order_id=entity.get('order_id')
+            ).exclude(status=Payment.Status.SUCCESS).update(status=Payment.Status.FAILED)
 
         return JsonResponse({'status': 'ok'})
 
+        
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_invoice(request, booking_number):

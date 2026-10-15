@@ -1,0 +1,108 @@
+
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Website Enquiries</h1>
+            <p class="text-muted">
+                Contact messages submitted through your website.
+            </p>
+        </div>
+        <span class="badge bg-primary">
+            {{ page_obj.paginator.count }} enquiries
+        </span>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Hotel</th>
+                            <th>Message</th>
+                            <th>Source Page</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for inquiry in inquiries %}
+                        <tr>
+                            <td>{{ inquiry.name }}</td>
+
+                            <td>
+                                <a href="mailto:{{ inquiry.email }}">
+                                    {{ inquiry.email }}
+                                </a>
+                            </td>
+
+                            <td>
+                                <a href="tel:{{ inquiry.phone }}">
+                                    {{ inquiry.phone }}
+                                </a>
+                            </td>
+
+                            <td>{{ inquiry.hotel }}</td>
+
+                            <td style="min-width: 220px; max-width: 350px;
+                                       white-space: normal;">
+                                {{ inquiry.comment|truncatechars:120 }}
+                            </td>
+
+                            <td>{{ inquiry.source_page|default:"—" }}</td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                No website enquiries received yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Enquiry pagination">
+                <ul class="pagination justify-content-end mt-3">
+
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Page {{ page_obj.number }}
+                            of {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

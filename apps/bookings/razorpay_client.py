@@ -1,40 +1,62 @@
-import razorpay
-import hmac
 import hashlib
+import hmac
+
+import razorpay
 from django.conf import settings
 
-
-def get_client():
-    return razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+from apps.properties.models import PropertyPaymentAccount
 
 
-def create_razorpay_order(*, amount, currency='INR', receipt=''):
+class PaymentAccountNotConfigured(Exception):
+    pass
+
+
+def get_credentials(property_obj):
     """
-    Creates a Razorpay order for the given amount (in rupees — converted
-    to paise here since Razorpay's API expects the smallest currency unit).
-    Returns the order dict, which the frontend uses to open Razorpay's
-    checkout widget.
+    Returns {'key_id', 'key_secret', 'webhook_secret'} for a property.
+    Falls back to the global .env keys only if the property has no
+    account of its own (keeps your existing test setup working).
     """
-    client = get_client()
-    order = client.order.create({
-        'amount': int(amount * 100),  # rupees -> paise
+    if property_obj is not None:
+        acct = PropertyPaymentAccount.objects.filter(
+            property=property_obj, is_active=True
+        ).first()
+        if acct:
+            return {
+                'key_id': acct.razorpay_key_id,
+                'key_secret': acct.razorpay_key_secret,
+                'webhook_secret': acct.razorpay_webhook_secret,
+            }
+
+    if settings.RAZORPAY_KEY_ID and settings.RAZORPAY_KEY_SECRET:
+        return {
+            'key_id': settings.RAZORPAY_KEY_ID,
+            'key_secret': settings.RAZORPAY_KEY_SECRET,
+            'webhook_secret': settings.RAZORPAY_WEBHOOK_SECRET,
+        }
+
+    raise PaymentAccountNotConfigured(
+        f"No Razorpay account configured for property "
+        f"{getattr(property_obj, 'name', None)}."
+    )
+
+
+def _client(creds):
+    return razorpay.Client(auth=(creds['key_id'], creds['key_secret']))
+
+
+def create_razorpay_order(creds, *, amount, currency='INR', receipt=''):
+    return _client(creds).order.create({
+        'amount': int(amount * 100),   # rupees -> paise
         'currency': currency,
         'receipt': receipt,
-        'payment_capture': 1,  # auto-capture on successful payment
+        'payment_capture': 1,
     })
-    return order
 
 
-def verify_payment_signature(*, razorpay_order_id, razorpay_payment_id, razorpay_signature):
-    """
-    Verifies the signature Razorpay sends back after checkout completes,
-    proving the payment response wasn't tampered with client-side.
-    Returns True/False rather than raising, so the caller decides how
-    to handle a failed verification.
-    """
-    client = get_client()
+def verify_payment_signature(creds, *, razorpay_order_id, razorpay_payment_id, razorpay_signature):
     try:
-        client.utility.verify_payment_signature({
+        _client(creds).utility.verify_payment_signature({
             'razorpay_order_id': razorpay_order_id,
             'razorpay_payment_id': razorpay_payment_id,
             'razorpay_signature': razorpay_signature,
@@ -44,16 +66,9 @@ def verify_payment_signature(*, razorpay_order_id, razorpay_payment_id, razorpay
         return False
 
 
-def verify_webhook_signature(*, payload_body, signature):
-    """
-    Verifies a Razorpay webhook's signature using the webhook secret
-    (different from the API secret) configured in the Razorpay dashboard.
-    payload_body must be the raw request body bytes, not parsed JSON —
-    HMAC verification requires the exact bytes Razorpay signed.
-    """
-    expected_signature = hmac.new(
-        key=settings.RAZORPAY_WEBHOOK_SECRET.encode(),
-        msg=payload_body,
-        digestmod=hashlib.sha256,
-    ).hexdigest()
-    return hmac.compare_digest(expected_signature, signature)
+def verify_webhook_signature(creds, *, payload_body, signature):
+    secret = creds.get('webhook_secret') or ''
+    if not secret:
+        return False   # never accept unsigned webhooks
+    expected = hmac.new(secret.encode(), payload_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)

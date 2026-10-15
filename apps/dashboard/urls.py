@@ -11,7 +11,7 @@ from .views import (
     BulkRateGenerateView,
     PaymentListView, InvoiceListView, InvoiceViewByPk,
     SyncLogListView, ChannelMappingListView, ChannelMappingCreateView,
-    ChannelMappingUpdateView, ChannelMappingDeleteView, PropertyImageCoverView, PropertyImageDeleteView,
+    ChannelMappingUpdateView, ChannelMappingDeleteView, PropertyImageCoverView, PropertyImageDeleteView, InquiryListView,
 )
 
 app_name = 'dashboard'
@@ -70,4 +70,5 @@ urlpatterns = [
 
 
     path('search/', GlobalSearchView.as_view(), name='search'),
+    path('inquiries/', InquiryListView.as_view(), name='inquiry_list'),
 ]

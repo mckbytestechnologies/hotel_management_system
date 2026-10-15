@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Property, RoomType, Room, RatePlan, PropertyImage
-
+from .models import PropertyPaymentAccount
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
@@ -40,3 +40,7 @@ class RatePlanAdmin(admin.ModelAdmin):
 class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
     extra = 1
+
+@admin.register(PropertyPaymentAccount)
+class PropertyPaymentAccountAdmin(admin.ModelAdmin):
+    list_display = ('property', 'razorpay_key_id', 'is_active')

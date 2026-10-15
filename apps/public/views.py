@@ -26,6 +26,15 @@ from urllib.parse import urlencode
 from django.core.paginator import Paginator
 from django.db.models import Count, Exists, Min, OuterRef, Q
 from django.urls import reverse
+import logging
+from django.core.cache import cache
+from django.core.mail import EmailMessage
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
+from django.urls import reverse
+from .forms import InquiryForm
+
+logger = logging.getLogger(__name__)
 
 
 PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80'
@@ -628,3 +637,146 @@ def stays(request):
         'page_qs': _querystring(request, drop=('page',)),
         'min_checkin': today.isoformat(),
     })
+
+def about(request):
+    return render(request, 'public/about.html')
+
+def contact(request):
+    return render(request,'public/contact.html')
+
+def privay_policy(request):
+    return render(request,'public/privay-policy.html')
+
+def termsandcondition(request):
+    return render(request, 'public/termsandcondition.html')
+
+def locations(request):
+    return render(request, 'public/locations.html')
+
+
+
+def gallery(request):
+    """
+    The public homepage: a hero search form (property, check-in, check-out,
+    guests). Submitting redirects to the search results page with these
+    as query params — keeps the results page bookmarkable/shareable.
+    """
+    properties = Property.objects.filter(is_active=True).prefetch_related('images', 'room_types')
+
+    if request.method == 'POST':
+        property_id = request.POST.get('property')
+        check_in = request.POST.get('check_in')
+        check_out = request.POST.get('check_out')
+        adults = request.POST.get('adults', 1)
+
+        if not all([property_id, check_in, check_out]):
+            messages.error(request, 'Please select a property and both dates.')
+            return redirect('public:landing')
+
+        return redirect(
+            f"/book/search/?property={property_id}&check_in={check_in}"
+            f"&check_out={check_out}&adults={adults}"
+        )
+
+    today = date.today()
+    default_checkin = today + timedelta(days=1)
+    default_checkout = today + timedelta(days=2)
+
+    return render(request, 'public/gallery.html', {
+        'properties': properties,
+        'property_cards': build_property_cards(properties),
+
+        # Default values
+        'default_checkin': default_checkin.isoformat(),
+        'default_checkout': default_checkout.isoformat(),
+
+        # Minimum selectable dates
+        'min_checkin': today.isoformat(),
+        'min_checkout': (today + timedelta(days=1)).isoformat(),
+    })
+
+INQUIRY_LIMIT = 5          # enquiries allowed per IP...
+INQUIRY_WINDOW = 3600      # ...per hour
+
+
+def _notify_admin_of_inquiry(inquiry):
+    """Email the team. A mail failure must never lose or block the enquiry."""
+    to = getattr(settings, 'ADMIN_NOTIFICATION_EMAIL', '')
+    if not to:
+        return
+    body = (
+        "New website enquiry.\n\n"
+        f"Name: {inquiry.name}\n"
+        f"Email: {inquiry.email}\n"
+        f"Phone: {inquiry.phone}\n"
+        f"Hotel: {inquiry.hotel}\n"
+        f"Submitted from: {inquiry.source_page}\n\n"
+        f"Message:\n{inquiry.comment}\n"
+    )
+    try:
+        EmailMessage(
+            subject='New website enquiry',
+            body=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[to],
+            reply_to=[inquiry.email],     # "Reply" goes straight to the guest
+        ).send(fail_silently=False)
+    except Exception:
+        logger.exception('Could not send enquiry notification email')
+
+
+@require_POST
+def submit_inquiry(request):
+    """
+    Saves an enquiry from the landing or contact page, then redirects back
+    to the page it came from with ?inquiry=sent|error|limit so the page can
+    show a message (Post/Redirect/Get: refreshing never re-submits).
+    """
+    next_url = request.POST.get('next', '')
+    if not url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        next_url = reverse('public:landing')
+    base = next_url.split('?')[0].split('#')[0]
+
+    def back(state):
+        return redirect(f"{base}?inquiry={state}#inquiry")
+
+    # Honeypot: real visitors never see or fill this field; bots do.
+    # Pretend it worked so the bot doesn't learn anything.
+    if request.POST.get('website'):
+        return back('sent')
+
+    # Simple per-IP limit so the form can't be used to flood the inbox.
+    ip = request.META.get('REMOTE_ADDR', '')
+    key = f'inquiry_rate:{ip}'
+    if cache.add(key, 1, INQUIRY_WINDOW):
+        count = 1
+    else:
+        try:
+            count = cache.incr(key)
+        except ValueError:
+            cache.set(key, 1, INQUIRY_WINDOW)
+            count = 1
+    if count > INQUIRY_LIMIT:
+        return back('limit')
+
+    form = InquiryForm(request.POST)
+
+    if not form.is_valid():
+        print("\n========== INQUIRY VALIDATION FAILED ==========")
+        print("Errors:", form.errors.as_json())
+        print("Fields received:", list(request.POST.keys()))
+        print("===============================================\n")
+
+        return back('error')
+
+    print("Inquiry form validation passed.")
+
+    inquiry = form.save(commit=False)
+    inquiry.ip_address = ip or None
+    inquiry.source_page = base[:200]
+    inquiry.save()                      # saved first, so it is kept even if email fails
+
+    _notify_admin_of_inquiry(inquiry)
+    return back('sent')

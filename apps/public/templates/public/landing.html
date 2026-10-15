@@ -9,150 +9,378 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
   :root{
     --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
-    --bottle:#1F3D33; --bottle-light:#2B5245;
+    --bottle:#000000; --bottle-light:#2A2D30;
     --stone:#8B8375; --stone-light:#B8B0A0;
     --white:#FFFFFF; --line:rgba(21,24,27,0.10);
-    --overlap:40px;   /* set by JS: 20% of the search panel height */
+    --gold:#D4A843;
+    --overlap:40px;
+    --whatsapp:#25D366;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;
   }
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }
-  html{ scroll-behavior:smooth; scroll-padding-top:76px; -webkit-text-size-adjust:100%; }
-  body{ margin:0; font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; overflow-x:clip; }
-  h1,h2,h3,.serif{ font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em; }
-  p{ margin:0; } a{ color:inherit; text-decoration:none; } ul{ list-style:none; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; scroll-padding-top:72px; -webkit-text-size-adjust:100%; }
+  body{ margin:0; font-family:var(--font); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overflow-x:clip; line-height:1.5; }
+  h1,h2,h3,h4,p,ul{ margin:0; padding:0; }
+  h1,h2,h3{ font-weight:600; letter-spacing:-0.03em; }
+  ul{ list-style:none; }
+  a{ color:inherit; text-decoration:none; }
   img{ display:block; max-width:100%; }
   button{ font:inherit; color:inherit; }
-  :focus-visible{ outline:2px solid var(--bottle); outline-offset:2px; }
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 20px; }
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
   @media (min-width:1024px){ .wrap{ padding:0 40px; } }
 
-  /* ---------- header: black, white text ---------- */
-  header.site{ position:sticky; top:0; z-index:60; background:#000; color:#fff; }
-  .head-row{ display:flex; align-items:center; justify-content:space-between; height:64px; }
-  .brand{ display:flex; align-items:center; gap:12px; }
-  .brand-mark{ width:36px; height:36px; border-radius:8px; background:#fff; color:#000; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
-  .brand-name{ color:#fff; font-size:17px; font-family:'Fraunces',serif; }
-  .brand-sub{ color:rgba(255,255,255,0.6); font-size:11px; margin-top:1px; }
+  /* ---------- fade-up reveal system ---------- */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .fade-up[data-delay="1"] { transition-delay: 0.05s; }
+  .fade-up[data-delay="2"] { transition-delay: 0.1s; }
+  .fade-up[data-delay="3"] { transition-delay: 0.15s; }
+  .fade-up[data-delay="4"] { transition-delay: 0.2s; }
+  .fade-up[data-delay="5"] { transition-delay: 0.25s; }
+  .fade-up[data-delay="6"] { transition-delay: 0.3s; }
+  .fade-up[data-delay="7"] { transition-delay: 0.35s; }
+  .fade-up[data-delay="8"] { transition-delay: 0.4s; }
+  .fade-up[data-delay="9"] { transition-delay: 0.45s; }
+  .fade-up[data-delay="10"] { transition-delay: 0.5s; }
+  .fade-up[data-delay="11"] { transition-delay: 0.55s; }
+  .fade-up[data-delay="12"] { transition-delay: 0.6s; }
 
-  .nav{ display:none; align-items:center; gap:4px; }
-  .nav a, .nav button{ background:none; border:none; cursor:pointer; color:#fff; font-size:14px; font-weight:500; padding:10px 14px; border-radius:4px; }
-  .nav a:hover, .nav button:hover{ background:rgba(255,255,255,0.14); }
-  .menu-btn{ width:44px; height:44px; border-radius:4px; border:1px solid rgba(255,255,255,0.3); background:none; color:#fff; cursor:pointer; font-size:16px; }
-  .mobile-nav{ display:none; background:#000; border-top:1px solid rgba(255,255,255,0.14); }
-  .mobile-nav.open{ display:block; }
-  .mobile-nav a, .mobile-nav button{ display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer; color:#fff; font-size:15px; font-weight:500; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
-  @media (min-width:800px){
-    .nav{ display:flex; } .menu-btn{ display:none; } .mobile-nav{ display:none !important; }
+  .prop-card .slides img,
+  .about-img .frame img,
+  .city {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .prop-card .slides img { opacity: 0.98; }
+  .prop-card:hover .slides img { opacity: 1; }
+
+  .city { opacity: 1; }
+  .city.fade-up { opacity: 0; }
+  .city.fade-up.visible { opacity: 1; }
+
+  .service, .amen, .foot-col {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .service.fade-up, .amen.fade-up, .foot-col.fade-up {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  .service.fade-up.visible, .amen.fade-up.visible, .foot-col.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
-  /* ---------- hero (short) ---------- */
-  .hero{ position:relative; background:var(--ink); overflow:hidden; padding:48px 0 calc(var(--overlap) + 44px); }
-  @media (min-width:800px){ .hero{ padding:84px 0 calc(var(--overlap) + 64px); } }
-  .hero-bg{ position:absolute; inset:0; background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2000&q=80') center/cover; }
-  .hero-scrim{ position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); }
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    .service.fade-up, .amen.fade-up, .foot-col.fade-up,
+    .city.fade-up, .prop-card.fade-up {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /* ---------- header ---------- */
+  .brand-logo{ height:36px; width:auto; display:block; }
+  header.site{ position:sticky; top:0; z-index:60; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:saturate(180%) blur(18px); backdrop-filter:saturate(180%) blur(18px); color:#fff; padding-top:env(safe-area-inset-top,0px); border-bottom:1px solid transparent; transition:border-color .25s ease; }
+  header.site.scrolled{ border-bottom-color:rgba(255,255,255,0.14); }
+  .head-row{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; height:68px; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:12px; justify-self:start; }
+  .brand-name{ font-size:21px; font-weight:600; letter-spacing:-0.04em; color:#fff; line-height:1; }
+  .brand-sub{ font-size:12px; font-weight:400; color:rgba(255,255,255,0.55); line-height:1; padding-left:12px; border-left:1px solid rgba(255,255,255,0.3); }
+  @media (max-width:420px){ .brand-sub{ display:none; } }
+
+  .nav{ display:none; align-items:center; gap:4px; justify-self:end; }
+  .nav a, .nav-dropdown > button{ background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.8); font-size:14px; font-weight:500; letter-spacing:-0.01em; padding:10px 14px; border-radius:980px; transition:background .2s ease; }
+  .nav a:hover, .nav-dropdown > button:hover, .nav-dropdown.open > button{ background:rgba(255,255,255,0.12); color:#fff; }
+
+  .head-cta{ display:none; justify-self:end; align-items:center; background:#fff; color:#000; font-size:14px; font-weight:500; letter-spacing:-0.01em; padding:10px 20px; border-radius:980px; transition:background .2s ease; }
+  .head-cta:hover{ background:var(--paper-2); }
+
+  .nav-dropdown{ position:relative; }
+  .nav-dropdown > button{ display:flex; align-items:center; gap:8px; }
+  .nav-dropdown > button i{ font-size:8px; transition:transform .25s ease; }
+  .nav-dropdown.open > button i{ transform:rotate(180deg); }
+
+  .dropdown-panel{
+    position:absolute; top:calc(100% + 16px); left:50%; margin-left:-340px;
+    width:680px; background:#fff; color:var(--ink);
+    border-radius:10px; box-shadow:0 28px 70px rgba(21,24,27,0.16); border:1px solid var(--line);
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .2s ease, transform .2s ease, visibility .2s;
+    z-index:80; overflow:hidden;
+  }
+  .nav-dropdown.open .dropdown-panel{ opacity:1; visibility:visible; transform:translateY(0); }
+  .dropdown-inner{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px; }
+  .dropdown-col{ padding:16px 14px 14px; border-radius:6px; transition:background .2s ease; }
+  .dropdown-col:hover{ background:var(--paper); }
+  .dropdown-city{ font-size:12.5px; font-weight:400; color:var(--stone); margin-bottom:6px; }
+  .dropdown-hotel{ display:block; font-size:16px; font-weight:600; letter-spacing:-0.02em; line-height:1.25; color:var(--ink) !important; cursor:pointer; }
+  .dropdown-footer{ border-top:1px solid var(--line); padding:14px 26px; background:var(--paper); }
+  .dropdown-footer a{ font-size:13.5px; font-weight:500; color:var(--bottle) !important; display:inline-block; }
+  .dropdown-footer a:hover{ text-decoration:underline; text-underline-offset:3px; }
+
+  .menu-btn{ justify-self:end; width:44px; height:44px; margin-right:-12px; border:none; background:none; color:#fff; cursor:pointer; font-size:18px; grid-column:3; }
+  .mobile-nav{ display:none; background:#000; border-top:1px solid rgba(255,255,255,0.14); padding:8px 24px 28px; max-height:calc(100vh - 68px); overflow-y:auto; }
+  .mobile-nav.open{ display:block; }
+  .mobile-nav a{ display:block; color:#fff; font-size:26px; font-weight:600; letter-spacing:-0.03em; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.12); }
+  .mobile-nav .sub{ font-size:16px; font-weight:400; letter-spacing:-0.01em; color:rgba(255,255,255,0.6); padding:12px 0 12px 16px; border-bottom:none; }
+  .mobile-nav .sub:last-of-type{ margin-bottom:6px; }
+  @media (min-width:900px){
+    .nav{ display:flex; } .head-cta{ display:inline-flex; } .menu-btn{ display:none; } .mobile-nav{ display:none !important; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero{ position:relative; background:var(--ink); overflow:hidden; padding:72px 0 calc(var(--overlap) + 56px); }
+  @media (min-width:800px){ .hero{ padding:128px 0 calc(var(--overlap) + 88px); } }
+  .hero-bg{ position:absolute; inset:0; background:url("{% static 'img/hero.png' %}") center/cover; }
+  .hero-scrim{ position:absolute; inset:0; background:rgba(0,0,0,0.55); }
   .hero-inner{ position:relative; z-index:2; }
-  .hero-label{ color:var(--stone-light); font-family:'Fraunces',serif; font-style:italic; font-size:14px; margin-bottom:14px; }
-  h1.hero-title{ color:#fff; font-size:34px; line-height:1.1; letter-spacing:-0.015em; max-width:16ch; }
-  @media (min-width:640px){ h1.hero-title{ font-size:44px; } }
-  @media (min-width:1024px){ h1.hero-title{ font-size:54px; } }
-  .hero-copy{ color:rgba(255,255,255,0.82); font-size:15.5px; line-height:1.6; max-width:48ch; margin-top:16px; }
+  .hero-label{ color:rgba(255,255,255,0.7); font-size:17px; letter-spacing:-0.01em; margin-bottom:18px; }
+  h1.hero-title{ color:#fff; font-size:clamp(42px,7.4vw,84px); line-height:1.03; letter-spacing:-0.045em; max-width:13ch; }
+  .hero-copy{ color:rgba(255,255,255,0.82); font-size:clamp(17px,1.8vw,21px); line-height:1.45; letter-spacing:-0.01em; max-width:40ch; margin-top:24px; }
 
   /* ---------- search panel: 20% overlaps the hero ---------- */
   .search-wrap{ position:relative; z-index:20; margin-top:calc(var(--overlap) * -1); }
-  .search-panel{ background:#fff; border:1px solid var(--line); border-radius:6px; box-shadow:0 14px 34px rgba(0,0,0,0.16); overflow:hidden; }
+  .search-panel{ background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 20px 50px rgba(0,0,0,0.16); overflow:hidden; }
   .msg{ margin:14px 16px 0; background:#FBEDE8; border:1px solid #EBC2B5; color:#8A3A28; font-size:13.5px; padding:11px 14px; border-radius:4px; }
   form.search{ display:grid; grid-template-columns:1fr 1fr; }
-  .field{ padding:13px 18px; border-bottom:1px solid var(--line); }
+  .field{ padding:14px 20px; border-bottom:1px solid var(--line); }
   .field.wide{ grid-column:1 / -1; }
   .field.in{ border-right:1px solid var(--line); }
-  .field:focus-within{ box-shadow:inset 0 0 0 2px var(--bottle); }
-  .field label{ display:block; font-size:11.5px; color:var(--stone); margin-bottom:4px; }
-  .field select, .field input{ width:100%; border:none; background:transparent; color:var(--ink); font-family:'Inter',sans-serif; font-size:16px; font-weight:500; padding:0; outline:none; min-height:24px; }
+  .field:focus-within{ box-shadow:inset 0 0 0 2px var(--ink); }
+  .field label{ display:block; font-size:12px; color:var(--stone); margin-bottom:4px; }
+  .field select, .field input{ width:100%; border:none; background:transparent; color:var(--ink); font-family:var(--font); font-size:16px; font-weight:500; letter-spacing:-0.01em; padding:0; outline:none; min-height:24px; }
   .field input[type="date"]{ -webkit-appearance:none; appearance:none; text-align:left; }
-  .btn-search{ grid-column:1 / -1; background:var(--bottle); color:#fff; border:none; min-height:54px; font-family:'Inter',sans-serif; font-weight:600; font-size:15px; cursor:pointer; transition:background .18s ease; }
+  .btn-search{ grid-column:1 / -1; background:var(--bottle); color:#fff; border:none; min-height:56px; font-family:var(--font); font-weight:500; font-size:15px; letter-spacing:-0.01em; cursor:pointer; transition:background .2s ease; }
   .btn-search:hover{ background:var(--bottle-light); }
   @media (min-width:1000px){
     form.search{ grid-template-columns:1.5fr 1fr 1fr 0.8fr auto; }
-    .field{ padding:16px 20px; border-bottom:none; border-right:1px solid var(--line); }
+    .field{ padding:18px 24px; border-bottom:none; border-right:1px solid var(--line); }
     .field.wide{ grid-column:auto; }
-    .btn-search{ grid-column:auto; padding:0 40px; }
+    .btn-search{ grid-column:auto; padding:0 44px; }
   }
 
   /* ---------- sections ---------- */
-  .section{ padding:56px 0; }
-  @media (min-width:760px){ .section{ padding:80px 0; } }
-  .section-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:28px; }
-  .section-head{ max-width:620px; }
-  .section-head h2{ font-size:28px; line-height:1.15; }
-  @media (min-width:760px){ .section-head h2{ font-size:38px; } }
-  .section-head p{ font-size:15px; color:var(--stone); line-height:1.6; margin-top:12px; }
-  .text-link{ font-size:14px; font-weight:600; color:var(--bottle); white-space:nowrap; padding:10px 0; }
-  .text-link:hover{ text-decoration:underline; }
+  .section{ padding:72px 0; }
+  @media (min-width:760px){ .section{ padding:112px 0; } }
+  .section-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:48px; }
+  .section-head{ max-width:640px; }
+  .section-head h2{ font-size:clamp(22px,3.6vw,42px); line-height:1.07; letter-spacing:-0.04em; }
+  .section-head p{ font-size:clamp(17px,1.6vw,19px); color:var(--stone); line-height:1.5; letter-spacing:-0.01em; margin-top:16px; max-width:46ch; }
+  section > .wrap > .section-head{ margin-bottom:56px; }
+  .text-link{ font-size:15px; font-weight:500; letter-spacing:-0.01em; color:var(--ink); white-space:nowrap; padding:10px 0; border-bottom:1px solid var(--ink); }
+  .text-link:hover{ opacity:.6; }
+
+  /* ---------- facts strip ---------- */
+  .facts-strip{ background:var(--white); border-bottom:1px solid var(--line); padding:56px 0 48px; }
+  .facts-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:28px 24px; }
+  @media (min-width:800px){ .facts-grid{ grid-template-columns:repeat(4,1fr); } }
+  .fact b{ display:block; font-size:clamp(30px,4vw,44px); font-weight:600; letter-spacing:-0.045em; line-height:1; }
+  .fact span{ display:block; font-size:14px; color:var(--stone); margin-top:8px; line-height:1.4; max-width:22ch; }
 
   /* ---------- property cards ---------- */
-  .prop-grid{ display:grid; gap:20px; }
-  @media (min-width:700px){ .prop-grid{ grid-template-columns:repeat(2,1fr); gap:24px; } }
+  .prop-grid{ display:grid; gap:32px 24px; }
+  @media (min-width:700px){ .prop-grid{ grid-template-columns:repeat(2,1fr); } }
   @media (min-width:1024px){ .prop-grid{ grid-template-columns:repeat(3,1fr); } }
-  .prop-card{ background:var(--white); border:1px solid var(--line); border-radius:4px; overflow:hidden; cursor:pointer; transition:border-color .18s ease; }
-  .prop-card:hover{ border-color:rgba(21,24,27,0.28); }
+  .prop-card{ background:var(--white); border-radius:6px; overflow:hidden; cursor:pointer; border:1px solid var(--line); transition:border-color .2s ease; }
+  .prop-card:hover{ border-color:rgba(21,24,27,0.3); }
   .slider{ position:relative; background:var(--paper-2); }
   .slides{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior-x:contain; }
   .slides::-webkit-scrollbar{ display:none; }
-  .slides img{ flex:0 0 100%; width:100%; height:220px; object-fit:cover; scroll-snap-align:start; }
-  @media (min-width:700px){ .slides img{ height:230px; } }
-  .slider-btn{ position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:100px; border:none; background:rgba(255,255,255,0.92); color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; opacity:0; transition:opacity .18s ease; }
+  .slides img{ flex:0 0 100%; width:100%; height:240px; object-fit:cover; scroll-snap-align:start; }
+  .slider-btn{ position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:100px; border:none; background:rgba(255,255,255,0.92); color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; opacity:0; transition:opacity .2s ease; }
   .slider-btn.prev{ left:10px; } .slider-btn.next{ right:10px; }
   .prop-card:hover .slider-btn, .slider-btn:focus-visible{ opacity:1; }
   @media (hover:none){ .slider-btn{ opacity:1; width:40px; height:40px; } }
   .slider-count{ position:absolute; right:10px; bottom:10px; background:rgba(21,24,27,0.72); color:#fff; font-size:11.5px; padding:4px 9px; border-radius:100px; }
-  .prop-body{ padding:18px 20px 20px; }
-  .prop-open{ background:none; border:none; padding:0; margin:0; font:inherit; color:inherit; cursor:pointer; text-align:left; }
-  .prop-body h3{ font-size:19px; }
-  .prop-loc{ font-size:13px; color:var(--stone); margin-top:4px; }
-  .prop-meta{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); }
-  .prop-meta .types{ font-size:12.5px; color:var(--stone); }
-  .prop-meta .price{ font-family:'Fraunces',serif; font-size:19px; }
-  .prop-meta .price span{ font-family:'Inter',sans-serif; font-size:12px; color:var(--stone); }
+  .prop-body{ padding:22px 24px 24px; }
+  .prop-open{ background:none; border:none; padding:0; margin:0; font:inherit; letter-spacing:inherit; color:inherit; cursor:pointer; text-align:left; }
+  .prop-body h3{ font-size:21px; letter-spacing:-0.03em; }
+  .prop-loc{ font-size:14px; color:var(--stone); margin-top:4px; }
+  .prop-meta{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--line); }
+  .prop-meta .types{ font-size:13px; color:var(--stone); }
+  .prop-meta .price{ font-size:17px; font-weight:600; letter-spacing:-0.02em; }
+  .prop-meta .price span{ font-size:12px; font-weight:400; color:var(--stone); letter-spacing:0; }
 
-  /* ---------- amenities (no slider — simple responsive grid) ---------- */
+  /* ---------- who we host ---------- */
+  .guest-grid{ display:grid; gap:0; border-top:1px solid var(--line); }
+  @media (min-width:700px){ .guest-grid{ grid-template-columns:repeat(2,1fr); column-gap:48px; } }
+  @media (min-width:1024px){ .guest-grid{ grid-template-columns:repeat(4,1fr); column-gap:32px; } }
+  .guest{ padding:28px 0 12px; }
+  @media (max-width:699px){ .guest + .guest{ border-top:1px solid var(--line); } }
+  .guest i{ font-size:20px; }
+  .guest h3{ font-size:20px; margin-top:18px; letter-spacing:-0.03em; }
+  .guest p{ font-size:15px; color:var(--stone); line-height:1.6; margin-top:8px; }
+
+  /* ---------- amenities ---------- */
   .amen-section{ background:var(--white); border-top:1px solid var(--line); }
-  .amen-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
-  @media (min-width:500px){ .amen-grid{ grid-template-columns:repeat(3,1fr); gap:14px; } }
-  @media (min-width:800px){ .amen-grid{ grid-template-columns:repeat(4,1fr); } }
-  @media (min-width:1000px){ .amen-grid{ grid-template-columns:repeat(6,1fr); gap:16px; } }
-  .amen{ background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:22px 16px; display:flex; flex-direction:column; align-items:flex-start; gap:14px; }
-  .amen i{ font-size:24px; color:var(--bottle); }
-  .amen span{ font-size:14px; font-weight:600; line-height:1.3; }
+  .amen-grid{ display:grid; grid-template-columns:repeat(2,1fr); column-gap:24px; }
+  @media (min-width:700px){ .amen-grid{ grid-template-columns:repeat(3,1fr); column-gap:40px; } }
+  @media (min-width:1000px){ .amen-grid{ grid-template-columns:repeat(4,1fr); } }
+  .amen{ display:flex; align-items:center; gap:14px; padding:20px 0; border-top:1px solid var(--line); }
+  .amen i{ width:22px; text-align:center; font-size:18px; color:var(--ink); flex-shrink:0; }
+  .amen span{ font-size:15px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; }
 
-  /* ---------- footer: single line ---------- */
-  footer.site{ background:#000; color:rgba(255,255,255,0.7); padding:28px 0; }
-  .foot-line{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px 28px; }
-  .foot-brand{ display:flex; align-items:center; gap:12px; }
-  .foot-brand .brand-mark{ width:30px; height:30px; font-size:12px; }
-  .foot-brand .brand-name{ font-size:15px; }
-  .foot-brand .brand-sub{ font-size:10px; }
-  .foot-links{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 24px; }
-  .foot-links a, .foot-links button{ background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.85); font-size:14px; padding:8px 0; }
-  .foot-links a:hover, .foot-links button:hover{ color:#fff; text-decoration:underline; }
-  .foot-copy{ font-size:12.5px; color:rgba(255,255,255,0.45); white-space:nowrap; }
+  /* ---------- cities ---------- */
+  .cities{ background:#000; color:#fff; padding:88px 0 40px; }
+  @media (min-width:760px){ .cities{ padding:128px 0 56px; } }
+  .cities .section-head h2{ color:#fff; }
+  .cities .section-head p{ color:rgba(255,255,255,0.6); }
+  .city-list{ border-bottom:1px solid rgba(255,255,255,0.16); }
+  .city{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px 24px; padding:32px 0; border-top:1px solid rgba(255,255,255,0.16); transition:opacity .3s ease; }
+  .city-name{ font-size:clamp(44px,8.4vw,104px); font-weight:600; line-height:1; letter-spacing:-0.05em; grid-column:1; }
+  .city-meta{ grid-column:1; font-size:15px; line-height:1.45; color:rgba(255,255,255,0.6); max-width:44ch; }
+  .city-meta b{ display:block; font-weight:500; color:#fff; letter-spacing:-0.01em; margin-bottom:2px; }
+  .city-arrow{ grid-column:2; grid-row:1 / span 2; font-size:22px; color:var(--gold); transition:transform .25s ease; }
+  .city:hover .city-arrow{ transform:translateX(6px); }
+  @media (min-width:900px){
+    .city{ grid-template-columns:1.4fr 1fr auto; padding:44px 0; }
+    .city-meta{ grid-column:2; }
+    .city-arrow{ grid-column:3; grid-row:auto; }
+  }
+  @media (hover:hover){
+    .city-list:hover .city{ opacity:.38; }
+    .city-list .city:hover{ opacity:1; }
+  }
 
-  /* ---------- modals (property + contact) ---------- */
+  /* ---------- three quiet columns ---------- */
+  .service-grid{ display:grid; gap:0; border-top:1px solid var(--line); }
+  @media (min-width:760px){ .service-grid{ grid-template-columns:repeat(3,1fr); column-gap:48px; } }
+  .service{ padding:32px 0 8px; }
+  @media (max-width:759px){ .service + .service{ border-top:1px solid var(--line); margin-top:24px; } }
+  .service i{ color:var(--ink); font-size:20px; }
+  .service h3{ font-size:22px; margin-top:20px; letter-spacing:-0.03em; }
+  .service p{ font-size:15px; color:var(--stone); line-height:1.6; margin-top:10px; max-width:34ch; }
+
+  /* ---------- how booking works ---------- */
+  .steps-section{ background:var(--white); border-top:1px solid var(--line); }
+  .steps{ display:grid; gap:0; counter-reset:step; }
+  @media (min-width:860px){ .steps{ grid-template-columns:repeat(4,1fr); column-gap:32px; } }
+  .step{ position:relative; padding:28px 0 28px 56px; border-top:1px solid var(--line); counter-increment:step; }
+  @media (min-width:860px){ .step{ padding:56px 0 8px; } }
+  .step::before{ content:counter(step); position:absolute; left:0; top:26px; width:36px; height:36px; border-radius:100px; background:var(--bottle); color:#fff; font-size:14px; font-weight:600; display:flex; align-items:center; justify-content:center; }
+  @media (min-width:860px){ .step::before{ top:-18px; } .step{ border-top:1px solid var(--ink); margin-top:18px; } }
+  .step h3{ font-size:19px; letter-spacing:-0.03em; }
+  .step p{ font-size:15px; color:var(--stone); line-height:1.6; margin-top:8px; max-width:30ch; }
+
+  /* ---------- reviews ---------- */
+  .review-grid{ display:grid; gap:24px; }
+  @media (min-width:860px){ .review-grid{ grid-template-columns:1.2fr 1fr 1fr; } }
+  .review{ background:var(--white); border:1px solid var(--line); border-radius:6px; padding:28px; display:flex; flex-direction:column; justify-content:space-between; gap:28px; margin:0; }
+  .review.lead{ background:#000; color:#fff; border-color:#000; }
+  .review blockquote{ margin:0; font-size:17px; line-height:1.5; letter-spacing:-0.015em; }
+  .review.lead blockquote{ font-size:clamp(20px,2.2vw,24px); line-height:1.4; letter-spacing:-0.025em; }
+  .stars{ color:var(--gold); font-size:13px; letter-spacing:2px; margin-bottom:14px; }
+  .review cite{ font-style:normal; font-size:14px; font-weight:600; display:block; }
+  .review cite small{ display:block; font-weight:400; color:var(--stone); margin-top:2px; font-size:13px; }
+  .review.lead cite small{ color:rgba(255,255,255,0.6); }
+
+  /* ---------- FAQ ---------- */
+  .faq-grid{ display:grid; gap:40px; }
+  @media (min-width:960px){ .faq-grid{ grid-template-columns:0.8fr 1.2fr; gap:96px; } }
+  .faq-grid .section-head{ margin-bottom:0; }
+  .faq-list{ border-bottom:1px solid var(--line); }
+  .faq-list details{ border-top:1px solid var(--line); }
+  .faq-list summary{ list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 0; font-size:17px; font-weight:500; letter-spacing:-0.015em; min-height:44px; }
+  .faq-list summary::-webkit-details-marker{ display:none; }
+  .faq-list summary i{ font-size:12px; color:var(--stone); transition:transform .25s ease; flex-shrink:0; }
+  .faq-list details[open] summary i{ transform:rotate(45deg); color:var(--ink); }
+  .faq-list details p{ font-size:15px; color:var(--stone); line-height:1.65; padding:0 40px 24px 0; max-width:60ch; }
+  .faq-list details p a, .faq-note a{ text-decoration:underline; text-underline-offset:3px; color:var(--ink); }
+
+  /* ---------- closing CTA band ---------- */
+  .cta-band{ position:relative; background:var(--ink); color:#fff; overflow:hidden; padding:72px 0; }
+  @media (min-width:760px){ .cta-band{ padding:104px 0; } }
+  .cta-band .bg{ position:absolute; inset:0; background:url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=2000&q=80') center/cover; }
+  .cta-band .scrim{ position:absolute; inset:0; background:rgba(0,0,0,0.68); }
+  .cta-inner{ position:relative; z-index:2; display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:32px; }
+  .cta-inner h2{ font-size:clamp(30px,5vw,56px); line-height:1.05; letter-spacing:-0.045em; max-width:16ch; }
+  .cta-inner p{ color:rgba(255,255,255,0.75); font-size:17px; margin-top:16px; max-width:40ch; }
+  .cta-actions{ display:flex; flex-wrap:wrap; gap:12px; }
+  .btn-light, .btn-ghost{ display:inline-flex; align-items:center; min-height:48px; padding:0 28px; border-radius:980px; font-size:15px; font-weight:500; letter-spacing:-0.01em; transition:background .2s ease; }
+  .btn-light{ background:#fff; color:#000; }
+  .btn-light:hover{ background:var(--paper-2); }
+  .btn-ghost{ border:1px solid rgba(255,255,255,0.4); color:#fff; }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.12); }
+
+  /* ---------- about ---------- */
+  section.about{ background:var(--white); border-top:1px solid var(--line); }
+  .about-grid{ display:grid; gap:56px; align-items:center; }
+  @media (min-width:960px){ .about-grid{ grid-template-columns:1fr 0.85fr; gap:96px; } }
+  .about-text h2{ font-size:clamp(32px,4.6vw,52px); line-height:1.07; letter-spacing:-0.04em; max-width:15ch; }
+  .about-text p{ font-size:17px; color:var(--stone); line-height:1.6; letter-spacing:-0.01em; margin-top:22px; max-width:46ch; }
+  .about-img{ position:relative; }
+  .about-img .frame{ border-radius:4px; overflow:hidden; }
+  .about-img img{ width:100%; height:480px; object-fit:cover; }
+  .quote{ position:absolute; left:-16px; bottom:-24px; max-width:270px; background:#000; color:#fff; padding:24px; border-radius:4px; font-size:16px; font-weight:500; letter-spacing:-0.02em; line-height:1.4; }
+  @media (max-width:640px){ .quote{ position:static; margin-top:16px; max-width:none; } }
+
+  /* ---------- footer ---------- */
+  footer.site{ background:var(--paper-2); color:var(--bottle); padding:80px 0 0; margin-top:48px; border-top:1px solid var(--line); }
+  .foot-top{ display:grid; gap:56px; padding-bottom:64px; }
+  @media (min-width:900px){ .foot-top{ grid-template-columns:1.25fr 1fr; gap:80px; } }
+  .foot-wordmark{ font-size:36px; font-weight:600; letter-spacing:-0.045em; line-height:1; color:var(--bottle); }
+  .foot-wordmark span{ font-size:13px; font-weight:400; letter-spacing:0; color:var(--stone); margin-left:10px; }
+  .foot-lede{ font-size:17px; line-height:1.45; letter-spacing:-0.01em; margin-top:18px; max-width:38ch; }
+  .foot-form{ display:flex; align-items:flex-end; gap:20px; margin-top:36px; max-width:460px; }
+  .foot-form input{ flex:1; min-width:0; background:transparent; border:none; border-bottom:1px solid var(--bottle); border-radius:0; padding:10px 0 12px; font:inherit; font-size:16px; color:var(--ink); outline:none; transition:border-color .2s ease, box-shadow .2s ease; }
+  .foot-form input::placeholder{ color:var(--stone); opacity:1; }
+  .foot-form input:focus{ border-bottom-color:var(--gold); box-shadow:0 1px 0 var(--gold); }
+  .foot-form button{ background:var(--bottle); color:#fff; border:none; border-radius:980px; padding:13px 26px; font-size:15px; font-weight:500; letter-spacing:-0.01em; cursor:pointer; transition:background .2s ease; flex-shrink:0; }
+  .foot-form button:hover{ background:var(--bottle-light); }
+  .foot-note{ font-size:12px; line-height:1.5; color:var(--stone); margin-top:16px; max-width:46ch; }
+  .foot-note a{ color:var(--bottle); text-decoration:underline; text-underline-offset:2px; }
+
+  .foot-cols{ display:grid; grid-template-columns:1fr 1fr; gap:40px 32px; align-content:start; }
+  @media (min-width:900px){ .foot-cols{ grid-template-columns:auto auto auto; justify-content:end; gap:48px; } }
+  .foot-col h4{ font-size:14px; font-weight:600; letter-spacing:-0.01em; margin-bottom:18px; }
+  .foot-col ul{ display:flex; flex-direction:column; gap:12px; }
+  .foot-col li{ font-size:14px; line-height:1.4; }
+  .foot-col a{ transition:opacity .2s ease; }
+  .foot-col a:hover{ opacity:.6; }
+  .foot-social a{ display:flex; align-items:center; gap:12px; }
+  .foot-social i{ width:16px; text-align:center; font-size:16px; }
+
+  .foot-bottom{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px 32px; padding:26px 0 calc(28px + env(safe-area-inset-bottom,0px)); border-top:1px solid rgba(0,0,0,0.25); font-size:13px; }
+  .foot-bottom-l{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 28px; }
+  .foot-bottom-r{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:12px 32px; margin-left:auto; }
+  .foot-links{ display:flex; flex-wrap:wrap; gap:10px 28px; }
+  .foot-links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px; transition:opacity .2s ease; }
+  .foot-links a:hover{ opacity:.6; }
+  .mck-credit{ display:flex; align-items:center; gap:8px; color:var(--stone); transition:color .2s ease; }
+  .mck-credit:hover{ color:var(--bottle); }
+  .mck-credit img{ height:18px; width:auto; opacity:.9; transition:opacity .2s ease; }
+
+  /* ---------- modals ---------- */
   .modal{ position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; padding:16px; }
   .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,0.72); }
-  .modal-panel{ position:relative; background:var(--paper); width:100%; max-width:1000px; max-height:92vh; max-height:92dvh; overflow-y:auto; border-radius:6px; outline:none; }
+  .modal-panel{ position:relative; background:var(--paper); width:100%; max-width:1000px; max-height:92vh; max-height:92dvh; overflow-y:auto; border-radius:8px; outline:none; }
   .modal-panel.contact-panel{ max-width:880px; }
   .modal-close{ position:absolute; top:12px; right:12px; z-index:3; width:44px; height:44px; border-radius:100px; border:none; background:rgba(255,255,255,0.95); color:var(--ink); cursor:pointer; font-size:15px; }
   @media (max-width:639px){
     .modal{ padding:0; align-items:flex-end; }
     .modal-panel{ max-height:94vh; max-height:94dvh; border-radius:12px 12px 0 0; }
   }
-
   .gallery{ background:#000; }
   .gallery-main{ position:relative; }
   .gallery-main img{ width:100%; height:240px; object-fit:cover; }
@@ -163,35 +391,34 @@
   .gallery-thumbs button[aria-current="true"]{ border-color:var(--paper); opacity:1; }
   .gallery-thumbs img{ width:100%; height:100%; object-fit:cover; }
 
-  .modal-cols{ display:grid; gap:24px; padding:22px 20px 28px; }
-  @media (min-width:860px){ .modal-cols{ grid-template-columns:1fr 1fr; padding:36px; gap:28px; } }
-  .modal-info h2{ font-size:24px; padding-right:40px; }
+  .modal-cols{ display:grid; gap:24px; padding:24px 20px 28px; }
+  @media (min-width:860px){ .modal-cols{ grid-template-columns:1fr 1fr; padding:40px; gap:32px; } }
+  .modal-info h2{ font-size:28px; padding-right:40px; }
   .modal-address{ font-size:14px; color:var(--stone); margin-top:8px; line-height:1.55; }
   .facts{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); margin-top:18px; }
   .facts > div{ background:var(--paper-2); padding:12px 14px; }
-  .facts .l{ font-size:11px; color:var(--stone); }
-  .facts .v{ font-size:13.5px; font-weight:600; margin-top:3px; }
+  .facts .l{ font-size:11.5px; color:var(--stone); }
+  .facts .v{ font-size:14px; font-weight:600; margin-top:3px; }
   .facts .wide{ grid-column:1 / -1; }
   .type-list{ margin-top:20px; border-top:1px solid var(--line); }
-  .type-row{ display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
+  .type-row{ display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); font-size:14px; }
   .type-row .sub{ color:var(--stone); font-size:12px; margin-top:2px; }
-  .btn-cta{ display:block; text-align:center; margin-top:20px; width:100%; background:var(--bottle); color:#fff; border:none; border-radius:4px; padding:15px; min-height:48px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer; transition:background .18s ease; }
+  .btn-cta{ display:block; text-align:center; margin-top:20px; width:100%; background:var(--bottle); color:#fff; border:none; border-radius:980px; padding:15px; min-height:48px; font-family:var(--font); font-weight:500; font-size:15px; letter-spacing:-0.01em; cursor:pointer; transition:background .2s ease; }
   .btn-cta:hover{ background:var(--bottle-light); }
   .map-frame{ width:100%; height:280px; border:0; border-radius:4px; background:var(--paper-2); display:block; }
   @media (min-width:860px){ .map-frame{ height:100%; min-height:380px; } }
-  .map-link{ display:inline-block; margin-top:12px; font-size:13px; font-weight:600; color:var(--bottle); padding:6px 0; }
+  .map-link{ display:inline-block; margin-top:12px; font-size:13.5px; font-weight:500; color:var(--ink); border-bottom:1px solid var(--ink); }
 
-  /* contact popup */
   .contact-cols{ display:grid; }
   @media (min-width:800px){ .contact-cols{ grid-template-columns:0.95fr 1.05fr; } }
-  .contact-info{ padding:26px 20px 24px; }
-  @media (min-width:800px){ .contact-info{ padding:38px; } }
-  .contact-info h2{ font-size:26px; padding-right:40px; }
-  .contact-lead{ font-size:14px; color:var(--stone); line-height:1.6; margin-top:10px; }
+  .contact-info{ padding:28px 20px 24px; }
+  @media (min-width:800px){ .contact-info{ padding:40px; } }
+  .contact-info h2{ font-size:30px; padding-right:40px; }
+  .contact-lead{ font-size:15px; color:var(--stone); line-height:1.6; margin-top:10px; }
   .contact-list{ margin-top:22px; border-top:1px solid var(--line); }
   .crow{ display:flex; align-items:flex-start; gap:14px; padding:16px 0; border-bottom:1px solid var(--line); min-height:44px; }
   a.crow:hover .cv{ text-decoration:underline; }
-  .cicon{ width:38px; height:38px; border-radius:100px; background:var(--paper-2); color:var(--bottle); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; }
+  .cicon{ width:38px; height:38px; border-radius:100px; background:var(--paper-2); color:var(--ink); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; }
   .cl{ display:block; font-size:12px; color:var(--stone); }
   .cv{ display:block; font-size:15px; font-weight:600; margin-top:2px; line-height:1.45; word-break:break-word; }
   address.cv{ font-style:normal; }
@@ -199,92 +426,136 @@
   .contact-map .map-frame{ border-radius:0; height:100%; min-height:260px; }
   @media (min-width:800px){ .contact-map .map-frame{ min-height:100%; } }
 
+  /* ---------- floating action button ---------- */
+  .fab{
+    position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:20px; z-index:90;
+    width:52px; height:52px; border-radius:50%;
+    background:#000; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    transition:transform .2s ease, background .2s ease;
+  }
+  .fab:hover{ transform:scale(1.06); }
+  .fab-call{ display:flex; }
+  .fab-whatsapp{ display:none; }
+  @media (min-width:800px){
+    .fab-call{ display:none; }
+    .fab-whatsapp{ display:flex; background:var(--whatsapp); color:#fff; }
+    .fab.fab-whatsapp:hover{ background:#1ebe5b; }
+  }
+
   @media (prefers-reduced-motion: reduce){
     html{ scroll-behavior:auto; }
-    .slider-btn, .prop-card, .btn-search, .btn-cta{ transition:none; }
+    *{ transition:none !important; }
   }
-  /* ---------- section heading ---------- */
-  .section{ padding:100px 0; }
-  .section-head{ max-width:640px; margin-bottom:56px; }
-  .section-head h2{ font-size:36px; line-height:1.15; letter-spacing:-0.01em; }
-  @media (min-width:760px){ .section-head h2{ font-size:44px; } }
-  .section-head .accent{ color:var(--bottle); }
-  .section-head p{ font-size:15.5px; color:var(--stone); line-height:1.6; margin-top:16px; max-width:52ch; }
 
-  /* ---------- three quiet cards (no numbers — not a sequence) ---------- */
-  .service-grid{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
-  @media (min-width:760px){ .service-grid{ grid-template-columns:repeat(3,1fr); } }
-  .service{ background:var(--white); padding:36px 32px; }
-  .service i{ color:var(--bottle); font-size:19px; }
-  .service h3{ font-size:19px; margin-top:22px; }
-  .service p{ font-size:14px; color:var(--stone); line-height:1.65; margin-top:10px; }
+  /* ---------- inquiry form ---------- */
+  .inquiry-section{ padding:24px 0 80px; }
+  .inquiry-title{ text-align:center; font-size:clamp(28px,4vw,38px); font-weight:600; letter-spacing:-0.03em; margin-bottom:36px; }
 
-  /* ---------- how it works (a real sequence: numbers earned) ---------- */
-  section.flow{ background:var(--ink); color:var(--white); }
-  .flow-grid{ display:grid; gap:56px; }
-  @media (min-width:900px){ .flow-grid{ grid-template-columns:0.85fr 1.15fr; } }
-  .flow-head h2{ color:var(--white); font-size:36px; line-height:1.18; }
-  @media (min-width:760px){ .flow-head h2{ font-size:42px; } }
-  .flow-head p{ color:rgba(246,243,236,0.55); font-size:15px; line-height:1.6; margin-top:18px; max-width:38ch; }
+  .inquiry-form{ max-width:680px; margin:0 auto; }
+  .form-row{ display:flex; align-items:flex-start; gap:24px; margin-bottom:20px; }
+  .form-row label{ flex:0 0 110px; font-size:14px; font-weight:600; padding-top:12px; }
+  .form-row .field-wrap{ flex:1; }
 
-  .flow-steps{ display:flex; flex-direction:column; }
-  .flow-step{
-    display:flex; gap:22px; padding:26px 0;
-    border-top:1px solid var(--line-dark);
+  .form-control{
+    width:100%; background:#fff; border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; font-family:var(--font); font-size:15px; color:var(--ink);
+    outline:none; transition:border-color .15s, box-shadow .15s;
   }
-  .flow-step:last-child{ border-bottom:1px solid var(--line-dark); }
-  .flow-step .num{ font-family:'Fraunces',serif; font-size:14px; color:var(--stone-light); padding-top:3px; width:26px; flex-shrink:0; }
-  .flow-step h4{ font-size:17px; color:var(--white); font-weight:500; margin:0; }
-  .flow-step p{ color:rgba(246,243,236,0.55); font-size:14px; line-height:1.6; margin-top:6px; max-width:44ch; }
+  .form-control:focus{ border-color:var(--bottle); box-shadow:0 0 0 3px rgba(0,0,0,0.08); }
+  textarea.form-control{ min-height:120px; resize:vertical; }
 
-    /* ---------- philosophy ---------- */
-  section.about{ background:var(--white); }
-  .about-grid{ display:grid; gap:52px; align-items:center; }
-  @media (min-width:960px){ .about-grid{ grid-template-columns:1fr 0.85fr; } }
-  .about-text h2{ font-size:34px; line-height:1.16; max-width:14ch; }
-  @media (min-width:760px){ .about-text h2{ font-size:42px; } }
-  .about-text p{ font-size:15px; color:var(--stone); line-height:1.7; margin-top:20px; max-width:48ch; }
-  .about-img{ position:relative; }
-  .about-img .frame{ border-radius:4px; overflow:hidden; }
-  .about-img img{ width:100%; height:440px; object-fit:cover; }
-  .quote{
-    position:absolute; left:-16px; bottom:-24px; max-width:260px;
-    background:var(--ink); color:var(--paper);
-    padding:22px; border-radius:4px; font-family:'Fraunces',serif; font-size:14.5px; line-height:1.55;
+  .phone-group{ display:flex; gap:8px; }
+  .phone-flag{
+    flex:0 0 56px; display:flex; align-items:center; justify-content:center;
+    background:#fff; border:1px solid var(--line); border-radius:8px;
+    font-size:18px; padding:10px 0;
   }
-  @media (max-width:640px){ .quote{ position:static; margin-top:16px; max-width:none; } }
+  .phone-flag img{ width:24px; height:auto; }
 
+  .form-select{
+    width:100%; background:#fff; border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; font-family:var(--font); font-size:15px; color:var(--ink);
+    outline:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238B8375' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; background-size:12px;
+  }
+  .form-select:focus{ border-color:var(--bottle); box-shadow:0 0 0 3px rgba(0,0,0,0.08); }
+
+  .btn-submit{
+    width:100%; background:#15181b; color:#fff; border:none; border-radius:980px;
+    padding:16px; font-family:var(--font); font-weight:600; font-size:15px; letter-spacing:-0.01em;
+    cursor:pointer; transition:background .18s ease; margin-top:8px;
+  }
+  .btn-submit:hover{ background:#353636; }
+
+  @media (max-width:639px){
+    .form-row{ flex-direction:column; gap:6px; }
+    .form-row label{ flex:none; padding-top:0; }
+  }
 </style>
 </head>
 
 <body id="top">
 
-<header class="site">
+<header class="site" id="site-header">
   <div class="wrap head-row">
-    <a class="brand" href="#top">
-      <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
-      <div>
-        <p class="brand-name">M Square</p>
-        <p class="brand-sub">Serviced Apartments</p>
-      </div>
+    <a class="brand" href="{% url 'public:landing' %}">
+      <span class="brand-name"><img src="{% static 'img/logo.png' %}" alt="M Square" class="brand-logo"></span>
+      <span class="brand-sub">Serviced Apartments</span>
     </a>
 
     <nav class="nav" aria-label="Main">
-      <a href="#top">Home</a>
-      <a href="{% url 'public:stays' %}">Rooms</a>
-      <a href="#amenities">Amenities</a>
-      <button type="button" data-open-contact>Contact</button>
+      <a href="{% url 'public:landing' %}">Home</a>
+
+      <div class="nav-dropdown" id="hotels-dropdown">
+        <button type="button" aria-expanded="false" aria-haspopup="true">
+          Our Hotels <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-panel" role="menu">
+          <div class="dropdown-inner">
+            <div class="dropdown-col">
+              <p class="dropdown-city">Vellore, Tamil Nadu</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#vellore" role="menuitem">M Square — Vellore</a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-city">Chennai, Tamil Nadu</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#chennai" role="menuitem">M Square — Chennai</a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-city">Bengaluru, Karnataka</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#bengaluru" role="menuitem">M Square — Bengaluru</a>
+            </div>
+          </div>
+          <div class="dropdown-footer">
+            <a href="{% url 'public:locations' %}" role="menuitem">Our Hotels Directory</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="{% url 'public:landing' %}#amenities">Amenities</a>
+      <a href="{% url 'public:about' %}">About Us</a>
+      <a href="{% url 'public:gallery' %}">Gallery</a>
     </nav>
+
+    <a class="head-cta" href="{% url 'public:contact' %}">Contact</a>
 
     <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>
+
   <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile">
-    <a href="#top">Home</a>
-    <a href="{% url 'public:stays' %}">Rooms</a>
-    <a href="#amenities">Amenities</a>
-    <button type="button" data-open-contact>Contact</button>
+    <a href="{% url 'public:landing' %}">Home</a>
+    <a href="{% url 'public:locations' %}">Our Hotels</a>
+    <a class="sub" href="{% url 'public:locations' %}#vellore">M Square — Vellore</a>
+    <a class="sub" href="{% url 'public:locations' %}#chennai">M Square — Chennai</a>
+    <a class="sub" href="{% url 'public:locations' %}#bengaluru">M Square — Bengaluru</a>
+    <a href="{% url 'public:landing' %}#amenities">Amenities</a>
+    <a href="{% url 'public:about' %}">About Us</a>
+    <a href="{% url 'public:gallery' %}">Gallery</a>
+    <a href="{% url 'public:contact' %}">Contact</a>
   </nav>
 </header>
 
@@ -294,15 +565,15 @@
   <div class="hero-bg"></div>
   <div class="hero-scrim"></div>
   <div class="hero-inner wrap">
-    <p class="hero-label">A quieter kind of hospitality</p>
-    <h1 class="hero-title">Rooms built for staying, not just sleeping.</h1>
-    <p class="hero-copy">Serviced apartments designed for longer visits — real kitchens, real light, and a booking process that takes under two minutes.</p>
+    <p class="hero-label fade-up">A quieter kind of hospitality</p>
+    <h1 class="hero-title fade-up" data-delay="1">Rooms built for staying, not just sleeping.</h1>
+    <p class="hero-copy fade-up" data-delay="2">Serviced apartments designed for longer visits — real kitchens, real light, and a booking process that takes under two minutes.</p>
   </div>
 </section>
 
 <section class="search-wrap" id="find-stay" aria-label="Check availability">
   <div class="wrap">
-    <div class="search-panel" id="search-panel">
+    <div class="search-panel fade-up" id="search-panel" data-delay="3">
 
       {% if messages %}
         {% for message in messages %}
@@ -352,9 +623,19 @@
   </div>
 </section>
 
+<!-- FACTS STRIP -->
+<section class="facts-strip" aria-label="At a glance">
+  <div class="wrap facts-grid">
+    <div class="fact fade-up"><b>3</b><span>cities across Tamil Nadu and Karnataka</span></div>
+    <div class="fact fade-up" data-delay="1"><b>24/7</b><span>front desk, for late arrivals and early starts</span></div>
+    <div class="fact fade-up" data-delay="2"><b>2 min</b><span>to search, pick and confirm a booking</span></div>
+    <div class="fact fade-up" data-delay="3"><b>Full kitchen</b><span>in every apartment, ready for longer stays</span></div>
+  </div>
+</section>
+
 <section class="section" id="rooms">
   <div class="wrap">
-    <div class="section-row">
+    <div class="section-row fade-up">
       <div class="section-head">
         <h2>Stays you can book today.</h2>
         <p>Look through the photos and check the location before you pick your dates.</p>
@@ -365,7 +646,7 @@
     {% if property_cards %}
     <div class="prop-grid">
       {% for card in property_cards %}
-      <article class="prop-card" data-index="{{ forloop.counter0 }}">
+      <article class="prop-card fade-up" data-index="{{ forloop.counter0 }}" data-delay="{{ forloop.counter }}">
         <div class="slider">
           <div class="slides">
             {% for img in card.images %}
@@ -397,10 +678,41 @@
   </div>
 </section>
 
-<!-- AMENITIES: static responsive grid, no slider -->
+<!-- WHO WE HOST -->
+<section class="section" id="stay-types" aria-labelledby="stay-types-title" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head fade-up">
+      <h2 id="stay-types-title">Made for the way you travel.</h2>
+      <p>Whether it's a week of meetings or a month of treatment, the apartment adapts to the stay.</p>
+    </div>
+    <div class="guest-grid">
+      <div class="guest fade-up" data-delay="1">
+        <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+        <h3>Business travel</h3>
+        <p>A desk, fast Wi-Fi and a quiet room, close to tech parks and business districts.</p>
+      </div>
+      <div class="guest fade-up" data-delay="2">
+        <i class="fa-solid fa-stethoscope" aria-hidden="true"></i>
+        <h3>Medical visits</h3>
+        <p>Comfortable, home-like stays near hospitals, with a kitchen for simple home-style meals.</p>
+      </div>
+      <div class="guest fade-up" data-delay="3">
+        <i class="fa-solid fa-people-roof" aria-hidden="true"></i>
+        <h3>Families</h3>
+        <p>Space to spread out, rooms for up to six guests, and a kitchen that keeps routines intact.</p>
+      </div>
+      <div class="guest fade-up" data-delay="4">
+        <i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i>
+        <h3>Relocation &amp; long stays</h3>
+        <p>Settle into a new city without the hotel feel while you look for a permanent home.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section amen-section" id="amenities" aria-labelledby="amenities-title">
   <div class="wrap">
-    <div class="section-row">
+    <div class="section-row fade-up">
       <div class="section-head">
         <h2 id="amenities-title">Amenities at our stays</h2>
         <p>The comforts that make a longer stay easier.</p>
@@ -408,42 +720,67 @@
     </div>
 
     <ul class="amen-grid">
-      <li class="amen"><i class="fa-solid fa-wifi" aria-hidden="true"></i><span>Free Wi-Fi</span></li>
-      <li class="amen"><i class="fa-solid fa-snowflake" aria-hidden="true"></i><span>Air conditioning</span></li>
-      <li class="amen"><i class="fa-solid fa-kitchen-set" aria-hidden="true"></i><span>Equipped kitchen</span></li>
-      <li class="amen"><i class="fa-solid fa-square-parking" aria-hidden="true"></i><span>Free parking</span></li>
-      <li class="amen"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Power backup</span></li>
-      <li class="amen"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i><span>24/7 front desk</span></li>
-      <li class="amen"><i class="fa-solid fa-broom" aria-hidden="true"></i><span>Housekeeping</span></li>
-      <li class="amen"><i class="fa-solid fa-shower" aria-hidden="true"></i><span>Hot water</span></li>
-      <li class="amen"><i class="fa-solid fa-tv" aria-hidden="true"></i><span>Smart TV</span></li>
-      <li class="amen"><i class="fa-solid fa-shirt" aria-hidden="true"></i><span>Laundry</span></li>
-      <li class="amen"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>Secure access</span></li>
-      <li class="amen"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i><span>Tea &amp; coffee</span></li>
+      <li class="amen fade-up" data-delay="1"><i class="fa-solid fa-wifi" aria-hidden="true"></i><span>Free Wi-Fi</span></li>
+      <li class="amen fade-up" data-delay="2"><i class="fa-solid fa-snowflake" aria-hidden="true"></i><span>Air conditioning</span></li>
+      <li class="amen fade-up" data-delay="3"><i class="fa-solid fa-kitchen-set" aria-hidden="true"></i><span>Equipped kitchen</span></li>
+      <li class="amen fade-up" data-delay="4"><i class="fa-solid fa-square-parking" aria-hidden="true"></i><span>Free parking</span></li>
+      <li class="amen fade-up" data-delay="5"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Power backup</span></li>
+      <li class="amen fade-up" data-delay="6"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i><span>24/7 front desk</span></li>
+      <li class="amen fade-up" data-delay="7"><i class="fa-solid fa-broom" aria-hidden="true"></i><span>Housekeeping</span></li>
+      <li class="amen fade-up" data-delay="8"><i class="fa-solid fa-shower" aria-hidden="true"></i><span>Hot water</span></li>
+      <li class="amen fade-up" data-delay="9"><i class="fa-solid fa-tv" aria-hidden="true"></i><span>Smart TV</span></li>
+      <li class="amen fade-up" data-delay="10"><i class="fa-solid fa-shirt" aria-hidden="true"></i><span>Laundry</span></li>
+      <li class="amen fade-up" data-delay="11"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>Secure access</span></li>
+      <li class="amen fade-up" data-delay="12"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i><span>Tea &amp; coffee</span></li>
     </ul>
   </div>
 </section>
 
-</main>
+<!-- CITIES -->
+<section class="cities" id="cities" aria-labelledby="cities-title">
+  <div class="wrap">
+    <div class="section-head fade-up">
+      <h2 id="cities-title">Three cities.</h2>
+      <p>One standard of quiet, well-run hospitality.</p>
+    </div>
+    <div class="city-list">
+      <a class="city fade-up" href="{% url 'public:locations' %}#vellore" data-delay="1">
+        <span class="city-name">Vellore</span>
+        <span class="city-meta"><b>Tamil Nadu</b>Close to the CMC campus and the main business district.</span>
+        <i class="fa-solid fa-arrow-right city-arrow" aria-hidden="true"></i>
+      </a>
+      <a class="city fade-up" href="{% url 'public:locations' %}#chennai" data-delay="2">
+        <span class="city-name">Chennai</span>
+        <span class="city-meta"><b>Tamil Nadu</b>In Alwarpet, near Citi Centre, Marina Beach and the US Consulate.</span>
+        <i class="fa-solid fa-arrow-right city-arrow" aria-hidden="true"></i>
+      </a>
+      <a class="city fade-up" href="{% url 'public:locations' %}#bengaluru" data-delay="3">
+        <span class="city-name">Bengaluru</span>
+        <span class="city-meta"><b>Karnataka</b>In Indiranagar, minutes from cafés, tech parks and shopping.</span>
+        <i class="fa-solid fa-arrow-right city-arrow" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+</section>
 
 <section class="section">
   <div class="wrap">
-    <div class="section-head">
-      <h2>Fewer steps between <span class="accent">arriving</span> and settling in.</h2>
+    <div class="section-head fade-up">
+      <h2>Fewer steps between arriving and settling in.</h2>
       <p>Everything from finding a room to checking out runs through one system, so nothing gets lost between the booking and the front desk.</p>
     </div>
     <div class="service-grid">
-      <div class="service">
+      <div class="service fade-up" data-delay="1">
         <i class="fa-solid fa-bed"></i>
         <h3>Room operations</h3>
         <p>Availability, pricing and status stay in sync across every channel a room is listed on.</p>
       </div>
-      <div class="service">
+      <div class="service fade-up" data-delay="2">
         <i class="fa-regular fa-address-card"></i>
         <h3>Guest history</h3>
         <p>Preferences and past stays are on hand the moment a returning guest checks in.</p>
       </div>
-      <div class="service">
+      <div class="service fade-up" data-delay="3">
         <i class="fa-solid fa-receipt"></i>
         <h3>Billing, itemized</h3>
         <p>Every charge is traceable — no surprise line items at checkout, for guests or for staff.</p>
@@ -452,45 +789,210 @@
   </div>
 </section>
 
+<!-- HOW BOOKING WORKS -->
+<section class="section steps-section" id="how-it-works" aria-labelledby="steps-title">
+  <div class="wrap">
+    <div class="section-head fade-up">
+      <h2 id="steps-title">Book in four steps.</h2>
+      <p>No account, no back-and-forth. You'll know your room and rate before you confirm.</p>
+    </div>
+    <div class="steps">
+      <div class="step fade-up" data-delay="1">
+        <h3>Choose a property</h3>
+        <p>Pick Vellore, Chennai or Bengaluru and view photos and the location on the map.</p>
+      </div>
+      <div class="step fade-up" data-delay="2">
+        <h3>Set your dates</h3>
+        <p>Enter check-in, check-out and guests to see what's available.</p>
+      </div>
+      <div class="step fade-up" data-delay="3">
+        <h3>Select a room</h3>
+        <p>Compare room types and nightly rates, with every charge itemized.</p>
+      </div>
+      <div class="step fade-up" data-delay="4">
+        <h3>Confirm and arrive</h3>
+        <p>Your details are ready at the front desk when you walk in.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INQUIRY FORM -->
+{% include 'public/_inquiry_form.html' %}
+
+<!-- GUEST REVIEWS (placeholder text: replace with real reviews before going live) -->
+<section class="section" id="reviews" aria-labelledby="reviews-title">
+  <div class="wrap">
+    <div class="section-head fade-up">
+      <h2 id="reviews-title">What guests say.</h2>
+      <p>Notes from people who stayed a few nights, and a few months.</p>
+    </div>
+    <div class="review-grid">
+      <figure class="review lead fade-up" data-delay="1">
+        <div>
+          <div class="stars" aria-label="5 out of 5">★★★★★</div>
+          <blockquote>“Replace with a real guest review about a longer stay — the kitchen, the quiet, the front desk.”</blockquote>
+        </div>
+        <figcaption><cite>Guest name<small>Stayed in Chennai</small></cite></figcaption>
+      </figure>
+      <figure class="review fade-up" data-delay="2">
+        <div>
+          <div class="stars" aria-label="5 out of 5">★★★★★</div>
+          <blockquote>“Replace with a real review. Check-in was quick and the apartment felt like home.”</blockquote>
+        </div>
+        <figcaption><cite>Guest name<small>Stayed in Vellore</small></cite></figcaption>
+      </figure>
+      <figure class="review fade-up" data-delay="3">
+        <div>
+          <div class="stars" aria-label="5 out of 5">★★★★★</div>
+          <blockquote>“Replace with a real review. Great location and a clear bill at checkout.”</blockquote>
+        </div>
+        <figcaption><cite>Guest name<small>Stayed in Bengaluru</small></cite></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section amen-section" id="faq" aria-labelledby="faq-title">
+  <div class="wrap faq-grid">
+    <div class="section-head fade-up">
+      <h2 id="faq-title">Questions, answered.</h2>
+      <p class="faq-note">Can't find what you need? <a href="{% url 'public:contact' %}">Contact us</a> and we'll reply quickly.</p>
+    </div>
+    <div class="faq-list fade-up" data-delay="1">
+      <details>
+        <summary>What are the check-in and check-out times? <i class="fa-solid fa-plus" aria-hidden="true"></i></summary>
+        <p>Times vary slightly by property and are listed in each property's details. Open a stay above to see them. The front desk is staffed 24/7 for late arrivals.</p>
+      </details>
+      <details>
+        <summary>Do the apartments have a kitchen? <i class="fa-solid fa-plus" aria-hidden="true"></i></summary>
+        <p>Yes. Apartments include an equipped kitchen, so longer stays feel closer to home.</p>
+      </details>
+      <details>
+        <summary>Is parking available? <i class="fa-solid fa-plus" aria-hidden="true"></i></summary>
+        <p>Free parking is available for guests. Tell us about your vehicle when you book so we can plan for it.</p>
+      </details>
+      <details>
+        <summary>Can I book for a month or longer? <i class="fa-solid fa-plus" aria-hidden="true"></i></summary>
+        <p>Yes. Use the inquiry form on this page with your dates and we'll share long-stay options.</p>
+      </details>
+      <details>
+        <summary>What ID do I need at check-in? <i class="fa-solid fa-plus" aria-hidden="true"></i></summary>
+        <p>Every guest must present a valid government-issued photo ID at check-in. Foreign nationals should carry a passport and valid visa.</p>
+      </details>
+      <details>
+        <summary>How do I change or cancel a booking? <i class="fa-solid fa-plus" aria-hidden="true"></i></summary>
+        <p>Call or message us on WhatsApp with your booking details. Cancellation terms are listed in our <a href="{% url 'public:terms' %}">Terms and Conditions</a>.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING CTA BAND -->
+<section class="cta-band" aria-labelledby="cta-title">
+  <div class="bg"></div>
+  <div class="scrim"></div>
+  <div class="wrap cta-inner">
+    <div class="fade-up">
+      <h2 id="cta-title">Ready for a stay that feels like yours?</h2>
+      <p>Pick your dates and see what's available tonight.</p>
+    </div>
+    <div class="cta-actions fade-up" data-delay="1">
+      <a class="btn-light" href="#find-stay">Check availability</a>
+      <a class="btn-ghost" href="{% url 'public:contact' %}">Talk to us</a>
+    </div>
+  </div>
+</section>
 
 <section class="section about" id="about">
   <div class="wrap about-grid">
-    <div class="about-text">
+    <div class="about-text fade-up">
       <h2>Hospitality should be easy to forget you're managing.</h2>
       <p>A good stay isn't measured by the room alone — it's the absence of friction everywhere around it: the booking, the check-in, the bill.</p>
       <p>M Square keeps rooms, reservations and billing in one place, so guests get a smoother stay and the team behind it keeps a clear view of everything running.</p>
     </div>
-    <div class="about-img">
+    <div class="about-img fade-up" data-delay="1">
       <div class="frame">
-        <img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1400&q=80" alt="Interior">
+        <img src="{% static 'img/about.png' %}" alt="Interior">
       </div>
       <div class="quote">"The best system is the one you stop noticing."</div>
     </div>
   </div>
 </section>
 
+</main>
 
-<!-- FOOTER: all content in one single line -->
 <footer class="site">
   <div class="wrap">
-    <div class="foot-line">
-      <div class="foot-brand">
-        <div class="brand-mark"><i class="fa-solid fa-hotel"></i></div>
-        <div>
-          <p class="brand-name">M Square</p>
-          <p class="brand-sub">Serviced Apartments</p>
+    <div class="foot-top">
+
+      <div class="foot-news fade-up">
+        <p class="foot-wordmark">
+            <img src="{% static 'img/black-logo.png' %}" alt="M Square" style="width: 150px; height: auto;">
+        </p>
+        <p class="foot-lede">Join our newsletter to stay up to date on new stays and offers.</p>
+        <!-- TODO: set the form action to your newsletter endpoint -->
+
+        <p class="foot-note">By subscribing you agree to our <a href="{% url 'public:privacy' %}">Privacy Policy</a> and provide consent to receive updates from our company.</p>
+      </div>
+
+      <div class="foot-cols">
+        <div class="foot-col fade-up" data-delay="1">
+          <h4>Our Locations</h4>
+          <ul>
+            <li><a href="{% url 'public:locations' %}#vellore">Vellore</a></li>
+            <li><a href="{% url 'public:locations' %}#chennai">Chennai</a></li>
+            <li><a href="{% url 'public:locations' %}#bengaluru">Bengaluru</a></li>
+          </ul>
+        </div>
+        <div class="foot-col fade-up" data-delay="2">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{% url 'public:stays' %}">Rooms</a></li>
+            <li><a href="{% url 'public:landing' %}#amenities">Amenities</a></li>
+            <li><a href="{% url 'public:gallery' %}">Gallery</a></li>
+            <li><a href="{% url 'public:contact' %}">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="foot-col foot-social fade-up" data-delay="3">
+          <h4>Follow Us</h4>
+          <ul>
+            <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i> Facebook</a></li>
+            <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i> Instagram</a></li>
+            <li><a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a></li>
+          </ul>
         </div>
       </div>
-      <nav class="foot-links" aria-label="Footer">
-        <a href="{% url 'public:stays' %}">Rooms</a>
-        <a href="#amenities">Amenities</a>
-        <button type="button" data-open-contact>Contact</button>
-      </nav>
-      <p class="foot-copy">© 2026 M Square Hotel. All rights reserved.</p>
+
+    </div>
+
+    <div class="foot-bottom">
+      <div class="foot-bottom-l">
+        <p>© 2026 M Square Hotel. All rights reserved.</p>
+      </div>
+      <div class="foot-bottom-r">
+        <div class="foot-links">
+          <a href="{% url 'public:privacy' %}">Privacy Policy</a>
+          <a href="{% url 'public:terms' %}">Terms and Conditions</a>
+          <a href="{% url 'public:contact' %}">Contact Us</a>
+        </div>
+        <a class="mck-credit" href="https://mckbytes.com/" target="_blank" rel="noopener">
+          <span>Created by</span>
+          <img src="https://mckbytes.com/static/img/LOGO/logo.png" alt="MCK Bytes">
+        </a>
+      </div>
     </div>
   </div>
 </footer>
 
+<!-- ================= FLOATING ACTION BUTTON ================= -->
+<a class="fab fab-call" href="tel:+910000000000" aria-label="Call us">
+  <i class="fa-solid fa-phone"></i>
+</a>
+<a class="fab fab-whatsapp" href="https://wa.me/910000000000" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
 
 <!-- ================= CONTACT POPUP ================= -->
 <div id="contact-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="contact-title">
@@ -536,7 +1038,6 @@
   </div>
 </div>
 
-
 <!-- ================= PROPERTY POPUP ================= -->
 {{ property_cards|json_script:"property-data" }}
 
@@ -574,11 +1075,29 @@
   </div>
 </div>
 
-
 <script>
 (function () {
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- intersection observer for fade-up ---------- */
+  var fadeEls = document.querySelectorAll('.fade-up');
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: '0px 0px -60px 0px',
+      threshold: 0.1
+    });
+    fadeEls.forEach(function (el) { observer.observe(el); });
+  } else {
+    fadeEls.forEach(function (el) { el.classList.add('visible'); });
+  }
 
   /* ---------- shared modal helper ---------- */
   function createModal(el) {
@@ -630,6 +1149,39 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && mobileNav.classList.contains('open')) { closeMenu(); menuBtn.focus(); }
   });
+
+  /* ---------- header border on scroll ---------- */
+  var header = $('site-header');
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- Our Hotels dropdown ---------- */
+  var dropdown = $('hotels-dropdown');
+  if (dropdown) {
+    var toggleBtn = dropdown.querySelector('button');
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+    toggleBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = dropdown.classList.toggle('open');
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!dropdown.contains(e.target)) closeDropdown();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && dropdown.classList.contains('open')) {
+        closeDropdown();
+        toggleBtn.focus();
+      }
+    });
+    dropdown.querySelectorAll('.dropdown-hotel, .dropdown-footer a').forEach(function (link) {
+      link.addEventListener('click', closeDropdown);
+    });
+  }
 
   /* ---------- search panel sits 20% inside the hero ---------- */
   var panel = $('search-panel');

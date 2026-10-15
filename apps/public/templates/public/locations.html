@@ -1,0 +1,473 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Our Locations — M Square Serviced Apartments</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  :root{
+    --ink:#15181B; --paper:#F6F3EC; --paper-2:#EFEAE0;
+    --bottle:#000000; --bottle-light:#2A2D30; /* was green; now black */
+    --stone:#8B8375; --stone-light:#B8B0A0;
+    --white:#FFFFFF; --line:rgba(21,24,27,0.10);
+    --gold:#D4A843;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
+  html{ scroll-behavior:smooth; scroll-padding-top:72px; -webkit-text-size-adjust:100%; }
+  body{ margin:0; font-family:var(--font); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overflow-x:clip; line-height:1.5; }
+  h1,h2,h3,h4,p,ul{ margin:0; padding:0; }
+  ul{ list-style:none; }
+  a{ color:inherit; text-decoration:none; }
+  img{ display:block; max-width:100%; }
+  button{ font:inherit; color:inherit; }
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  @media (min-width:1024px){ .wrap{ padding:0 40px; } }
+
+  /* ---------- header ---------- */
+  .brand-logo{ height:36px; width:auto; display:block; }
+  header.site{ position:sticky; top:0; z-index:60; background:rgba(0,0,0,0.88); -webkit-backdrop-filter:saturate(180%) blur(18px); backdrop-filter:saturate(180%) blur(18px); color:#fff; padding-top:env(safe-area-inset-top,0px); border-bottom:1px solid transparent; transition:border-color .25s ease; }
+  header.site.scrolled{ border-bottom-color:rgba(255,255,255,0.14); }
+  .head-row{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; height:68px; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:12px; justify-self:start; }
+  .brand-name{ font-size:21px; font-weight:600; letter-spacing:-0.04em; color:#fff; line-height:1; }
+  .brand-sub{ font-size:12px; font-weight:400; color:rgba(255,255,255,0.55); line-height:1; padding-left:12px; border-left:1px solid rgba(255,255,255,0.3); }
+  @media (max-width:420px){ .brand-sub{ display:none; } }
+
+  .nav{ display:none; align-items:center; gap:4px; justify-self:end; }
+  .nav a, .nav-dropdown > button{ background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.8); font-size:14px; font-weight:500; letter-spacing:-0.01em; padding:10px 14px; border-radius:980px; transition:background .2s ease; }
+  .nav a:hover, .nav-dropdown > button:hover, .nav-dropdown.open > button{ background:rgba(255,255,255,0.12); color:#fff; }
+
+  .head-cta{ display:none; justify-self:end; align-items:center; background:#fff; color:#000; font-size:14px; font-weight:500; letter-spacing:-0.01em; padding:10px 20px; border-radius:980px; transition:background .2s ease; }
+  .head-cta:hover{ background:var(--paper-2); }
+
+  .nav-dropdown{ position:relative; }
+  .nav-dropdown > button{ display:flex; align-items:center; gap:8px; }
+  .nav-dropdown > button i{ font-size:8px; transition:transform .25s ease; }
+  .nav-dropdown.open > button i{ transform:rotate(180deg); }
+
+  .dropdown-panel{
+    position:absolute; top:calc(100% + 16px); left:50%; margin-left:-340px;
+    width:680px; background:#fff; color:var(--ink);
+    border-radius:10px; box-shadow:0 28px 70px rgba(21,24,27,0.16); border:1px solid var(--line);
+    opacity:0; visibility:hidden; transform:translateY(-6px);
+    transition:opacity .2s ease, transform .2s ease, visibility .2s;
+    z-index:80; overflow:hidden;
+  }
+  .nav-dropdown.open .dropdown-panel{ opacity:1; visibility:visible; transform:translateY(0); }
+  .dropdown-inner{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px; }
+  .dropdown-col{ padding:16px 14px 14px; border-radius:6px; transition:background .2s ease; }
+  .dropdown-col:hover{ background:var(--paper); }
+  .dropdown-city{ font-size:12.5px; font-weight:400; color:var(--stone); margin-bottom:6px; }
+  .dropdown-hotel{ display:block; font-size:16px; font-weight:600; letter-spacing:-0.02em; line-height:1.25; color:var(--ink) !important; cursor:pointer; }
+  .dropdown-footer{ border-top:1px solid var(--line); padding:14px 26px; background:var(--paper); }
+  .dropdown-footer a{ font-size:13.5px; font-weight:500; color:var(--bottle) !important; display:inline-block; }
+  .dropdown-footer a:hover{ text-decoration:underline; text-underline-offset:3px; }
+
+  .menu-btn{ justify-self:end; width:44px; height:44px; margin-right:-12px; border:none; background:none; color:#fff; cursor:pointer; font-size:18px; grid-column:3; }
+  .mobile-nav{ display:none; background:#000; border-top:1px solid rgba(255,255,255,0.14); padding:8px 24px 28px; max-height:calc(100vh - 68px); overflow-y:auto; }
+  .mobile-nav.open{ display:block; }
+  .mobile-nav a{ display:block; color:#fff; font-size:26px; font-weight:600; letter-spacing:-0.03em; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.12); }
+  .mobile-nav .sub{ font-size:16px; font-weight:400; letter-spacing:-0.01em; color:rgba(255,255,255,0.6); padding:12px 0 12px 16px; border-bottom:none; }
+  .mobile-nav .sub:last-of-type{ margin-bottom:6px; }
+  @media (min-width:900px){
+    .nav{ display:flex; } .head-cta{ display:inline-flex; } .menu-btn{ display:none; } .mobile-nav{ display:none !important; }
+  }
+
+  /* ---------- page title ---------- */
+  .page-title{ padding:88px 24px 72px; }
+  .page-title h1{ font-size:clamp(44px,8vw,88px); font-weight:600; line-height:1.03; letter-spacing:-0.045em; max-width:12ch; }
+  .page-title p{ font-size:clamp(19px,2.4vw,26px); font-weight:400; line-height:1.3; letter-spacing:-0.015em; color:var(--stone); margin-top:24px; max-width:26ch; }
+  @media (min-width:1024px){ .page-title{ padding:128px 40px 104px; } }
+
+  /* ---------- locations ---------- */
+  .locations-section{ padding-bottom:40px; }
+  .location-row{ display:grid; gap:32px; padding:56px 0; border-top:1px solid var(--line); scroll-margin-top:56px; }
+  @media (min-width:900px){
+    .location-row{ grid-template-columns:7fr 5fr; gap:80px; padding:88px 0; align-items:center; }
+    .location-row:nth-child(even) .location-map{ order:2; }
+  }
+
+  .location-map{ position:relative; aspect-ratio:4/3; background:var(--paper-2); border-radius:4px; overflow:hidden; }
+  @media (min-width:900px){ .location-map{ aspect-ratio:5/4; } }
+  .location-map iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; filter:grayscale(.55) contrast(.96); transition:filter .5s ease; }
+  .location-map:hover iframe{ filter:grayscale(0); }
+
+  .location-info{ display:flex; flex-direction:column; align-items:flex-start; }
+  .location-info h2{ font-size:clamp(34px,4.4vw,52px); font-weight:600; line-height:1.06; letter-spacing:-0.035em; }
+  .location-info h2 span{ display:block; font-size:clamp(17px,1.6vw,20px); font-weight:400; letter-spacing:-0.01em; color:var(--stone); margin-top:10px; }
+
+  .location-desc{ font-size:17px; line-height:1.55; letter-spacing:-0.01em; color:#3A3D40; margin-top:28px; max-width:44ch; }
+  .location-address{ font-size:15px; line-height:1.65; color:var(--ink); margin-top:28px; padding-top:20px; border-top:1px solid var(--line); width:100%; font-style:normal; }
+
+  .btn-directions{
+    display:inline-flex; align-items:center; gap:10px;
+    margin-top:32px;
+    background:var(--bottle); color:#fff;
+    border-radius:980px; padding:13px 26px;
+    font-size:15px; font-weight:500; letter-spacing:-0.01em;
+    transition:background .2s ease;
+  }
+  .btn-directions:hover{ background:var(--bottle-light); }
+  .btn-directions i{ font-size:12px; color:var(--gold); }
+
+  /* ---------- footer ---------- */
+  footer.site{ background:var(--paper-2); color:var(--bottle); padding:80px 0 0; margin-top:48px; border-top:1px solid var(--line); }
+  .foot-top{ display:grid; gap:56px; padding-bottom:64px; }
+  @media (min-width:900px){ .foot-top{ grid-template-columns:1.25fr 1fr; gap:80px; } }
+  .foot-wordmark{ font-size:36px; font-weight:600; letter-spacing:-0.045em; line-height:1; color:var(--bottle); }
+  .foot-wordmark span{ font-size:13px; font-weight:400; letter-spacing:0; color:var(--stone); margin-left:10px; }
+  .foot-lede{ font-size:17px; line-height:1.45; letter-spacing:-0.01em; margin-top:18px; max-width:38ch; }
+  .foot-form{ display:flex; align-items:flex-end; gap:20px; margin-top:36px; max-width:460px; }
+  .foot-form input{ flex:1; min-width:0; background:transparent; border:none; border-bottom:1px solid var(--bottle); border-radius:0; padding:10px 0 12px; font:inherit; font-size:16px; color:var(--ink); outline:none; transition:border-color .2s ease, box-shadow .2s ease; }
+  .foot-form input::placeholder{ color:var(--stone); opacity:1; }
+  .foot-form input:focus{ border-bottom-color:var(--gold); box-shadow:0 1px 0 var(--gold); }
+  .foot-form button{ background:var(--bottle); color:#fff; border:none; border-radius:980px; padding:13px 26px; font-size:15px; font-weight:500; letter-spacing:-0.01em; cursor:pointer; transition:background .2s ease; flex-shrink:0; }
+  .foot-form button:hover{ background:var(--bottle-light); }
+  .foot-note{ font-size:12px; line-height:1.5; color:var(--stone); margin-top:16px; max-width:46ch; }
+  .foot-note a{ color:var(--bottle); text-decoration:underline; text-underline-offset:2px; }
+
+  .foot-cols{ display:grid; grid-template-columns:1fr 1fr; gap:40px 32px; align-content:start; }
+  @media (min-width:900px){ .foot-cols{ grid-template-columns:auto auto auto; justify-content:end; gap:48px; } }
+  .foot-col h4{ font-size:14px; font-weight:600; letter-spacing:-0.01em; margin-bottom:18px; }
+  .foot-col ul{ display:flex; flex-direction:column; gap:12px; }
+  .foot-col li{ font-size:14px; line-height:1.4; }
+  .foot-col a{ transition:opacity .2s ease; }
+  .foot-col a:hover{ opacity:.6; }
+  .foot-social a{ display:flex; align-items:center; gap:12px; }
+  .foot-social i{ width:16px; text-align:center; font-size:16px; }
+
+  .foot-bottom{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px 32px; padding:26px 0 calc(28px + env(safe-area-inset-bottom,0px)); border-top:1px solid rgba(0,0,0,0.25); font-size:13px; }
+  .foot-bottom-l{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 28px; }
+  .foot-bottom-r{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:12px 32px; margin-left:auto; }
+  .foot-links{ display:flex; flex-wrap:wrap; gap:10px 28px; }
+  .foot-links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px; transition:opacity .2s ease; }
+  .foot-links a:hover{ opacity:.6; }
+  .mck-credit{ display:flex; align-items:center; gap:8px; color:var(--stone); transition:color .2s ease; }
+  .mck-credit:hover{ color:var(--bottle); }
+  .mck-credit img{ height:18px; width:auto; opacity:.9; opacity:.55; transition:opacity .2s ease; }
+  .mck-credit:hover img{ opacity:.9; }
+
+  /* ---------- floating action button ---------- */
+  .fab{
+    position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); right:20px; z-index:90;
+    width:52px; height:52px; border-radius:50%;
+    background:var(--bottle); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    transition:transform .2s ease, background .2s ease;
+  }
+  .fab:hover{ transform:scale(1.06); background:var(--bottle-light); }
+  .fab-call{ display:flex; }
+  .fab-whatsapp{ display:none; }
+  @media (min-width:800px){
+    .fab-call{ display:none; }
+    .fab-whatsapp{ display:flex; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+
+<body id="top">
+
+<header class="site" id="site-header">
+  <div class="wrap head-row">
+    <a class="brand" href="{% url 'public:landing' %}">
+      <span class="brand-name"><img src="{% static 'img/logo.png' %}" alt="M Square" class="brand-logo"></span>
+      <span class="brand-sub">Serviced Apartments</span>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <a href="{% url 'public:landing' %}">Home</a>
+
+      <div class="nav-dropdown" id="hotels-dropdown">
+        <button type="button" aria-expanded="false" aria-haspopup="true">
+          Our Hotels <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-panel" role="menu">
+          <div class="dropdown-inner">
+            <div class="dropdown-col">
+              <p class="dropdown-city">Vellore, Tamil Nadu</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#vellore" role="menuitem">M Square — Vellore</a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-city">Chennai, Tamil Nadu</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#chennai" role="menuitem">M Square — Chennai</a>
+            </div>
+            <div class="dropdown-col">
+              <p class="dropdown-city">Bengaluru, Karnataka</p>
+              <a class="dropdown-hotel" href="{% url 'public:locations' %}#bengaluru" role="menuitem">M Square — Bengaluru</a>
+            </div>
+          </div>
+          <div class="dropdown-footer">
+            <a href="{% url 'public:locations' %}" role="menuitem">Our Hotels Directory</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="{% url 'public:landing' %}#amenities">Amenities</a>
+      <a href="{% url 'public:about' %}">About Us</a>
+      <a href="{% url 'public:gallery' %}">Gallery</a>
+    </nav>
+
+    <a class="head-cta" href="{% url 'public:contact' %}">Contact</a>
+
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile">
+    <a href="{% url 'public:landing' %}">Home</a>
+    <a href="{% url 'public:locations' %}">Our Hotels</a>
+    <a class="sub" href="#vellore">M Square — Vellore</a>
+    <a class="sub" href="#chennai">M Square — Chennai</a>
+    <a class="sub" href="#bengaluru">M Square — Bengaluru</a>
+    <a href="{% url 'public:landing' %}#amenities">Amenities</a>
+    <a href="{% url 'public:landing' %}#about">About Us</a>
+    <a href="{% url 'public:contact' %}">Contact</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- PAGE TITLE -->
+  <section class="page-title wrap">
+    <h1>Our Locations</h1>
+    <p>Three cities. One standard of quiet, well-run hospitality.</p>
+  </section>
+
+  <!-- LOCATIONS -->
+  <section class="locations-section wrap">
+
+    <!-- ================= VELLORE ================= -->
+    <article class="location-row" id="vellore">
+      <div class="location-map">
+        <iframe
+          title="Map of M Square Vellore"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=Vellore,Tamil+Nadu,632001&output=embed">
+        </iframe>
+      </div>
+      <div class="location-info">
+        <h2>M Square — Vellore <span>Vellore, Tamil Nadu</span></h2>
+        <p class="location-desc">
+          Our flagship property in the heart of Vellore, offering quiet serviced apartments close to the CMC campus and the city's main business district. Ideal for extended stays, medical visits, and business travel.
+        </p>
+        <address class="location-address">
+          M Square Serviced Apartments,<br>
+          Your street address,<br>
+          Vellore, Tamil Nadu - 632001
+        </address>
+        <a class="btn-directions"
+           target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&destination=M+Square+Serviced+Apartments+Vellore+Tamil+Nadu+632001">
+          Get Directions <i class="fa-solid fa-diamond-turn-right"></i>
+        </a>
+      </div>
+    </article>
+
+    <!-- ================= CHENNAI ================= -->
+    <article class="location-row" id="chennai">
+      <div class="location-map">
+        <iframe
+          title="Map of M Square Chennai"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=Alwarpet,Chennai,Tamil+Nadu+600018&output=embed">
+        </iframe>
+      </div>
+      <div class="location-info">
+        <h2>M Square — Chennai <span>Chennai, Tamil Nadu</span></h2>
+        <p class="location-desc">
+          Located in the heart of Chennai's Alwarpet neighbourhood, our Chennai property is ideal for both business and leisure travellers, with easy access to the Citi Centre, Marina Beach, and the US Consulate.
+        </p>
+        <address class="location-address">
+          180, TT Krishnamachari Road,<br>
+          Alwarpet, Chennai,<br>
+          Tamil Nadu - 600018
+        </address>
+        <a class="btn-directions"
+           target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&destination=180+TT+Krishnamachari+Road+Alwarpet+Chennai+Tamil+Nadu+600018">
+          Get Directions <i class="fa-solid fa-diamond-turn-right"></i>
+        </a>
+      </div>
+    </article>
+
+    <!-- ================= BENGALURU ================= -->
+    <article class="location-row" id="bengaluru">
+      <div class="location-map">
+        <iframe
+          title="Map of M Square Bengaluru"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=Indiranagar,Bengaluru,Karnataka+560038&output=embed">
+        </iframe>
+      </div>
+      <div class="location-info">
+        <h2>M Square — Bengaluru <span>Bengaluru, Karnataka</span></h2>
+        <p class="location-desc">
+          Set in the leafy neighbourhood of Indiranagar, our Bengaluru property puts you minutes from the city's best cafés, tech parks, and shopping. Perfect for longer corporate stays and weekend getaways.
+        </p>
+        <address class="location-address">
+          M Square Serviced Apartments,<br>
+          Your street address,<br>
+          Bengaluru, Karnataka - 560038
+        </address>
+        <a class="btn-directions"
+           target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&destination=M+Square+Serviced+Apartments+Indiranagar+Bengaluru+Karnataka+560038">
+          Get Directions <i class="fa-solid fa-diamond-turn-right"></i>
+        </a>
+      </div>
+    </article>
+
+  </section>
+
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-top">
+
+      <div class="foot-news">
+        <p class="foot-wordmark">
+            <img src="{% static 'img/black-logo.png' %}" style="width: 150px; height: auto;">
+        </p>
+        <p class="foot-lede">Join our newsletter to stay up to date on new stays and offers.</p>
+        <!-- TODO: set the form action to your newsletter endpoint -->
+     
+        <p class="foot-note">By subscribing you agree to our <a href="{% url 'public:privacy' %}">Privacy Policy</a> and provide consent to receive updates from our company.</p>
+      </div>
+
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Our Locations</h4>
+          <ul>
+            <li><a href="#vellore">Vellore</a></li>
+            <li><a href="#chennai">Chennai</a></li>
+            <li><a href="#bengaluru">Bengaluru</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{% url 'public:stays' %}">Rooms</a></li>
+            <li><a href="{% url 'public:landing' %}#amenities">Amenities</a></li>
+            <li><a href="{% url 'public:contact' %}">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="foot-col foot-social">
+          <h4>Follow Us</h4>
+          <ul>
+            <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i> Facebook</a></li>
+            <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i> Instagram</a></li>
+            <li><a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="foot-bottom">
+      <div class="foot-bottom-l">
+        <p>© 2026 M Square Hotel. All rights reserved.</p>
+      </div>
+      <div class="foot-bottom-r">
+        <div class="foot-links">
+          <a href="{% url 'public:privacy' %}">Privacy Policy</a>
+          <a href="{% url 'public:terms' %}">Terms and Conditions</a>
+          <a href="{% url 'public:contact' %}">Contact Us</a>
+        </div>
+        <a class="mck-credit" href="https://mckbytes.com/" target="_blank" rel="noopener">
+          <span>Created by</span>
+          <img src="https://mckbytes.com/static/img/LOGO/logo.png" alt="MCK Bytes">
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= FLOATING ACTION BUTTON ================= -->
+<a class="fab fab-call" href="tel:+910000000000" aria-label="Call us">
+  <i class="fa-solid fa-phone"></i>
+</a>
+<a class="fab fab-whatsapp" href="https://wa.me/910000000000" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- mobile menu ---------- */
+  var menuBtn = $('menu-btn'), mobileNav = $('mobile-nav');
+  function closeMenu() {
+    mobileNav.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.querySelector('i').className = 'fa-solid fa-bars';
+  }
+  menuBtn.addEventListener('click', function () {
+    var open = mobileNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.querySelector('i').className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+  });
+  mobileNav.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && mobileNav.classList.contains('open')) { closeMenu(); menuBtn.focus(); }
+  });
+
+  /* ---------- header border on scroll ---------- */
+  var header = $('site-header');
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- Our Hotels dropdown ---------- */
+  var dropdown = $('hotels-dropdown');
+  if (dropdown) {
+    var toggleBtn = dropdown.querySelector('button');
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+    toggleBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = dropdown.classList.toggle('open');
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!dropdown.contains(e.target)) closeDropdown();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && dropdown.classList.contains('open')) {
+        closeDropdown();
+        toggleBtn.focus();
+      }
+    });
+    dropdown.querySelectorAll('.dropdown-hotel, .dropdown-footer a').forEach(function (link) {
+      link.addEventListener('click', closeDropdown);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

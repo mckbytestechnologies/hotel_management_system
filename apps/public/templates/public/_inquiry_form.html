@@ -1,0 +1,75 @@
+<style>
+  .inquiry-alert{ padding:13px 16px; border-radius:4px; font-size:14px; margin-bottom:20px; }
+  .inquiry-alert.ok{ background:rgba(31,61,51,0.09); color:#1F3D33; border:1px solid rgba(31,61,51,0.25); }
+  .inquiry-alert.bad{ background:#FBEDE8; color:#8A3A28; border:1px solid #EBC2B5; }
+  .hp-field{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+</style>
+
+<!-- INQUIRY FORM -->
+<section class="inquiry-section wrap" id="inquiry">
+  <h2 class="inquiry-title">Information &amp; Query Form</h2>
+
+  {% if request.GET.inquiry == 'sent' %}
+    <div class="inquiry-alert ok" role="status">Thank you. We have received your enquiry and will get back to you shortly.</div>
+  {% elif request.GET.inquiry == 'limit' %}
+    <div class="inquiry-alert bad" role="alert">You have sent several enquiries recently. Please try again later or call us.</div>
+  {% elif request.GET.inquiry == 'error' %}
+    <div class="inquiry-alert bad" role="alert">We could not send your enquiry. Please check the details and try again.</div>
+  {% endif %}
+
+  <form class="inquiry-form" method="post" action="{% url 'public:inquiry' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+
+    <!-- Honeypot: leave empty. Hidden from people, filled in by bots. -->
+    <div class="hp-field" aria-hidden="true">
+      <input type="text" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="form-row">
+      <label for="contact-name">Name</label>
+      <div class="field-wrap">
+        <input type="text" id="contact-name" name="name" class="form-control" placeholder="Enter your name here" maxlength="100" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="contact-email">Email</label>
+      <div class="field-wrap">
+        <input type="email" id="contact-email" name="email" class="form-control" placeholder="Enter your valid email ID here" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="contact-phone">Phone</label>
+      <div class="field-wrap">
+        <div class="phone-group">
+          <span class="phone-flag"><img src="https://flagcdn.com/w40/in.png" alt="IN"></span>
+          <input type="tel" id="contact-phone" name="phone" class="form-control" placeholder="Enter your phone number here" maxlength="20" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="contact-hotel">Our Hotels</label>
+      <div class="field-wrap">
+        <select id="contact-hotel" name="hotel" class="form-select" required>
+          <option value="">Select a hotel</option>
+          <option value="M Square - Chennai">M Square — Chennai</option>
+          <option value="M Square - Tirupati">M Square — Tirupati</option>
+          <option value="M Square - Vellore">M Square — Vellore</option>
+          <option value="M Square - Bengaluru">M Square — Bengaluru</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="contact-comment">Comment</label>
+      <div class="field-wrap">
+        <textarea id="contact-comment" name="comment" class="form-control" placeholder="How can we help you?" maxlength="2000" required></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit">Submit</button>
+  </form>
+</section>

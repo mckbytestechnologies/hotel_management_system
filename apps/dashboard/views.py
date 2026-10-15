@@ -32,6 +32,9 @@ from django.views import View
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from apps.properties.models import Property, PropertyImage
+from apps.public.models import Inquiry
+from django.views.generic import ListView
+
 
 class DashboardHomeView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/home.html'
@@ -610,3 +613,25 @@ class GlobalSearchView(LoginRequiredMixin, TemplateView):
         ).select_related('property', 'room_type')[:20]
 
         return context
+
+
+
+class InquiryListView(BaseListView):
+    module = Module.PROPERTIES
+    model = Inquiry
+    ordering = ['-id']
+    page_title = 'Website Enquiries'
+    singular_name = 'Enquiry'
+    add_url_name = None
+    edit_url_name = None
+    delete_url_name = None
+    view_url_name = None
+
+    columns = [
+        {'label': 'Name', 'field': 'name'},
+        {'label': 'Email', 'field': 'email'},
+        {'label': 'Phone', 'field': 'phone'},
+        {'label': 'Hotel', 'field': 'hotel'},
+        {'label': 'Message', 'field': 'comment'},
+    ]
+

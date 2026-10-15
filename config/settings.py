@@ -85,6 +85,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
@@ -120,7 +121,7 @@ CACHES = {
 
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')
 RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='')
-
+RAZORPAY_WEBHOOK_SECRET = env('RAZORPAY_WEBHOOK_SECRET', default='')
 
 STAAH_API_BASE_URL = env('STAAH_API_BASE_URL', default='https://api.staah.com')
 STAAH_API_KEY = env('STAAH_API_KEY', default='')

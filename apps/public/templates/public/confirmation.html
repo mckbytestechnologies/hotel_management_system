@@ -98,6 +98,10 @@ document.getElementById('pay-now-btn')?.addEventListener('click', async function
             body: JSON.stringify({ booking_id: {{ booking.id }} })
         });
         const orderData = await orderRes.json();
+        if (!orderRes.ok) {
+            alert(orderData.detail || 'Online payment is not available for this property right now. Please contact the property.');
+            return;
+        }
 
         const options = {
             key: orderData.razorpay_key_id,
